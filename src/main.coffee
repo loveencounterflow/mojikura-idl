@@ -106,6 +106,7 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_as_csl = ( me, R = null ) ->
   token           = me.tokens[ me.idx ]
+  throw new Error "syntax error (premature end of source #{rpr me.source}" unless token?
   me.idx         += +1
   # argument_count  = 0
   operator_count  = 0

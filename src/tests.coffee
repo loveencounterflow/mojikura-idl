@@ -101,6 +101,8 @@ nice_text_rpr = ( text ) ->
     ["","syntax error (empty text)"]
     ["⿱⿰亻式⿱目八木木木","syntax error @ token idx 7 of '⿱⿰亻式⿱目八木木木'"]
     ["⿺廴聿123","syntax error @ token idx 3 of '⿺廴聿123'"]
+    ["⿺","syntax error (premature end of source '⿺'"]
+    ["⿺⿺⿺⿺","syntax error (premature end of source '⿺⿺⿺⿺'"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -117,7 +119,7 @@ nice_text_rpr = ( text ) ->
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
-    "demo"
+    # "demo"
     "parse simple formulas"
     "reject bogus formulas"
     ]
