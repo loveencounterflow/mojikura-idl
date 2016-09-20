@@ -25,16 +25,16 @@ module.exports = O =
 
   idl:
     operators:
-      ⿰: { name: 'left/right',    arity: 2, }
-      ⿱: { name: 'top/down',      arity: 2, }
-      ⿴: { name: 'surround',      arity: 2, }
-      ⿵: { name: 'cap',           arity: 2, }
-      ⿶: { name: 'cup',           arity: 2, }
-      ⿷: { name: 'left-embrace',  arity: 2, }
-      ⿸: { name: 'topleft',       arity: 2, }
-      ⿹: { name: 'topright',      arity: 2, }
-      ⿺: { name: 'leftbottom',    arity: 2, }
-      ⿻: { name: 'interlace',     arity: 2, }
-      ⿲: { name: 'pillars',       arity: 3, }
-      ⿳: { name: 'layers',        arity: 3, }
+      '⿰': { name: 'left/right',    arity: 2, }
+      '⿱': { name: 'top/down',      arity: 2, }
+      '⿴': { name: 'surround',      arity: 2, }
+      '⿵': { name: 'cap',           arity: 2, }
+      '⿶': { name: 'cup',           arity: 2, }
+      '⿷': { name: 'left-embrace',  arity: 2, }
+      '⿸': { name: 'topleft',       arity: 2, }
+      '⿹': { name: 'topright',      arity: 2, }
+      '⿺': { name: 'leftbottom',    arity: 2, }
+      '⿻': { name: 'interlace',     arity: 2, }
+      '⿲': { name: 'pillars',       arity: 3, }
+      '⿳': { name: 'layers',        arity: 3, }
 

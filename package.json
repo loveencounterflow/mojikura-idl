@@ -4,7 +4,7 @@
   "description": "文字倉字形描述語言 MojiKura Ideographic Description Language",
   "main": "lib/main.js",
   "scripts": {
-    "build": "coffee --map -o lib -c src",
+    "build": "coffee --map -o lib -c src && coffee --map -o lib -c options.coffee",
     "push": "git add . && git commit -m'update' && git push",
     "doctoc": "doctoc README.md",
     "pub": "npm run build && npm run doctoc && npm run push && npm version patch && npm publish",
