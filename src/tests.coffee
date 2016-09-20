@@ -66,14 +66,51 @@ nice_text_rpr = ( text ) ->
     '⿱癶⿰弓貝'
     '⿱⿰亻式貝'
     '⿱⿰亻式⿱目八'
-    '⿱⿰亻式⿱目八木木木'
-    # '⿺辶言'
+    '⿺辶言'
+    # '⿱⿰亻式⿱目八木木木'
     # '⿺廴聿123'
     ]
   for source in sources
     help source
     p = IDL.parse source
-    urge '\n' + rpr p
+    urge JSON.stringify p
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "parse simple formulas" ] = ( T ) ->
+  probes_and_matchers = [
+    ["木","木"]
+    ["⿲木木木",["⿲","木","木","木"]]
+    ["⿱癶⿰弓貝",["⿱","癶",["⿰","弓","貝"]]]
+    ["⿱⿰亻式貝",["⿱",["⿰","亻","式"],"貝"]]
+    ["⿱⿰亻式⿱目八",["⿱",["⿰","亻","式"],["⿱","目","八"]]]
+    ["⿺辶言",["⿺","辶","言"]]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    result = IDL.parse probe
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "reject bogus formulas" ] = ( T ) ->
+  probes_and_matchers = [
+    [42,"expected a text, got a number"]
+    ["","syntax error (empty text)"]
+    ["⿱⿰亻式⿱目八木木木","syntax error @ token idx 7 of '⿱⿰亻式⿱目八木木木'"]
+    ["⿺廴聿123","syntax error @ token idx 3 of '⿺廴聿123'"]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    try
+      result = IDL.parse probe
+      T.fail "expected an exception, got result #{rpr result}"
+    catch error
+      warn JSON.stringify [ probe, error[ 'message' ], ]
+      T.eq error[ 'message' ], matcher
+  #.........................................................................................................
+  return null
 
 
 ############################################################################################################
@@ -81,6 +118,8 @@ unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
     "demo"
+    "parse simple formulas"
+    "reject bogus formulas"
     ]
   @_prune()
   @_main()

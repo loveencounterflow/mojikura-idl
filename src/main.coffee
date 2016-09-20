@@ -83,40 +83,49 @@ O                         = require './options'
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
 @parse = ( source ) ->
-  me  = @_new_parse source
-  R   = @_parse me
-  unless me.idx is me.tokens.length
-    throw new Error """syntax error
-      #{me.source}
-      #{me.idx}"""
+  return @_parse @as_csl source
+
+#-----------------------------------------------------------------------------------------------------------
+@_parse = ( csl ) ->
+  return csl.s unless CND.isa_list csl
+  R = []
+  for token in csl
+    R.push @_parse token
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_parse = ( me, R = null ) ->
+@as_csl = ( source ) ->
+  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
+  throw new Error "syntax error (empty text)" unless source.length > 0
+  me  = @_new_parse source
+  R   = @_as_csl me
+  unless me.idx is me.tokens.length
+    throw new Error "syntax error @ token idx #{me.idx} of #{rpr me.source}"
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
+@_as_csl = ( me, R = null ) ->
   token           = me.tokens[ me.idx ]
   me.idx         += +1
   # argument_count  = 0
   operator_count  = 0
   target          = null
   arity           = null
-  debug '30211', token
+  # debug '30211', token
   switch type = token.t
     when 'operator'
       operator_count += +1
       arity           = token.a
       target          = [ token, ]
       for count in [ 1 .. arity ] by +1
-        @_parse me, target
+        @_as_csl me, target
       if R? then  R.push target
       else        return target
     when 'component'
       if R? then  R.push token
       else        return token
     else
-      throw new Error """
-        unable to parse token of type #{type}
-        #{me.source}
-        #{me.idx}"""
+      throw new Error "unable to parse token of type #{type} @ token idx #{me.idx} of #{rpr me.source}"
   return R
 
 
