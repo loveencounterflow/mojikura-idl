@@ -82,12 +82,23 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @parse = ( source ) ->
   me  = @_new_parse source
-  debug '10111', me
-  R   = @_parse me, source
+  R   = @_parse me
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_parse = ( me, source ) ->
+@_parse = ( me, R = null, stack = null, idx = null ) ->
+  R     ?= []
+  stack ?= []
+  idx   ?= 0
+  token = me.tokens[ idx ]
+  switch type = token.t
+    when 'operator'
+      null
+    when 'component'
+      null
+    else
+      throw new Error """unable to parse token of type #{type}\n#{me.source}\n#{idx}"""
+  return R
 
 
 #===========================================================================================================
@@ -100,8 +111,9 @@ O                         = require './options'
     '⿺廴聿123'
     ]
   for source in sources
-    p       = @_new_parse source
+    p = @parse source
     debug '90777', p
+    break
     # for token in tokens
     #   nfo             = MKNCR.describe token
     #   tags            = nfo.tag ? []
