@@ -27,11 +27,23 @@ O                         = require './options'
    '~isa':    'MOJIKURA/IDL/parse'
    'grammar': O.idl
    'source':  source
+  R.tokens = @_tokenize R, source
   return R
 
 
 #===========================================================================================================
 # TOKENS
+#-----------------------------------------------------------------------------------------------------------
+@_tokenize = ( me, source ) ->
+  R       = []
+  chrs    = MKNCR.chrs_from_text source
+  cu_idx  = 1
+  for symbol in chrs
+    R.push @_new_token me, symbol, cu_idx
+    ### we're counting JS code units here ###
+    cu_idx += symbol.length
+  return R
+
 #-----------------------------------------------------------------------------------------------------------
 @_new_token = ( me, symbol, cu_idx ) ->
   type  = @_type_of_symbol me, symbol
@@ -64,30 +76,32 @@ O                         = require './options'
   # return 'rbracket'   if @_symbol_is_rbracket   me, symbol
   return 'other'
 
+
+#===========================================================================================================
+# PARSING
 #-----------------------------------------------------------------------------------------------------------
-@_tokenize = ( me ) ->
-  R       = []
-  chrs    = MKNCR.chrs_from_text me.source
-  cu_idx  = 1
-  for symbol in chrs
-    R.push @_new_token me, symbol, cu_idx
-    ### we're counting JS code units here ###
-    cu_idx += symbol.length
+@parse = ( source ) ->
+  me  = @_new_parse source
+  debug '10111', me
+  R   = @_parse me, source
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@parse = ( source ) ->
+@_parse = ( me, source ) ->
 
+
+#===========================================================================================================
+# DEMO
 #-----------------------------------------------------------------------------------------------------------
 @demo = ->
   sources = [
+    '⿲木木木'
     '⿺辶言'
     '⿺廴聿123'
     ]
   for source in sources
     p       = @_new_parse source
-    tokens  = @_tokenize p
-    debug '90777', tokens
+    debug '90777', p
     # for token in tokens
     #   nfo             = MKNCR.describe token
     #   tags            = nfo.tag ? []
