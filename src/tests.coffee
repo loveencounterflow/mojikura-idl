@@ -99,10 +99,12 @@ nice_text_rpr = ( text ) ->
   probes_and_matchers = [
     [42,"expected a text, got a number"]
     ["","syntax error (empty text)"]
-    ["⿱⿰亻式⿱目八木木木","syntax error @ token idx 7 of '⿱⿰亻式⿱目八木木木'"]
-    ["⿺廴聿123","syntax error @ token idx 3 of '⿺廴聿123'"]
-    ["⿺","syntax error (premature end of source '⿺'"]
-    ["⿺⿺⿺⿺","syntax error (premature end of source '⿺⿺⿺⿺'"]
+    ["⿱⿰亻式⿱目八木木木","syntax error (token idx 7 of '⿱⿰亻式⿱目八木木木')"]
+    ["⿺廴聿123","syntax error (token idx 3 of '⿺廴聿123')"]
+    ["⿺","syntax error (premature end of source '⿺')"]
+    ["⿺⿺⿺⿺","syntax error (premature end of source '⿺⿺⿺⿺')"]
+    ["⿺12","unable to parse token of type other (token idx 2 of '⿺12')"]
+    ["(⿰亻聿式)","unable to parse token of type other (token idx 1 of '(⿰亻聿式)')"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
