@@ -25,8 +25,10 @@ O                         = require './options'
 @_new_parse = ( source ) ->
   R =
    '~isa':    'MOJIKURA/IDL/parse'
-   'grammar': O.idl
-   'source':  source
+   grammar:   O.idl
+   source:    source
+   stack:     []
+   idx:       0
   R.tokens = @_tokenize R, source
   return R
 
@@ -37,7 +39,7 @@ O                         = require './options'
 @_tokenize = ( me, source ) ->
   R       = []
   chrs    = MKNCR.chrs_from_text source
-  cu_idx  = 1
+  cu_idx  = 0
   for symbol in chrs
     R.push @_new_token me, symbol, cu_idx
     ### we're counting JS code units here ###
@@ -86,16 +88,25 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_parse = ( me, R = null, stack = null, idx = null ) ->
-  R     ?= []
-  stack ?= []
-  idx   ?= 0
-  token = me.tokens[ idx ]
+@_parse = ( me, R = null ) ->
+  R              ?= []
+  token           = me.tokens[ me.idx ]
+  me.idx         += +1
+  # argument_count  = 0
+  operator_count  = 0
+  target          = null
+  arity           = null
+  debug '30211', token
   switch type = token.t
     when 'operator'
-      null
+      operator_count += +1
+      arity           = token.a
+      target          = [ token, ]
+      R.push target
+      for count in [ 1 .. arity ] by +1
+        @_parse me, target
     when 'component'
-      null
+      R.push token
     else
       throw new Error """unable to parse token of type #{type}\n#{me.source}\n#{idx}"""
   return R
@@ -107,13 +118,17 @@ O                         = require './options'
 @demo = ->
   sources = [
     '⿲木木木'
-    '⿺辶言'
-    '⿺廴聿123'
+    '⿱癶⿰弓貝'
+    '⿱⿰亻式貝'
+    '⿱⿰亻式⿱目八'
+    # '⿺辶言'
+    # '⿺廴聿123'
     ]
   for source in sources
+    help source
     p = @parse source
-    debug '90777', p
-    break
+    urge '\n' + rpr p
+    # break
     # for token in tokens
     #   nfo             = MKNCR.describe token
     #   tags            = nfo.tag ? []
