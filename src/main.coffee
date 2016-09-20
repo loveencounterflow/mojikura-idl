@@ -4,7 +4,7 @@
 ############################################################################################################
 CND                       = require 'cnd'
 rpr                       = CND.rpr
-badge                     = 'MOJIKURA/IDL'
+badge                     = 'MOJIKURA-IDL'
 log                       = CND.get_logger 'plain',     badge
 info                      = CND.get_logger 'info',      badge
 whisper                   = CND.get_logger 'whisper',   badge
@@ -120,44 +120,3 @@ O                         = require './options'
   return R
 
 
-#===========================================================================================================
-# DEMO
-#-----------------------------------------------------------------------------------------------------------
-@demo = ->
-  sources = [
-    '木'
-    '⿲木木木'
-    '⿱癶⿰弓貝'
-    '⿱⿰亻式貝'
-    '⿱⿰亻式⿱目八'
-    '⿱⿰亻式⿱目八木木木'
-    # '⿺辶言'
-    # '⿺廴聿123'
-    ]
-  for source in sources
-    help source
-    p = @parse source
-    urge '\n' + rpr p
-
-    # break
-    # for token in tokens
-    #   nfo             = MKNCR.describe token
-    #   tags            = nfo.tag ? []
-    #   tags_txt        = tags.join ' '
-    #   operator_nfo    = O.idl.operators[ token ] ? null
-    #   is_cjk          = 'cjk' in tags
-    #   is_ideograph    = 'ideograph' in tags
-    #   name            = null
-    #   arity           = null
-    #   if ( is_idl = operator_nfo? )
-    #     { name, arity, }  = operator_nfo
-    #     color             = CND.grey
-    #   if is_cjk         then color = CND.gold
-    #   if is_ideograph   then color = CND.lime
-    #   if is_idl         then color = CND.pink
-    #   help ( color token ), ( CND.white name, arity )
-
-
-############################################################################################################
-unless module.parent?
-  @demo()
