@@ -85,11 +85,14 @@ O                         = require './options'
 @parse = ( source ) ->
   me  = @_new_parse source
   R   = @_parse me
+  unless me.idx is me.tokens.length
+    throw new Error """syntax error
+      #{me.source}
+      #{me.idx}"""
   return R
 
 #-----------------------------------------------------------------------------------------------------------
 @_parse = ( me, R = null ) ->
-  R              ?= []
   token           = me.tokens[ me.idx ]
   me.idx         += +1
   # argument_count  = 0
@@ -102,13 +105,18 @@ O                         = require './options'
       operator_count += +1
       arity           = token.a
       target          = [ token, ]
-      R.push target
       for count in [ 1 .. arity ] by +1
         @_parse me, target
+      if R? then  R.push target
+      else        return target
     when 'component'
-      R.push token
+      if R? then  R.push token
+      else        return token
     else
-      throw new Error """unable to parse token of type #{type}\n#{me.source}\n#{idx}"""
+      throw new Error """
+        unable to parse token of type #{type}
+        #{me.source}
+        #{me.idx}"""
   return R
 
 
@@ -117,10 +125,12 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @demo = ->
   sources = [
+    '木'
     '⿲木木木'
     '⿱癶⿰弓貝'
     '⿱⿰亻式貝'
     '⿱⿰亻式⿱目八'
+    '⿱⿰亻式⿱目八木木木'
     # '⿺辶言'
     # '⿺廴聿123'
     ]
@@ -128,6 +138,7 @@ O                         = require './options'
     help source
     p = @parse source
     urge '\n' + rpr p
+
     # break
     # for token in tokens
     #   nfo             = MKNCR.describe token
