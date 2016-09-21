@@ -30,3 +30,9 @@ module.exports = IDLX = Object.assign {}, ( CND.deep_copy IDL )
 # debug '34100', CND.equals IDL.grammar.operators, IDLX.grammar.operators
 # debug '34100', IDLX.grammar.operators
 
+
+#===========================================================================================================
+# GRAMMAR
+#-----------------------------------------------------------------------------------------------------------
+@grammar = O.idlx
+
