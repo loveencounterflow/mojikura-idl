@@ -19,10 +19,14 @@ echo                      = CND.echo.bind CND
 #...........................................................................................................
 MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
-{ mix, }                  = require 'multimix'
 IDL                       = require './idl'
 
 ############################################################################################################
-module.exports = mix IDL, @
+module.exports = IDLX = Object.assign {}, ( CND.deep_copy IDL )
 
+# debug '34100', IDL.grammar is IDLX.grammar
+# debug '34100', IDL.grammar.operators is IDLX.grammar.operators
+# debug '34100', CND.equals IDL.grammar, IDLX.grammar
+# debug '34100', CND.equals IDL.grammar.operators, IDLX.grammar.operators
+# debug '34100', IDLX.grammar.operators
 
