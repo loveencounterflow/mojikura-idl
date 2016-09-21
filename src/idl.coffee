@@ -67,8 +67,10 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
+@_describe_symbol       = ( me, symbol ) -> MKNCR.describe symbol
+@_tags_from_symbol      = ( me, symbol ) -> ( @_describe_symbol me, symbol ).tag ? []
 @_symbol_is_operator    = ( me, symbol ) -> symbol of @grammar.operators
-@_symbol_is_component   = ( me, symbol ) -> 'cjk' in ( ( MKNCR.describe symbol ).tag ? [] )
+@_symbol_is_component   = ( me, symbol ) -> 'cjk' in @_tags_from_symbol me, symbol
 # @_symbol_is_lbracket    = ( me, symbol ) -> symbol of me.lbrackets
 # @_symbol_is_rbracket    = ( me, symbol ) -> symbol of me.rbrackets
 

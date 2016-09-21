@@ -6,5 +6,5 @@
     "src/main.coffee"
   ],
   "names": [],
-  "mappings": ";AAkBA;EAAA,IAAC,CAAA,GAAD,GAA4B,OAAA,CAAQ,OAAR;AAA5B"
+  "mappings": ";AAkBA;EAAA,IAAC,CAAA,GAAD,GAA4B,OAAA,CAAQ,OAAR;;EAC5B,IAAC,CAAA,IAAD,GAA4B,OAAA,CAAQ,QAAR;AAD5B"
 }

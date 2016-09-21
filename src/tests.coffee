@@ -74,6 +74,18 @@ nice_text_rpr = ( text ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
+@[ "(IDL) sanity checks (private methods)" ] = ( T ) ->
+  probes_and_matchers = [
+    ["木",["assigned","ideograph","cjk","sim","sim/has-source","sim/is-target","sim/has-source/global","sim/is-target/global","sim/global"]]
+    ["⿲",["assigned","cjk","idl"]]
+    ["a",["assigned"]]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    result = IDL._tags_from_symbol  null, probe
+    help JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+
+#-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) parse simple formulas" ] = ( T ) ->
   probes_and_matchers = [
     ["木","木"]
@@ -145,7 +157,7 @@ nice_text_rpr = ( text ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
-      result = IDL.parse probe
+      result = IDLX.parse probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
       warn JSON.stringify [ probe, error[ 'message' ], ]
@@ -160,7 +172,7 @@ nice_text_rpr = ( text ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
-      result = IDL.parse probe
+      result = IDLX.parse probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
       warn JSON.stringify [ probe, error[ 'message' ], ]
@@ -174,11 +186,12 @@ unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
     # "(IDL) demo"
+    "(IDL) sanity checks (private methods)"
     "(IDL) parse simple formulas"
     "(IDL) reject bogus formulas"
-    # "(IDLX) parse simple formulas"
-    # "(IDLX) reject bogus formulas"
-    # "(IDLX) reject IDL operators with arity 3"
+    "(IDLX) parse simple formulas"
+    "(IDLX) reject bogus formulas"
+    "(IDLX) reject IDL operators with arity 3"
     ]
   @_prune()
   @_main()
