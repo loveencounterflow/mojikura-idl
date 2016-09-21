@@ -25,7 +25,7 @@ module.exports = O =
 
   idl:
     operators:
-      '⿰': { name: 'left/right',    arity: 2, }
+      '⿰': { name: 'left-right',    arity: 2, }
       '⿱': { name: 'top/down',      arity: 2, }
       '⿴': { name: 'surround',      arity: 2, }
       '⿵': { name: 'cap',           arity: 2, }
@@ -37,4 +37,27 @@ module.exports = O =
       '⿻': { name: 'interlace',     arity: 2, }
       '⿲': { name: 'pillars',       arity: 3, }
       '⿳': { name: 'layers',        arity: 3, }
+
+  # idlx:
+  #   operators:
+  #     '⿰':  { name: 'left-right',     arity: 2, }
+  #     '⿱':  { name: 'top/down',       arity: 2, }
+  #     '⿴':  { name: 'surround',       arity: 2, }
+  #     '⿵':  { name: 'cap',            arity: 2, }
+  #     '⿶':  { name: 'cup',            arity: 2, }
+  #     '⿷':  { name: 'left-embrace',   arity: 2, }
+  #     '⿸':  { name: 'topleft',        arity: 2, }
+  #     '⿹':  { name: 'topright',       arity: 2, }
+  #     '⿺':  { name: 'leftbottom',     arity: 2, }
+  #     '⿻':  { name: 'interlace',      arity: 2, }
+  #     '◰':  { name: 'topleftcorner',  arity: 2, }
+  #     '≈':  { name: 'similar',        arity: 1, }
+  #     '↻':  { name: 'upsidedown',     arity: 1, }
+  #     '↔':  { name: 'mirror',         arity: 1, }
+  #     '↕':  { name: 'flip',           arity: 1, }
+
+
+
+
+
 

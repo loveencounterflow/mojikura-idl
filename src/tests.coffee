@@ -176,9 +176,9 @@ unless module.parent?
     # "(IDL) demo"
     "(IDL) parse simple formulas"
     "(IDL) reject bogus formulas"
-    "(IDLX) parse simple formulas"
-    "(IDLX) reject bogus formulas"
-    "(IDLX) reject IDL operators with arity 3"
+    # "(IDLX) parse simple formulas"
+    # "(IDLX) reject bogus formulas"
+    # "(IDLX) reject IDL operators with arity 3"
     ]
   @_prune()
   @_main()
