@@ -98,35 +98,37 @@ O                         = require './options'
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "syntax error (empty text)" unless source.length > 0
   me  = @_new_parse source
-  R   = @_as_csl me
+  R   = @_as_csl    me
   unless me.idx is me.tokens.length
     throw new Error "syntax error (token idx #{me.idx} of #{rpr me.source})"
   return R
 
 #-----------------------------------------------------------------------------------------------------------
 @_as_csl = ( me, R = null ) ->
-  token           = me.tokens[ me.idx ]
+  token     = me.tokens[ me.idx ]
   throw new Error "syntax error (premature end of source #{rpr me.source})" unless token?
-  me.idx         += +1
-  # argument_count  = 0
-  operator_count  = 0
-  target          = null
-  arity           = null
-  # debug '30211', token
+  me.idx   += +1
+  target    = null
+  arity     = null
+  #.........................................................................................................
   switch type = token.t
+    #.......................................................................................................
     when 'operator'
-      operator_count += +1
-      arity           = token.a
-      target          = [ token, ]
+      arity   = token.a
+      target  = [ token, ]
       for count in [ 1 .. arity ] by +1
         @_as_csl me, target
       if R? then  R.push target
-      else        return target
+      else        R = target
+    #.......................................................................................................
     when 'component'
       if R? then  R.push token
-      else        return token
+      else        R = token
+    #.......................................................................................................
     else
       throw new Error "unable to parse token of type #{type} (token idx #{me.idx} of #{rpr me.source})"
+  #.........................................................................................................
+  # debug '66541', '\n' + rpr R
   return R
 
 
