@@ -128,7 +128,6 @@ O                         = require './options'
     else
       throw new Error "unable to parse token of type #{type} (token idx #{me.idx} of #{rpr me.source})"
   #.........................................................................................................
-  # debug '66541', '\n' + rpr R
   return R
 
 
