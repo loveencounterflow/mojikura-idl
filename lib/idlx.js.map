@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "idlx.js",
+  "sourceRoot": "..",
+  "sources": [
+    "src/idlx.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAAA;;AAAA"
+}
