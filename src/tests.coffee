@@ -21,7 +21,7 @@ urge                      = CND.get_logger 'urge',      badge
 echo                      = CND.echo.bind CND
 #...........................................................................................................
 test                      = require 'guy-test'
-IDL                       = require './main'
+{ IDL, IDLX, }            = require './main'
 
 
 #===========================================================================================================
@@ -57,9 +57,9 @@ nice_text_rpr = ( text ) ->
 
 
 #===========================================================================================================
-# TESTS
+# TESTS (IDL)
 #-----------------------------------------------------------------------------------------------------------
-@[ "demo" ] = ( T ) ->
+@[ "(IDL) demo" ] = ( T ) ->
   sources = [
     '木'
     '⿲木木木'
@@ -78,7 +78,7 @@ nice_text_rpr = ( text ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@[ "parse simple formulas" ] = ( T ) ->
+@[ "(IDL) parse simple formulas" ] = ( T ) ->
   probes_and_matchers = [
     ["木","木"]
     ["⿲木木木",["⿲","木","木","木"]]
@@ -95,7 +95,7 @@ nice_text_rpr = ( text ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@[ "reject bogus formulas" ] = ( T ) ->
+@[ "(IDL) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
     [42,"expected a text, got a number"]
     ["","syntax error (empty text)"]
@@ -117,13 +117,33 @@ nice_text_rpr = ( text ) ->
   return null
 
 
+#===========================================================================================================
+# TESTS (IDLX)
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) parse simple formulas" ] = ( T ) ->
+  probes_and_matchers = [
+    ["木","木"]
+    ["⿲木木木",["⿲","木","木","木"]]
+    ["⿱癶⿰弓貝",["⿱","癶",["⿰","弓","貝"]]]
+    ["⿱⿰亻式貝",["⿱",["⿰","亻","式"],"貝"]]
+    ["⿱⿰亻式⿱目八",["⿱",["⿰","亻","式"],["⿱","目","八"]]]
+    ["⿺辶言",["⿺","辶","言"]]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    result = IDLX.parse probe
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
 ############################################################################################################
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
-    # "demo"
-    "parse simple formulas"
-    "reject bogus formulas"
+    # "(IDL) demo"
+    "(IDL) parse simple formulas"
+    "(IDL) reject bogus formulas"
+    "(IDLX) parse simple formulas"
     ]
   @_prune()
   @_main()
