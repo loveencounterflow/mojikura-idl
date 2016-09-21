@@ -3,10 +3,6 @@
 
 
 ############################################################################################################
-njs_path                  = require 'path'
-# njs_fs                    = require 'fs'
-join                      = njs_path.join
-#...........................................................................................................
 CND                       = require 'cnd'
 rpr                       = CND.rpr
 badge                     = 'MOJIKURA-IDL/tests'
@@ -123,7 +119,6 @@ nice_text_rpr = ( text ) ->
 @[ "(IDLX) parse simple formulas" ] = ( T ) ->
   probes_and_matchers = [
     ["木","木"]
-    ["⿲木木木",["⿲","木","木","木"]]
     ["⿱癶⿰弓貝",["⿱","癶",["⿰","弓","貝"]]]
     ["⿱⿰亻式貝",["⿱",["⿰","亻","式"],"貝"]]
     ["⿱⿰亻式⿱目八",["⿱",["⿰","亻","式"],["⿱","目","八"]]]
@@ -136,6 +131,44 @@ nice_text_rpr = ( text ) ->
   #.........................................................................................................
   return null
 
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) reject bogus formulas" ] = ( T ) ->
+  probes_and_matchers = [
+    [42,"expected a text, got a number"]
+    ["","syntax error (empty text)"]
+    ["⿱⿰亻式⿱目八木木木","syntax error (token idx 7 of '⿱⿰亻式⿱目八木木木')"]
+    ["⿺廴聿123","syntax error (token idx 3 of '⿺廴聿123')"]
+    ["⿺","syntax error (premature end of source '⿺')"]
+    ["⿺⿺⿺⿺","syntax error (premature end of source '⿺⿺⿺⿺')"]
+    ["⿺12","unable to parse token of type other (token idx 2 of '⿺12')"]
+    ["(⿰亻聿式)","unable to parse token of type other (token idx 1 of '(⿰亻聿式)')"]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    try
+      result = IDL.parse probe
+      T.fail "expected an exception, got result #{rpr result}"
+    catch error
+      warn JSON.stringify [ probe, error[ 'message' ], ]
+      T.eq error[ 'message' ], matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) reject IDL operators with arity 3" ] = ( T ) ->
+  probes_and_matchers = [
+    ["⿲木木木",'']
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    try
+      result = IDL.parse probe
+      T.fail "expected an exception, got result #{rpr result}"
+    catch error
+      warn JSON.stringify [ probe, error[ 'message' ], ]
+      T.eq error[ 'message' ], matcher
+  #.........................................................................................................
+  return null
+
+
 ############################################################################################################
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
@@ -144,6 +177,8 @@ unless module.parent?
     "(IDL) parse simple formulas"
     "(IDL) reject bogus formulas"
     "(IDLX) parse simple formulas"
+    "(IDLX) reject bogus formulas"
+    "(IDLX) reject IDL operators with arity 3"
     ]
   @_prune()
   @_main()

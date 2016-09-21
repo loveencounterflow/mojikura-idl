@@ -22,6 +22,7 @@ O                         = require './options'
 { mix, }                  = require 'multimix'
 IDL                       = require './idl'
 
-# module.exports = mix IDL, @
+############################################################################################################
+module.exports = mix IDL, @
 
 
