@@ -118,30 +118,32 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_mark_token = ( me, idx = null ) ->
   idx ?= me.idx
-  offending_token.error = yes if ( offending_token = me.tokens[ me.idx ] )?
+  offending_token.error = yes if ( offending_token = me.tokens[ idx ] )?
   return null
 
 #-----------------------------------------------------------------------------------------------------------
 @parse_tree = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
-  throw new Error "syntax error (empty text)" unless source.length > 0
+  throw new Error "syntax error: empty text" unless source.length > 0
   me  = @_new_parse   source
   R   = @_parse_tree  me
   #.........................................................................................................
   if me.idx isnt me.tokens.length
     @_mark_token me
-    throw new Error "syntax error: extra token(s) (##{me.idx} of #{rpr me.tokens})"
+    throw new Error "syntax error: extra token(s) in #{rpr me.tokens}"
   #.........................................................................................................
   if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )
     @_mark_token me, 0
-    throw new Error "syntax error:  lone token of type #{rpr type} in #{rpr me.source}"
+    throw new Error "syntax error: lone token of type #{rpr type} in #{rpr me.tokens}"
   #.........................................................................................................
   return R
 
 #-----------------------------------------------------------------------------------------------------------
 @_parse_tree = ( me, R = null ) ->
   token     = me.tokens[ me.idx ]
-  throw new Error "syntax error (premature end of source #{rpr me.source})" unless token?
+  unless token?
+    @_mark_token me, me.idx - 1
+    throw new Error "syntax error: premature end of source in #{rpr me.tokens})"
   me.idx   += +1
   target    = null
   arity     = null
@@ -161,7 +163,8 @@ O                         = require './options'
       else        R = token
     #.......................................................................................................
     else
-      throw new Error "unable to parse token of type #{rpr type} (##{me.idx} of #{rpr me.source})"
+      @_mark_token me
+      throw new Error "syntax error: illegal token (type #{rpr type}) in #{rpr me.tokens}"
   #.........................................................................................................
   return R
 

@@ -50,7 +50,11 @@ IDL                       = require './idl'
 #-----------------------------------------------------------------------------------------------------------
 @_parse_tree = ( me, R = null ) ->
   token     = me.tokens[ me.idx ]
-  throw new Error "syntax error (premature end of source #{rpr me.source})" unless token?
+  #.........................................................................................................
+  unless token?
+    @_mark_token me, me.idx - 1
+    throw new Error "syntax error: premature end of source in #{rpr me.tokens})"
+  #.........................................................................................................
   me.idx   += +1
   target    = null
   arity     = null
@@ -70,7 +74,8 @@ IDL                       = require './idl'
       else        R = token
     #.......................................................................................................
     else
-      throw new Error "unable to parse token of type #{rpr type} (token idx #{me.idx} of #{rpr me.source})"
+      @_mark_token me
+      throw new Error "syntax error: illegal token (type #{rpr type}) in #{rpr me.tokens}"
   #.........................................................................................................
   return R
 

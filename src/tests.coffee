@@ -295,9 +295,11 @@ unless module.parent?
   # d = IDLX.parse_tree "⿺走⿹◰口戈〓"
   # d = IDLX._tokenize null, "⿺走⿹◰口弓戈〓"
   sources = [
+    ""
     "⿺"
     "走"
     "走⿹◰口弓戈〓"
+    "⿺走x"
     "⿺走⿹◰口弓戈〓"
     ]
   for source in sources
