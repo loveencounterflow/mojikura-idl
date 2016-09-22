@@ -63,7 +63,7 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_operator_from_symbol = ( me, symbol ) ->
   unless ( R = @grammar.operators[ symbol ] )?
-    throw new Error "symbol not known to be an operator: #{rpr symbol}"
+    throw new Error "unknown operator #{rpr symbol}"
   return R
 
 #-----------------------------------------------------------------------------------------------------------
@@ -71,15 +71,11 @@ O                         = require './options'
 @_tags_from_symbol      = ( me, symbol ) -> ( @_describe_symbol me, symbol ).tag ? []
 @_symbol_is_operator    = ( me, symbol ) -> symbol of @grammar.operators
 @_symbol_is_component   = ( me, symbol ) -> 'cjk' in @_tags_from_symbol me, symbol
-# @_symbol_is_lbracket    = ( me, symbol ) -> symbol of me.lbrackets
-# @_symbol_is_rbracket    = ( me, symbol ) -> symbol of me.rbrackets
 
 #-----------------------------------------------------------------------------------------------------------
 @_type_of_symbol = ( me, symbol ) ->
   return 'operator'   if @_symbol_is_operator   me, symbol
   return 'component'  if @_symbol_is_component  me, symbol
-  # return 'lbracket'   if @_symbol_is_lbracket   me, symbol
-  # return 'rbracket'   if @_symbol_is_rbracket   me, symbol
   return 'other'
 
 
@@ -87,7 +83,7 @@ O                         = require './options'
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
 @parse = ( source ) ->
-  return @_parse @as_csl source
+  return @_parse @parse_tree source
 
 #-----------------------------------------------------------------------------------------------------------
 @_parse = ( csl ) ->
@@ -98,17 +94,17 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@as_csl = ( source ) ->
+@parse_tree = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "syntax error (empty text)" unless source.length > 0
-  me  = @_new_parse source
-  R   = @_as_csl    me
+  me  = @_new_parse   source
+  R   = @_parse_tree  me
   unless me.idx is me.tokens.length
     throw new Error "syntax error (token idx #{me.idx} of #{rpr me.source})"
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_as_csl = ( me, R = null ) ->
+@_parse_tree = ( me, R = null ) ->
   token     = me.tokens[ me.idx ]
   throw new Error "syntax error (premature end of source #{rpr me.source})" unless token?
   me.idx   += +1
@@ -121,7 +117,7 @@ O                         = require './options'
       arity   = token.a
       target  = [ token, ]
       for count in [ 1 .. arity ] by +1
-        @_as_csl me, target
+        @_parse_tree me, target
       if R? then  R.push target
       else        R = target
     #.......................................................................................................

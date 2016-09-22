@@ -21,18 +21,58 @@ MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
 IDL                       = require './idl'
 
-# debug '34100', IDL.grammar is IDLX.grammar
-# debug '34100', IDL.grammar.operators is IDLX.grammar.operators
-# debug '34100', CND.equals IDL.grammar, IDLX.grammar
-# debug '34100', CND.equals IDL.grammar.operators, IDLX.grammar.operators
-# debug '34100', IDLX.grammar.operators
-
-
 #===========================================================================================================
 # GRAMMAR
 #-----------------------------------------------------------------------------------------------------------
 @grammar = O.idlx
 
 
+#===========================================================================================================
+# TOKENS
+#-----------------------------------------------------------------------------------------------------------
+@_symbol_is_solitaire   = ( me, symbol ) -> symbol of @grammar.solitaires
+# @_symbol_is_lbracket    = ( me, symbol ) -> symbol of @grammar.lbrackets
+# @_symbol_is_rbracket    = ( me, symbol ) -> symbol of @grammar.rbrackets
+
+#-----------------------------------------------------------------------------------------------------------
+@_type_of_symbol = ( me, symbol ) ->
+  return R unless ( R = IDL._type_of_symbol.call IDLX, me, symbol ) is 'other'
+  return 'solitaire'  if @_symbol_is_solitaire  me, symbol
+  # return 'lbracket'   if @_symbol_is_lbracket   me, symbol
+  # return 'rbracket'   if @_symbol_is_rbracket   me, symbol
+  return 'other'
+
+
+#===========================================================================================================
+# PARSING
+#-----------------------------------------------------------------------------------------------------------
+@_parse_tree = ( me, R = null ) ->
+  token     = me.tokens[ me.idx ]
+  throw new Error "syntax error (premature end of source #{rpr me.source})" unless token?
+  me.idx   += +1
+  target    = null
+  arity     = null
+  #.........................................................................................................
+  switch type = token.t
+    #.......................................................................................................
+    when 'operator'
+      arity   = token.a
+      target  = [ token, ]
+      for count in [ 1 .. arity ] by +1
+        @_parse_tree me, target
+      if R? then  R.push target
+      else        R = target
+    #.......................................................................................................
+    when 'component', 'solitaire'
+      if R? then  R.push token
+      else        R = token
+    #.......................................................................................................
+    else
+      throw new Error "unable to parse token of type #{type} (token idx #{me.idx} of #{rpr me.source})"
+  #.........................................................................................................
+  return R
+
+
 ############################################################################################################
+### Poor Man's MultiMix: ###
 module.exports = IDLX = Object.assign ( CND.deep_copy IDL ), @

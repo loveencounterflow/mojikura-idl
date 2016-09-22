@@ -56,7 +56,8 @@ module.exports = O =
       '↔':  { name: 'mirror',         arity: 1, }
       '↕':  { name: 'flip',           arity: 1, }
 
-
+    solitaires:
+      '●':  { name: 'finish', }
 
 
 
