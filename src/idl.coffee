@@ -67,6 +67,15 @@ O                         = require './options'
 @_isa_token = ( x ) -> CND.isa x, 'MOJIKURA-IDL/token'
 
 #-----------------------------------------------------------------------------------------------------------
+@_rpr_tokens = ( me, error_idx = null ) ->
+  error_idx  ?= me.idx
+  R           = []
+  for token, idx in me.tokens
+    R.push if idx is error_idx then CND.red " ✘ #{token.s} ✘ " else CND.white "#{token.s}"
+  # offending_token.error = yes if ( offending_token = me.tokens[ error_idx ] )?
+  return CND.white "[ #{R.join ''} ]"
+
+#-----------------------------------------------------------------------------------------------------------
 @_operator_from_symbol = ( me, symbol ) ->
   unless ( R = @grammar.operators[ symbol ] )?
     throw new Error "unknown operator #{rpr symbol}"
@@ -97,15 +106,6 @@ O                         = require './options'
   return ( @_parse token for token in element )
 
 #-----------------------------------------------------------------------------------------------------------
-@_rpr_tokens = ( me, error_idx = null ) ->
-  error_idx  ?= me.idx
-  R           = []
-  for token, idx in me.tokens
-    R.push if idx is error_idx then CND.red " ✘ #{token.s} ✘ " else CND.white "#{token.s}"
-  offending_token.error = yes if ( offending_token = me.tokens[ error_idx ] )?
-  return CND.white "[ #{R.join ''} ]"
-
-#-----------------------------------------------------------------------------------------------------------
 @parse_tree = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "syntax error: empty text" unless source.length > 0
@@ -114,6 +114,7 @@ O                         = require './options'
   #.........................................................................................................
   if me.idx isnt me.tokens.length
     tokens_txt = @_rpr_tokens me
+    debug '55091', me
     throw new Error "syntax error: extra token(s) in #{tokens_txt}"
   #.........................................................................................................
   if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )

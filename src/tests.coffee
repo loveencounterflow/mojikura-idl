@@ -288,13 +288,33 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) parse extended formulas (bracketed)" ] = ( T ) ->
   probes_and_matchers = [
+    [ '⿰亻聿', [ '⿰', '亻', '聿', ], ]
     [ '(⿰亻聿式)', [ '⿰', '亻', '聿', '式', ], ]
-    [ '(⿱北㓁允)', [ '⿱', '北', '㓁', '允', ], ]
+    # [ '(⿱北㓁允)', [ '⿱', '北', '㓁', '允', ], ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = resume_next T, -> IDLX.parse probe
+    # result = resume_next T, -> IDLX.parse probe
+    result = IDLX.parse probe
     urge JSON.stringify [ probe, result, ]
-    T.eq result, matcher
+    # T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) reject bogus bracketed formulas" ] = ( T ) ->
+  probes_and_matchers = [
+    [ '(⿰亻聿)', "", ]
+    [ '(⿰亻)', "", ]
+    [ '(⿰亻)聿', "", ]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    try
+      result = IDLX.parse probe
+      T.fail "expected an exception, got result #{rpr result}"
+    catch error
+      message = CND.remove_colors error[ 'message' ]
+      warn JSON.stringify [ probe, message, ]
+      # T.eq message, matcher
   #.........................................................................................................
   return null
 
@@ -303,20 +323,21 @@ resume_next = ( T, method ) ->
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
-    # "(IDL) demo"
-    "sanity checks (private methods)"
-    "sanity checks (grammar data)"
-    "sanity checks (MKNCR)"
-    #.......................................................................................................
-    "(IDL) parse simple formulas"
-    "(IDL) reject bogus formulas"
-    "(IDL) parse tree of simple formulas"
-    #.......................................................................................................
-    "(IDLX) reject bogus formulas"
-    "(IDLX) reject IDL operators with arity 3"
-    "(IDLX) parse simple formulas"
-    "(IDLX) parse extended formulas (plain)"
-    # "(IDLX) parse extended formulas (bracketed)"
+    # # "(IDL) demo"
+    # "sanity checks (private methods)"
+    # "sanity checks (grammar data)"
+    # "sanity checks (MKNCR)"
+    # #.......................................................................................................
+    # "(IDL) parse simple formulas"
+    # "(IDL) reject bogus formulas"
+    # "(IDL) parse tree of simple formulas"
+    # #.......................................................................................................
+    # "(IDLX) reject bogus formulas"
+    # "(IDLX) reject IDL operators with arity 3"
+    # "(IDLX) parse simple formulas"
+    # "(IDLX) parse extended formulas (plain)"
+    "(IDLX) parse extended formulas (bracketed)"
+    # "(IDLX) reject bogus bracketed formulas"
     ]
   @_prune()
   @_main()
