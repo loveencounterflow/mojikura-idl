@@ -43,25 +43,12 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_tokenize = ( me, source ) ->
   R       = []
-  R       = @_new_token_list me
   chrs    = MKNCR.chrs_from_text source
   cu_idx  = 0
   for symbol in chrs
     R.push @_new_token me, symbol, cu_idx
     ### we're counting JS code units here ###
     cu_idx += symbol.length
-  return R
-
-#-----------------------------------------------------------------------------------------------------------
-@_new_token_list = ( me ) ->
-  R = []
-  #.........................................................................................................
-  R.inspect = ( P... ) ->
-    # color = if R.error? then CND.red else CND.white
-    # return color "#{R.t} #{R.s}"
-    kernel = ( rpr element for element in R ).join ''
-    return CND.white "[ #{kernel} ]"
-  #.........................................................................................................
   return R
 
 #-----------------------------------------------------------------------------------------------------------
@@ -75,10 +62,6 @@ O                         = require './options'
       operator  = @_operator_from_symbol me, symbol
       R.a       = operator.arity
       R.n       = operator.name
-  #.........................................................................................................
-  R.inspect = ( P... ) ->
-    return CND.red   " ✘ #{R.s} ✘ " if R.error?
-    return CND.white "#{R.s}"
   #.........................................................................................................
   return R
 
@@ -116,10 +99,13 @@ O                         = require './options'
   return ( @_parse token for token in element )
 
 #-----------------------------------------------------------------------------------------------------------
-@_mark_token = ( me, idx = null ) ->
-  idx ?= me.idx
-  offending_token.error = yes if ( offending_token = me.tokens[ idx ] )?
-  return null
+@_rpr_tokens = ( me, error_idx = null ) ->
+  error_idx  ?= me.idx
+  R           = []
+  for token, idx in me.tokens
+    R.push if idx is error_idx then CND.red " ✘ #{token.s} ✘ " else CND.white "#{token.s}"
+  offending_token.error = yes if ( offending_token = me.tokens[ error_idx ] )?
+  return CND.white "[ #{R.join ''} ]"
 
 #-----------------------------------------------------------------------------------------------------------
 @parse_tree = ( source ) ->
@@ -129,12 +115,12 @@ O                         = require './options'
   R   = @_parse_tree  me
   #.........................................................................................................
   if me.idx isnt me.tokens.length
-    @_mark_token me
-    throw new Error "syntax error: extra token(s) in #{rpr me.tokens}"
+    tokens_txt = @_rpr_tokens me
+    throw new Error "syntax error: extra token(s) in #{tokens_txt}"
   #.........................................................................................................
   if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )
-    @_mark_token me, 0
-    throw new Error "syntax error: lone token of type #{rpr type} in #{rpr me.tokens}"
+    tokens_txt = @_rpr_tokens me, 0
+    throw new Error "syntax error: lone token of type #{rpr type} in #{tokens_txt}"
   #.........................................................................................................
   return R
 
@@ -142,8 +128,8 @@ O                         = require './options'
 @_parse_tree = ( me, R = null ) ->
   token     = me.tokens[ me.idx ]
   unless token?
-    @_mark_token me, me.idx - 1
-    throw new Error "syntax error: premature end of source in #{rpr me.tokens})"
+    tokens_txt = @_rpr_tokens me, me.idx - 1
+    throw new Error "syntax error: premature end of source in #{tokens_txt})"
   me.idx   += +1
   target    = null
   arity     = null
@@ -163,8 +149,8 @@ O                         = require './options'
       else        R = token
     #.......................................................................................................
     else
-      @_mark_token me
-      throw new Error "syntax error: illegal token (type #{rpr type}) in #{rpr me.tokens}"
+      tokens_txt = @_rpr_tokens me, me.idx - 1
+      throw new Error "syntax error: illegal token #{rpr token.s} (type #{rpr type}) in #{tokens_txt}"
   #.........................................................................................................
   return R
 

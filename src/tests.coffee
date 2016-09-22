@@ -146,25 +146,26 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
-    ["木","syntax error:  lone token of type 'component' in '木'"]
+    ["木","syntax error: lone token of type 'component' in [  ✘ 木 ✘  ]"]
     [42,"expected a text, got a number"]
-    ["","syntax error (empty text)"]
-    ["⿱⿰亻式⿱目八木木木","syntax error (token idx 7 of '⿱⿰亻式⿱目八木木木')"]
-    ["⿺廴聿123","syntax error (token idx 3 of '⿺廴聿123')"]
-    ["⿺","syntax error (premature end of source '⿺')"]
-    ["⿺⿺⿺⿺","syntax error (premature end of source '⿺⿺⿺⿺')"]
-    ["⿺12","unable to parse token of type 'other' (token idx 2 of '⿺12')"]
-    ["(⿰亻聿式)","unable to parse token of type 'other' (token idx 1 of '(⿰亻聿式)')"]
-    ["≈〇","unable to parse token of type 'other' (token idx 1 of '≈〇')"]
-    ["●","unable to parse token of type 'other' (token idx 1 of '●')"]
+    ["","syntax error: empty text"]
+    ["⿱⿰亻式⿱目八木木木","syntax error: extra token(s) in [ ⿱⿰亻式⿱目八 ✘ 木 ✘ 木木 ]"]
+    ["⿺廴聿123","syntax error: extra token(s) in [ ⿺廴聿 ✘ 1 ✘ 23 ]"]
+    ["⿺","syntax error: premature end of source in [  ✘ ⿺ ✘  ])"]
+    ["⿺⿺⿺⿺","syntax error: premature end of source in [ ⿺⿺⿺ ✘ ⿺ ✘  ])"]
+    ["⿺12","syntax error: illegal token '1' (type 'other') in [ ⿺ ✘ 1 ✘ 2 ]"]
+    ["(⿰亻聿式)","syntax error: illegal token '(' (type 'other') in [  ✘ ( ✘ ⿰亻聿式) ]"]
+    ["≈〇","syntax error: illegal token '≈' (type 'other') in [  ✘ ≈ ✘ 〇 ]"]
+    ["●","syntax error: illegal token '●' (type 'other') in [  ✘ ● ✘  ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
       result = IDL.parse probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
-      warn JSON.stringify [ probe, error[ 'message' ], ]
-      T.eq error[ 'message' ], matcher
+      message = CND.remove_colors error[ 'message' ]
+      warn JSON.stringify [ probe, message, ]
+      T.eq message, matcher
   #.........................................................................................................
   return null
 
@@ -189,38 +190,39 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
-    ["木","syntax error:  lone token of type 'component' in '木'"]
+    ["木","syntax error: lone token of type 'component' in [  ✘ 木 ✘  ]"]
     [42,"expected a text, got a number"]
-    ["","syntax error (empty text)"]
-    ["⿱⿰亻式⿱目八木木木","syntax error (token idx 7 of '⿱⿰亻式⿱目八木木木')"]
-    ["⿺廴聿123","syntax error (token idx 3 of '⿺廴聿123')"]
-    ["⿺","syntax error (premature end of source '⿺')"]
-    ["⿺⿺⿺⿺","syntax error (premature end of source '⿺⿺⿺⿺')"]
-    ["⿺12","unable to parse token of type 'other' (token idx 2 of '⿺12')"]
-    ["(⿰亻聿式)","unable to parse token of type 'other' (token idx 1 of '(⿰亻聿式)')"]
+    ["","syntax error: empty text"]
+    ["⿱⿰亻式⿱目八木木木","syntax error: extra token(s) in [ ⿱⿰亻式⿱目八 ✘ 木 ✘ 木木 ]"]
+    ["⿺廴聿123","syntax error: extra token(s) in [ ⿺廴聿 ✘ 1 ✘ 23 ]"]
+    ["⿺","syntax error: premature end of source in [  ✘ ⿺ ✘  ])"]
+    ["⿺⿺⿺⿺","syntax error: premature end of source in [ ⿺⿺⿺ ✘ ⿺ ✘  ])"]
+    ["⿺12","syntax error: illegal token '1' (type 'other') in [ ⿺ ✘ 1 ✘ 2 ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
       result = IDLX.parse probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
-      warn JSON.stringify [ probe, error[ 'message' ], ]
-      T.eq error[ 'message' ], matcher
+      message = CND.remove_colors error[ 'message' ]
+      warn JSON.stringify [ probe, message, ]
+      T.eq message, matcher
   #.........................................................................................................
   return null
 
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject IDL operators with arity 3" ] = ( T ) ->
   probes_and_matchers = [
-    ["⿲木木木","syntax error (token idx 1 of '⿲木木木')"]
+    ["⿲木木木","syntax error: extra token(s) in [ ⿲ ✘ 木 ✘ 木木 ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
       result = IDLX.parse probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
-      warn JSON.stringify [ probe, error[ 'message' ], ]
-      T.eq error[ 'message' ], matcher
+      message = CND.remove_colors error[ 'message' ]
+      warn JSON.stringify [ probe, message, ]
+      T.eq message, matcher
   #.........................................................................................................
   return null
 
@@ -258,7 +260,8 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) parse extended formulas (bracketed)" ] = ( T ) ->
   probes_and_matchers = [
-      [ '(⿱北㓁允)', [ '⿱', [ '北', '㓁', '允' ] ], ]
+    [ '(⿰亻聿式)', [ '⿰', '亻', '聿', '式', ], ]
+    [ '(⿱北㓁允)', [ '⿱', '北', '㓁', '允', ], ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     result = IDLX.parse probe
@@ -277,38 +280,45 @@ unless module.parent?
     "sanity checks (grammar data)"
     #.......................................................................................................
     "(IDL) parse simple formulas"
-    "(IDL) parse tree of simple formulas"
     "(IDL) reject bogus formulas"
+    "(IDL) parse tree of simple formulas"
     #.......................................................................................................
-    "(IDLX) parse simple formulas"
     "(IDLX) reject bogus formulas"
     "(IDLX) reject IDL operators with arity 3"
+    "(IDLX) parse simple formulas"
     "(IDLX) parse extended formulas (plain)"
     # "(IDLX) parse extended formulas (bracketed)"
     ]
   @_prune()
-  # @_main()
+  @_main()
 
-  # urge IDL.parse "⿱癶⿰弓貝"
-  # help IDL.parse_tree "貝"
-  # d = IDL.parse_tree "⿱癶⿰弓貝"
-  # d = IDLX.parse_tree "⿺走⿹◰口戈〓"
-  # d = IDLX._tokenize null, "⿺走⿹◰口弓戈〓"
-  sources = [
-    ""
-    "⿺"
-    "走"
-    "走⿹◰口弓戈〓"
-    "⿺走x"
-    "⿺走⿹◰口弓戈〓"
-    ]
-  for source in sources
-    try
-      d = IDLX.parse_tree source
-    catch error
-      info error[ 'message' ]
-  # debug '30221', d
-
+  demo_errors = ->
+    # urge IDL.parse "⿱癶⿰弓貝"
+    # help IDL.parse_tree "貝"
+    # d = IDL.parse_tree "⿱癶⿰弓貝"
+    # d = IDLX.parse_tree "⿺走⿹◰口戈〓"
+    # d = IDLX._tokenize null, "⿺走⿹◰口弓戈〓"
+    sources = [
+      ""
+      "⿺"
+      "走"
+      "走⿹◰口弓戈〓"
+      "⿺走x"
+      "⿺走⿹◰口弓戈〓"
+      ]
+    for source in sources
+      try
+        d = IDLX.parse_tree source
+      catch error
+        info error[ 'message' ]
+  # demo_errors()
+  # prototype = {}
+  # prototype.x = 42
+  # d = Object.create prototype
+  # d.y = 'helo'
+  # debug d
+  # debug 'x' of d
+  # debug 'y' of d
 
 ###
 

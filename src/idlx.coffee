@@ -52,8 +52,8 @@ IDL                       = require './idl'
   token     = me.tokens[ me.idx ]
   #.........................................................................................................
   unless token?
-    @_mark_token me, me.idx - 1
-    throw new Error "syntax error: premature end of source in #{rpr me.tokens})"
+    tokens_txt = @_rpr_tokens me, me.idx - 1
+    throw new Error "syntax error: premature end of source in #{tokens_txt})"
   #.........................................................................................................
   me.idx   += +1
   target    = null
@@ -74,8 +74,8 @@ IDL                       = require './idl'
       else        R = token
     #.......................................................................................................
     else
-      @_mark_token me
-      throw new Error "syntax error: illegal token (type #{rpr type}) in #{rpr me.tokens}"
+      tokens_txt = @_rpr_tokens me, me.idx - 1
+      throw new Error "syntax error: illegal token #{rpr token.s} (type #{rpr type}) in #{tokens_txt}"
   #.........................................................................................................
   return R
 
