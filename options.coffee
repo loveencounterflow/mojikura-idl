@@ -56,8 +56,25 @@ module.exports = O =
       '↔':  { name: 'mirror',         arity: 1, }
       '↕':  { name: 'flip',           arity: 1, }
 
+    brackets:
+      '(':  { name: 'lbracket',                 }
+      ')':  { name: 'rbracket',                 }
+
     solitaires:
-      '●':  { name: 'finish', }
+      '●':  { name: 'terminator',               }
+      '▽':  { name: 'inhibitor',                }
+
+    proxies:
+      '〓':  { name: 'getamark',                 }
+      '§':  { name: 'curl',                     }
+
+
+
+
+
+
+
+
 
 
 

@@ -28,7 +28,7 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_new_parse = ( source ) ->
   R =
-   '~isa':    'MOJIKURA-IDL/IDL/parse'
+   '~isa':    'MOJIKURA-IDL/parse'
    source:    source
    stack:     []
    idx:       0
@@ -38,8 +38,12 @@ O                         = require './options'
 #===========================================================================================================
 # TOKENS
 #-----------------------------------------------------------------------------------------------------------
+@tokenize = ( source ) -> ( @_new_parse source ).tokens
+
+#-----------------------------------------------------------------------------------------------------------
 @_tokenize = ( me, source ) ->
   R       = []
+  R       = @_new_token_list me
   chrs    = MKNCR.chrs_from_text source
   cu_idx  = 0
   for symbol in chrs
@@ -49,16 +53,37 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
+@_new_token_list = ( me ) ->
+  R = []
+  #.........................................................................................................
+  R.inspect = ( P... ) ->
+    # color = if R.error? then CND.red else CND.white
+    # return color "#{R.t} #{R.s}"
+    kernel = ( rpr element for element in R ).join ''
+    return CND.white "[ #{kernel} ]"
+  #.........................................................................................................
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
 @_new_token = ( me, symbol, cu_idx ) ->
   type  = @_type_of_symbol me, symbol
   ### `t` for 'type' ###
-  R     = { s: symbol, idx: cu_idx, t: type, }
+  R     = { '~isa': 'MOJIKURA-IDL/token', s: symbol, idx: cu_idx, t: type, }
+  #.........................................................................................................
   switch type
     when 'operator'
       operator  = @_operator_from_symbol me, symbol
       R.a       = operator.arity
       R.n       = operator.name
+  #.........................................................................................................
+  R.inspect = ( P... ) ->
+    return CND.red   " ✘ #{R.s} ✘ " if R.error?
+    return CND.white "#{R.s}"
+  #.........................................................................................................
   return R
+
+#-----------------------------------------------------------------------------------------------------------
+@_isa_token = ( x ) -> CND.isa x, 'MOJIKURA-IDL/token'
 
 #-----------------------------------------------------------------------------------------------------------
 @_operator_from_symbol = ( me, symbol ) ->
@@ -86,12 +111,15 @@ O                         = require './options'
   return @_parse @parse_tree source
 
 #-----------------------------------------------------------------------------------------------------------
-@_parse = ( csl ) ->
-  return csl.s unless CND.isa_list csl
-  R = []
-  for token in csl
-    R.push @_parse token
-  return R
+@_parse = ( element ) ->
+  return element.s if @_isa_token element
+  return ( @_parse token for token in element )
+
+#-----------------------------------------------------------------------------------------------------------
+@_mark_token = ( me, idx = null ) ->
+  idx ?= me.idx
+  offending_token.error = yes if ( offending_token = me.tokens[ me.idx ] )?
+  return null
 
 #-----------------------------------------------------------------------------------------------------------
 @parse_tree = ( source ) ->
@@ -99,8 +127,15 @@ O                         = require './options'
   throw new Error "syntax error (empty text)" unless source.length > 0
   me  = @_new_parse   source
   R   = @_parse_tree  me
-  unless me.idx is me.tokens.length
-    throw new Error "syntax error (token idx #{me.idx} of #{rpr me.source})"
+  #.........................................................................................................
+  if me.idx isnt me.tokens.length
+    @_mark_token me
+    throw new Error "syntax error: extra token(s) (##{me.idx} of #{rpr me.tokens})"
+  #.........................................................................................................
+  if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )
+    @_mark_token me, 0
+    throw new Error "syntax error:  lone token of type #{rpr type} in #{rpr me.source}"
+  #.........................................................................................................
   return R
 
 #-----------------------------------------------------------------------------------------------------------
@@ -126,7 +161,7 @@ O                         = require './options'
       else        R = token
     #.......................................................................................................
     else
-      throw new Error "unable to parse token of type #{type} (token idx #{me.idx} of #{rpr me.source})"
+      throw new Error "unable to parse token of type #{rpr type} (##{me.idx} of #{rpr me.source})"
   #.........................................................................................................
   return R
 

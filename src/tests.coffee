@@ -114,7 +114,6 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) parse simple formulas" ] = ( T ) ->
   probes_and_matchers = [
-    ["木","木"]
     ["⿲木木木",["⿲","木","木","木"]]
     ["⿱癶⿰弓貝",["⿱","癶",["⿰","弓","貝"]]]
     ["⿱⿰亻式貝",["⿱",["⿰","亻","式"],"貝"]]
@@ -131,12 +130,11 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) parse tree of simple formulas" ] = ( T ) ->
   probes_and_matchers = [
-    ["木",{"s":"木","idx":0,"t":"component"}]
-    ["⿲木木木",[{"s":"⿲","idx":0,"t":"operator","a":3,"n":"pillars"},{"s":"木","idx":1,"t":"component"},{"s":"木","idx":2,"t":"component"},{"s":"木","idx":3,"t":"component"}]]
-    ["⿱癶⿰弓貝",[{"s":"⿱","idx":0,"t":"operator","a":2,"n":"top/down"},{"s":"癶","idx":1,"t":"component"},[{"s":"⿰","idx":2,"t":"operator","a":2,"n":"left-right"},{"s":"弓","idx":3,"t":"component"},{"s":"貝","idx":4,"t":"component"}]]]
-    ["⿱⿰亻式貝",[{"s":"⿱","idx":0,"t":"operator","a":2,"n":"top/down"},[{"s":"⿰","idx":1,"t":"operator","a":2,"n":"left-right"},{"s":"亻","idx":2,"t":"component"},{"s":"式","idx":3,"t":"component"}],{"s":"貝","idx":4,"t":"component"}]]
-    ["⿱⿰亻式⿱目八",[{"s":"⿱","idx":0,"t":"operator","a":2,"n":"top/down"},[{"s":"⿰","idx":1,"t":"operator","a":2,"n":"left-right"},{"s":"亻","idx":2,"t":"component"},{"s":"式","idx":3,"t":"component"}],[{"s":"⿱","idx":4,"t":"operator","a":2,"n":"top/down"},{"s":"目","idx":5,"t":"component"},{"s":"八","idx":6,"t":"component"}]]]
-    ["⿺辶言",[{"s":"⿺","idx":0,"t":"operator","a":2,"n":"leftbottom"},{"s":"辶","idx":1,"t":"component"},{"s":"言","idx":2,"t":"component"}]]
+    ["⿲木木木",[{"~isa":"MOJIKURA-IDL/token","s":"⿲","idx":0,"t":"operator","a":3,"n":"pillars"},{"~isa":"MOJIKURA-IDL/token","s":"木","idx":1,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"木","idx":2,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"木","idx":3,"t":"component"}]]
+    ["⿱癶⿰弓貝",[{"~isa":"MOJIKURA-IDL/token","s":"⿱","idx":0,"t":"operator","a":2,"n":"top/down"},{"~isa":"MOJIKURA-IDL/token","s":"癶","idx":1,"t":"component"},[{"~isa":"MOJIKURA-IDL/token","s":"⿰","idx":2,"t":"operator","a":2,"n":"left-right"},{"~isa":"MOJIKURA-IDL/token","s":"弓","idx":3,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"貝","idx":4,"t":"component"}]]]
+    ["⿱⿰亻式貝",[{"~isa":"MOJIKURA-IDL/token","s":"⿱","idx":0,"t":"operator","a":2,"n":"top/down"},[{"~isa":"MOJIKURA-IDL/token","s":"⿰","idx":1,"t":"operator","a":2,"n":"left-right"},{"~isa":"MOJIKURA-IDL/token","s":"亻","idx":2,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"式","idx":3,"t":"component"}],{"~isa":"MOJIKURA-IDL/token","s":"貝","idx":4,"t":"component"}]]
+    ["⿱⿰亻式⿱目八",[{"~isa":"MOJIKURA-IDL/token","s":"⿱","idx":0,"t":"operator","a":2,"n":"top/down"},[{"~isa":"MOJIKURA-IDL/token","s":"⿰","idx":1,"t":"operator","a":2,"n":"left-right"},{"~isa":"MOJIKURA-IDL/token","s":"亻","idx":2,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"式","idx":3,"t":"component"}],[{"~isa":"MOJIKURA-IDL/token","s":"⿱","idx":4,"t":"operator","a":2,"n":"top/down"},{"~isa":"MOJIKURA-IDL/token","s":"目","idx":5,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"八","idx":6,"t":"component"}]]]
+    ["⿺辶言",[{"~isa":"MOJIKURA-IDL/token","s":"⿺","idx":0,"t":"operator","a":2,"n":"leftbottom"},{"~isa":"MOJIKURA-IDL/token","s":"辶","idx":1,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"言","idx":2,"t":"component"}]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     result = IDL.parse_tree probe
@@ -148,14 +146,17 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
+    ["木","syntax error:  lone token of type 'component' in '木'"]
     [42,"expected a text, got a number"]
     ["","syntax error (empty text)"]
     ["⿱⿰亻式⿱目八木木木","syntax error (token idx 7 of '⿱⿰亻式⿱目八木木木')"]
     ["⿺廴聿123","syntax error (token idx 3 of '⿺廴聿123')"]
     ["⿺","syntax error (premature end of source '⿺')"]
     ["⿺⿺⿺⿺","syntax error (premature end of source '⿺⿺⿺⿺')"]
-    ["⿺12","unable to parse token of type other (token idx 2 of '⿺12')"]
-    ["(⿰亻聿式)","unable to parse token of type other (token idx 1 of '(⿰亻聿式)')"]
+    ["⿺12","unable to parse token of type 'other' (token idx 2 of '⿺12')"]
+    ["(⿰亻聿式)","unable to parse token of type 'other' (token idx 1 of '(⿰亻聿式)')"]
+    ["≈〇","unable to parse token of type 'other' (token idx 1 of '≈〇')"]
+    ["●","unable to parse token of type 'other' (token idx 1 of '●')"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -173,7 +174,6 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) parse simple formulas" ] = ( T ) ->
   probes_and_matchers = [
-    ["木","木"]
     ["⿱癶⿰弓貝",["⿱","癶",["⿰","弓","貝"]]]
     ["⿱⿰亻式貝",["⿱",["⿰","亻","式"],"貝"]]
     ["⿱⿰亻式⿱目八",["⿱",["⿰","亻","式"],["⿱","目","八"]]]
@@ -189,14 +189,15 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
+    ["木","syntax error:  lone token of type 'component' in '木'"]
     [42,"expected a text, got a number"]
     ["","syntax error (empty text)"]
     ["⿱⿰亻式⿱目八木木木","syntax error (token idx 7 of '⿱⿰亻式⿱目八木木木')"]
     ["⿺廴聿123","syntax error (token idx 3 of '⿺廴聿123')"]
     ["⿺","syntax error (premature end of source '⿺')"]
     ["⿺⿺⿺⿺","syntax error (premature end of source '⿺⿺⿺⿺')"]
-    ["⿺12","unable to parse token of type other (token idx 2 of '⿺12')"]
-    ["(⿰亻聿式)","unable to parse token of type other (token idx 1 of '(⿰亻聿式)')"]
+    ["⿺12","unable to parse token of type 'other' (token idx 2 of '⿺12')"]
+    ["(⿰亻聿式)","unable to parse token of type 'other' (token idx 1 of '(⿰亻聿式)')"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -224,27 +225,40 @@ nice_text_rpr = ( text ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@[ "(IDLX) parse extended formulas" ] = ( T ) ->
+@[ "(IDLX) parse extended formulas (plain)" ] = ( T ) ->
   probes_and_matchers = [
       [ '≈㐀', [ '≈', '㐀', ], ]
       [ '≈𠀎', [ '≈', '𠀎', ], ]
       [ '≈𪜀', [ '≈', '𪜀', ], ]
       [ '≈〇', [ '≈', '〇', ], ]
       [ '●', '●', ]
-      #  ['▽', []]
-      # [ '↻正', [ '↻', '正', ], ]
-      # [ '↔≈匕', [ '↔', [ '≈', '匕' ] ], ]
-      # [ '↔正', [ '↔', '正', ], ]
-      # [ '⿱丶乂', [ '⿱', '丶', '乂', ], ]
-      # [ '⿺走⿹◰口戈日', [ '⿺', '走', [ '⿹', [ '◰', '口', '戈' ], '日' ] ], ]
-      # [ '(⿱北㓁允)', [ '⿱', [ '北', '㓁', '允' ] ], ]
-      # ['≈匚', [ '≈', '匚' ], ]
-      # ['≈&jzr#xe174;', [ '≈', '&jzr#xe174;' ], ]
-      # ['≈非', [ '≈', '非' ], ]
-      # [ '⿱§&jzr#xe199;', [ '⿱', '§', '&jzr#xe199;' ], ]
-      # [ '〓', [ '〓' ], ]
-      # [ '⿺走⿹◰口〓日', [ '⿺', '走', [ '⿹', [ '◰', '口', '〓' ], '日' ] ], ]
-      # # [ '⿻串⿰立&jzr#x1234;', [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
+      [ '〓', '〓', ]
+      [ '⿱〓〓', [ '⿱', '〓', '〓' ]]
+      [ '▽', '▽', ]
+      [ '↻正', [ '↻', '正', ], ]
+      [ '↔≈匕', [ '↔', [ '≈', '匕' ] ], ]
+      [ '↔正', [ '↔', '正', ], ]
+      [ '⿱丶乂', [ '⿱', '丶', '乂', ], ]
+      [ '⿺走⿹◰口戈日', [ '⿺', '走', [ '⿹', [ '◰', '口', '戈' ], '日' ] ], ]
+      ['≈匚', [ '≈', '匚' ], ]
+      ['≈&jzr#xe174;', [ '≈', '&jzr#xe174;' ], ]
+      ['≈非', [ '≈', '非' ], ]
+      [ '⿺走⿹◰口〓日', [ '⿺', '走', [ '⿹', [ '◰', '口', '〓' ], '日' ] ], ]
+      [ '⿻串⿰立&jzr#x1234;', [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
+      [ '⿱丶⿵𠘨§', [ '⿱', '§', '&jzr#xe199;' ], ]
+      # [ '𡦹:⿱丶⿵𠘨§', [ '⿱', '§', '&jzr#xe199;' ], ]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    result = IDLX.parse probe
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) parse extended formulas (bracketed)" ] = ( T ) ->
+  probes_and_matchers = [
+      [ '(⿱北㓁允)', [ '⿱', [ '北', '㓁', '允' ] ], ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     result = IDLX.parse probe
@@ -269,11 +283,54 @@ unless module.parent?
     "(IDLX) parse simple formulas"
     "(IDLX) reject bogus formulas"
     "(IDLX) reject IDL operators with arity 3"
-    "(IDLX) parse extended formulas"
+    "(IDLX) parse extended formulas (plain)"
+    # "(IDLX) parse extended formulas (bracketed)"
     ]
   @_prune()
-  @_main()
+  # @_main()
 
   # urge IDL.parse "⿱癶⿰弓貝"
-  # help IDL.parse_tree "⿱癶⿰弓貝"
-  # IDL.parse    ["⿱癶⿰弓貝",["⿱","癶",["⿰","弓","貝"]]]
+  # help IDL.parse_tree "貝"
+  # d = IDL.parse_tree "⿱癶⿰弓貝"
+  # d = IDLX.parse_tree "⿺走⿹◰口戈〓"
+  # d = IDLX._tokenize null, "⿺走⿹◰口弓戈〓"
+  sources = [
+    "⿺"
+    "走"
+    "走⿹◰口弓戈〓"
+    "⿺走⿹◰口弓戈〓"
+    ]
+  for source in sources
+    try
+      d = IDLX.parse_tree source
+    catch error
+      info error[ 'message' ]
+  # debug '30221', d
+
+
+###
+
+what's wrong with
+      [ '⿻串⿰立&jzr#x1234;', [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
+
+use custom toString, colors for error display
+
+implement "on error resume next" method for exhaustive testing even with failing tests
+
+use PipeDreams tap to implement benchmarks
+
+detect bogus occurrences of solitaires in non-minimal formulas
+
+remove stack and other unused properties of _new_parse
+
+###
+
+
+
+
+
+
+
+
+
+

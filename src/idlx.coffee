@@ -31,16 +31,18 @@ IDL                       = require './idl'
 # TOKENS
 #-----------------------------------------------------------------------------------------------------------
 @_symbol_is_solitaire   = ( me, symbol ) -> symbol of @grammar.solitaires
+@_symbol_is_proxy       = ( me, symbol ) -> symbol of @grammar.proxies
 # @_symbol_is_lbracket    = ( me, symbol ) -> symbol of @grammar.lbrackets
 # @_symbol_is_rbracket    = ( me, symbol ) -> symbol of @grammar.rbrackets
 
 #-----------------------------------------------------------------------------------------------------------
 @_type_of_symbol = ( me, symbol ) ->
-  return R unless ( R = IDL._type_of_symbol.call IDLX, me, symbol ) is 'other'
+  R = IDL._type_of_symbol.call IDLX, me, symbol
   return 'solitaire'  if @_symbol_is_solitaire  me, symbol
+  return 'proxy'      if @_symbol_is_proxy      me, symbol
   # return 'lbracket'   if @_symbol_is_lbracket   me, symbol
   # return 'rbracket'   if @_symbol_is_rbracket   me, symbol
-  return 'other'
+  return R
 
 
 #===========================================================================================================
@@ -63,12 +65,12 @@ IDL                       = require './idl'
       if R? then  R.push target
       else        R = target
     #.......................................................................................................
-    when 'component', 'solitaire'
+    when 'component', 'solitaire', 'proxy'
       if R? then  R.push token
       else        R = token
     #.......................................................................................................
     else
-      throw new Error "unable to parse token of type #{type} (token idx #{me.idx} of #{rpr me.source})"
+      throw new Error "unable to parse token of type #{rpr type} (token idx #{me.idx} of #{rpr me.source})"
   #.........................................................................................................
   return R
 
