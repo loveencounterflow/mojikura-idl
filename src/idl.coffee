@@ -51,7 +51,7 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_new_token = ( me, symbol, idx ) ->
   type    = @_type_of_symbol me, symbol
-  # symbol  = MKNCR.jzr_as_uchr symbol
+  symbol  = MKNCR.jzr_as_uchr symbol
   ### `t` for 'type' ###
   R       = { '~isa': 'MOJIKURA-IDL/token', s: symbol, idx, t: type, }
   #.........................................................................................................

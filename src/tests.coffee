@@ -52,6 +52,14 @@ nice_text_rpr = ( text ) ->
     delete @[ name ] unless name in include
   return null
 
+#-----------------------------------------------------------------------------------------------------------
+resume_next = ( T, method ) ->
+  try
+    R = method()
+  catch error
+    return Symbol "### ERROR ### " + error[ 'message' ]
+  return R
+
 
 #===========================================================================================================
 # TESTS (SANITY CHECKS)
@@ -129,7 +137,6 @@ nice_text_rpr = ( text ) ->
   #.........................................................................................................
   return null
 
-
 #===========================================================================================================
 # TESTS (IDL)
 #-----------------------------------------------------------------------------------------------------------
@@ -142,7 +149,7 @@ nice_text_rpr = ( text ) ->
     ["⿺辶言",["⿺","辶","言"]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = IDL.parse probe
+    result = resume_next T, -> IDL.parse probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -158,7 +165,7 @@ nice_text_rpr = ( text ) ->
     ["⿺辶言",[{"~isa":"MOJIKURA-IDL/token","s":"⿺","idx":0,"t":"operator","a":2,"n":"leftbottom"},{"~isa":"MOJIKURA-IDL/token","s":"辶","idx":1,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"言","idx":2,"t":"component"}]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = IDL.parse_tree probe
+    result = resume_next T, -> IDL.parse_tree probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -202,7 +209,7 @@ nice_text_rpr = ( text ) ->
     ["⿺辶言",["⿺","辶","言"]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = IDLX.parse probe
+    result = resume_next T, -> IDLX.parse probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -264,15 +271,15 @@ nice_text_rpr = ( text ) ->
       [ '⿱丶乂', [ '⿱', '丶', '乂', ], ]
       [ '⿺走⿹◰口戈日', [ '⿺', '走', [ '⿹', [ '◰', '口', '戈' ], '日' ] ], ]
       ['≈匚', [ '≈', '匚' ], ]
-      ['≈&jzr#xe174;', [ '≈', '&jzr#xe174;' ], ]
+      ["≈&jzr#xe174;",["≈",""]]
       ['≈非', [ '≈', '非' ], ]
       [ '⿺走⿹◰口〓日', [ '⿺', '走', [ '⿹', [ '◰', '口', '〓' ], '日' ] ], ]
-      [ '⿻串⿰立&jzr#x1234;', [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
+      ["⿻串⿰立&jzr#x1234;",["⿻","串",["⿰","立","ሴ"]]]
       ["⿱丶⿵𠘨§",["⿱","丶",["⿵","𠘨","§"]]]
       # [ '𡦹:⿱丶⿵𠘨§', [ '⿱', '§', '&jzr#xe199;' ], ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = IDLX.parse probe
+    result = resume_next T, -> IDLX.parse probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -285,7 +292,7 @@ nice_text_rpr = ( text ) ->
     [ '(⿱北㓁允)', [ '⿱', '北', '㓁', '允', ], ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = IDLX.parse probe
+    result = resume_next T, -> IDLX.parse probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -341,15 +348,11 @@ unless module.parent?
   # debug d
   # debug 'x' of d
   # debug 'y' of d
-  debug '30201', IDLX.parse '⿻串⿰立&jzr#x1234;' # [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
-  debug '30201', IDLX.parse "⿱丶⿵𠘨§" #,["⿱","丶",["⿵","𠘨","§"]]
+  # debug '30201', IDLX.parse '⿻串⿰立&jzr#x1234;' # [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
+  # debug '30201', IDLX.parse "⿱丶⿵𠘨§" #,["⿱","丶",["⿵","𠘨","§"]]
 
 ###
 
-what's wrong with
-      [ '⿻串⿰立&jzr#x1234;', [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
-
-use custom toString, colors for error display
 
 implement "on error resume next" method for exhaustive testing even with failing tests
 
