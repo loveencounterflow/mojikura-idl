@@ -44,18 +44,16 @@ O                         = require './options'
 @_tokenize = ( me, source ) ->
   R       = []
   chrs    = MKNCR.chrs_from_text source
-  cu_idx  = 0
-  for symbol in chrs
-    R.push @_new_token me, symbol, cu_idx
-    ### we're counting JS code units here ###
-    cu_idx += symbol.length
+  for symbol, idx in chrs
+    R.push @_new_token me, symbol, idx
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_new_token = ( me, symbol, cu_idx ) ->
-  type  = @_type_of_symbol me, symbol
+@_new_token = ( me, symbol, idx ) ->
+  type    = @_type_of_symbol me, symbol
+  # symbol  = MKNCR.jzr_as_uchr symbol
   ### `t` for 'type' ###
-  R     = { '~isa': 'MOJIKURA-IDL/token', s: symbol, idx: cu_idx, t: type, }
+  R       = { '~isa': 'MOJIKURA-IDL/token', s: symbol, idx, t: type, }
   #.........................................................................................................
   switch type
     when 'operator'

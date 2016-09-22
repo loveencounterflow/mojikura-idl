@@ -18,6 +18,7 @@ echo                      = CND.echo.bind CND
 #...........................................................................................................
 test                      = require 'guy-test'
 { IDL, IDLX, }            = require './main'
+MKNCR                     = require 'mingkwai-ncr'
 
 
 #===========================================================================================================
@@ -105,6 +106,26 @@ nice_text_rpr = ( text ) ->
   T.ok IDL.grammar.operators isnt IDLX.grammar.operators
   T.ok not CND.equals IDL.grammar,            IDLX.grammar
   T.ok not CND.equals IDL.grammar.operators,  IDLX.grammar.operators
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "sanity checks (MKNCR)" ] = ( T ) ->
+  probes_and_matchers = [
+    ["⿲",["u",["assigned","cjk","idl"]]]
+    ["木",["u",["assigned","ideograph","cjk","sim","sim/has-source","sim/is-target","sim/has-source/global","sim/is-target/global","sim/global"]]]
+    ["&#x1234;",["u",["assigned"]]]
+    ["&#xe100;",["u",["assigned","pua","cjk"]]]
+    ["&jzr#xe100;",["jzr",["assigned","cjk"]]]
+    ["&morohashi#x1234;",["morohashi",["assigned","cjk"]]]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    description     = MKNCR.describe probe
+    # urge JSON.stringify [ probe, description, ]
+    { csg, tag, }   = description
+    result          = [ csg, tag, ]
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
   #.........................................................................................................
   return null
 
@@ -247,7 +268,7 @@ nice_text_rpr = ( text ) ->
       ['≈非', [ '≈', '非' ], ]
       [ '⿺走⿹◰口〓日', [ '⿺', '走', [ '⿹', [ '◰', '口', '〓' ], '日' ] ], ]
       [ '⿻串⿰立&jzr#x1234;', [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
-      [ '⿱丶⿵𠘨§', [ '⿱', '§', '&jzr#xe199;' ], ]
+      ["⿱丶⿵𠘨§",["⿱","丶",["⿵","𠘨","§"]]]
       # [ '𡦹:⿱丶⿵𠘨§', [ '⿱', '§', '&jzr#xe199;' ], ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
@@ -278,6 +299,7 @@ unless module.parent?
     # "(IDL) demo"
     "sanity checks (private methods)"
     "sanity checks (grammar data)"
+    "sanity checks (MKNCR)"
     #.......................................................................................................
     "(IDL) parse simple formulas"
     "(IDL) reject bogus formulas"
@@ -319,6 +341,8 @@ unless module.parent?
   # debug d
   # debug 'x' of d
   # debug 'y' of d
+  debug '30201', IDLX.parse '⿻串⿰立&jzr#x1234;' # [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
+  debug '30201', IDLX.parse "⿱丶⿵𠘨§" #,["⿱","丶",["⿵","𠘨","§"]]
 
 ###
 
