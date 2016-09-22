@@ -84,6 +84,42 @@ nice_text_rpr = ( text ) ->
     result = IDL._tags_from_symbol  null, probe
     help JSON.stringify [ probe, result, ]
     T.eq result, matcher
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDL) sanity checks (grammar data)" ] = ( T ) ->
+  T.ok '⿰' of IDL.grammar.operators
+  T.ok '⿱' of IDL.grammar.operators
+  T.ok '⿴' of IDL.grammar.operators
+  T.ok '⿵' of IDL.grammar.operators
+  T.ok '⿶' of IDL.grammar.operators
+  T.ok '⿷' of IDL.grammar.operators
+  T.ok '⿸' of IDL.grammar.operators
+  T.ok '⿹' of IDL.grammar.operators
+  T.ok '⿺' of IDL.grammar.operators
+  T.ok '⿻' of IDL.grammar.operators
+  T.ok '⿲' of IDL.grammar.operators
+  T.ok '⿳' of IDL.grammar.operators
+  #.........................................................................................................
+  T.ok '⿰' of IDLX.grammar.operators
+  T.ok '⿱' of IDLX.grammar.operators
+  T.ok '⿴' of IDLX.grammar.operators
+  T.ok '⿵' of IDLX.grammar.operators
+  T.ok '⿶' of IDLX.grammar.operators
+  T.ok '⿷' of IDLX.grammar.operators
+  T.ok '⿸' of IDLX.grammar.operators
+  T.ok '⿹' of IDLX.grammar.operators
+  T.ok '⿺' of IDLX.grammar.operators
+  T.ok '⿻' of IDLX.grammar.operators
+  T.ok '⿲' not of IDLX.grammar.operators
+  T.ok '⿳' not of IDLX.grammar.operators
+  T.ok '◰' of IDLX.grammar.operators
+  T.ok '≈' of IDLX.grammar.operators
+  T.ok '↻' of IDLX.grammar.operators
+  T.ok '↔' of IDLX.grammar.operators
+  T.ok '↕' of IDLX.grammar.operators
+  #.........................................................................................................
+  return null
 
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) parse simple formulas" ] = ( T ) ->
@@ -168,7 +204,7 @@ nice_text_rpr = ( text ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject IDL operators with arity 3" ] = ( T ) ->
   probes_and_matchers = [
-    ["⿲木木木",'']
+    ["⿲木木木","syntax error (token idx 1 of '⿲木木木')"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -192,6 +228,7 @@ unless module.parent?
     "(IDLX) parse simple formulas"
     "(IDLX) reject bogus formulas"
     "(IDLX) reject IDL operators with arity 3"
+    "(IDL) sanity checks (grammar data)"
     ]
   @_prune()
   @_main()

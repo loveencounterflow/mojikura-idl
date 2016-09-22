@@ -21,9 +21,6 @@ MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
 IDL                       = require './idl'
 
-############################################################################################################
-module.exports = IDLX = Object.assign {}, ( CND.deep_copy IDL )
-
 # debug '34100', IDL.grammar is IDLX.grammar
 # debug '34100', IDL.grammar.operators is IDLX.grammar.operators
 # debug '34100', CND.equals IDL.grammar, IDLX.grammar
@@ -36,3 +33,6 @@ module.exports = IDLX = Object.assign {}, ( CND.deep_copy IDL )
 #-----------------------------------------------------------------------------------------------------------
 @grammar = O.idlx
 
+
+############################################################################################################
+module.exports = IDLX = Object.assign ( CND.deep_copy IDL ), @
