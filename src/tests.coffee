@@ -354,13 +354,13 @@ unless module.parent?
 ###
 
 
-implement "on error resume next" method for exhaustive testing even with failing tests
-
 use PipeDreams tap to implement benchmarks
 
 detect bogus occurrences of solitaires in non-minimal formulas
 
 remove stack and other unused properties of _new_parse
+
+implement brackets
 
 ###
 
