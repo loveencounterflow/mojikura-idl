@@ -315,6 +315,28 @@ resume_next = ( T, method ) ->
     ["(⿰亻聿)","syntax error: too few constituents in [ (⿰亻聿 ✘ ) ✘  ]"]
     ["(⿰亻)","syntax error: too few constituents in [ (⿰亻 ✘ ) ✘  ]"]
     ["(⿰亻)聿","syntax error: too few constituents in [ (⿰亻 ✘ ) ✘ 聿 ]"]
+    ["(≈北㓁)","??????"]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    try
+      result = IDLX.parse probe
+      T.fail "expected an exception, got result #{rpr result}"
+    catch error
+      message = CND.remove_colors error[ 'message' ]
+      warn JSON.stringify [ probe, message, ]
+      T.eq message, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) reject bogus formulas (solitaires)" ] = ( T ) ->
+  probes_and_matchers = [
+    [ '⿱〓▽', [ '⿱', '〓', '〓' ]]
+    [ '↻●', [ '↻', '正', ], ]
+    [ '↔≈▽', [ '↔', [ '≈', '匕' ] ], ]
+    ["(⿰亻●式)",["⿰","亻","聿","式"]]
+    ["(⿱▽㓁允)",["⿱","北","㓁","允"]]
+    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人●丨))",["⿹","弓",["⿰",["⿱","人","人","丨"],["⿱","人","人","丨"],["⿱","人","人","丨"]]]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -351,10 +373,6 @@ unless module.parent?
   @_prune()
   @_main()
 
-  info IDLX.parse '⿰亻聿'      # [ '⿰', '亻', '聿', ]
-  info IDLX.parse '(⿰亻聿式)'   # [ '⿰', '亻', '聿', '式', ]
-
-
   # demo_errors = ->
   #   sources = [
   #     ""
@@ -373,6 +391,8 @@ unless module.parent?
 ###
 
 detect bogus occurrences of solitaires in non-minimal formulas
+
+detect bogus occurrences of bracketed unary operators (e.g. '(≈北㓁)')
 
 remove stack and other unused properties of _new_parse
 
