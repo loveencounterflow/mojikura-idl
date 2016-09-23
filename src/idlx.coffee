@@ -90,8 +90,10 @@ IDL                       = require './idl'
           loop
             next_token = @_peek_next_token me
             if @_token_is_rbracket next_token
-              debug '77401', me
-              debug '77401', target
+              # debug '77401', me
+              unless target.length - 1 > token.a
+                tokens_txt = @_rpr_tokens me #, me.idx - 1
+                throw new Error "syntax error: too few constituents in #{tokens_txt}"
               @_advance me
               break
             else if @_token_is_constituent next_token

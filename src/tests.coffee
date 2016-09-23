@@ -312,18 +312,18 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas (bracketed)" ] = ( T ) ->
   probes_and_matchers = [
-    # [ '(⿰亻聿)', "", ]
-    [ '(⿰亻)', "", ]
-    # [ '(⿰亻)聿', "", ]
+    ["(⿰亻聿)","syntax error: too few constituents in [ (⿰亻聿 ✘ ) ✘  ]"]
+    ["(⿰亻)","syntax error: too few constituents in [ (⿰亻 ✘ ) ✘  ]"]
+    ["(⿰亻)聿","syntax error: too few constituents in [ (⿰亻 ✘ ) ✘ 聿 ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
       result = IDLX.parse probe
-      # T.fail "expected an exception, got result #{rpr result}"
+      T.fail "expected an exception, got result #{rpr result}"
     catch error
       message = CND.remove_colors error[ 'message' ]
       warn JSON.stringify [ probe, message, ]
-      # T.eq message, matcher
+      T.eq message, matcher
   #.........................................................................................................
   return null
 
@@ -332,20 +332,20 @@ resume_next = ( T, method ) ->
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
-    # # "(IDL) demo"
-    # "sanity checks (private methods)"
-    # "sanity checks (grammar data)"
-    # "sanity checks (MKNCR)"
-    # #.......................................................................................................
-    # "(IDL) parse simple formulas"
-    # "(IDL) reject bogus formulas"
-    # "(IDL) parse tree of simple formulas"
-    # #.......................................................................................................
-    # "(IDLX) reject bogus formulas"
-    # "(IDLX) reject IDL operators with arity 3"
-    # "(IDLX) parse simple formulas"
-    # "(IDLX) parse extended formulas (plain)"
-    # "(IDLX) parse extended formulas (bracketed)"
+    # "(IDL) demo"
+    "sanity checks (private methods)"
+    "sanity checks (grammar data)"
+    "sanity checks (MKNCR)"
+    #.......................................................................................................
+    "(IDL) parse simple formulas"
+    "(IDL) reject bogus formulas"
+    "(IDL) parse tree of simple formulas"
+    #.......................................................................................................
+    "(IDLX) reject bogus formulas"
+    "(IDLX) reject IDL operators with arity 3"
+    "(IDLX) parse simple formulas"
+    "(IDLX) parse extended formulas (plain)"
+    "(IDLX) parse extended formulas (bracketed)"
     "(IDLX) reject bogus formulas (bracketed)"
     ]
   @_prune()
@@ -355,55 +355,25 @@ unless module.parent?
   info IDLX.parse '(⿰亻聿式)'   # [ '⿰', '亻', '聿', '式', ]
 
 
-  demo_errors = ->
-    # urge IDL.parse "⿱癶⿰弓貝"
-    # help IDL.parse_tree "貝"
-    # d = IDL.parse_tree "⿱癶⿰弓貝"
-    # d = IDLX.parse_tree "⿺走⿹◰口戈〓"
-    # d = IDLX._tokenize null, "⿺走⿹◰口弓戈〓"
-    sources = [
-      ""
-      "⿺"
-      "走"
-      "走⿹◰口弓戈〓"
-      "⿺走x"
-      "⿺走⿹◰口弓戈〓"
-      ]
-    for source in sources
-      try
-        d = IDLX.parse_tree source
-      catch error
-        info error[ 'message' ]
-  # demo_errors()
-  # prototype = {}
-  # prototype.x = 42
-  # d = Object.create prototype
-  # d.y = 'helo'
-  # debug d
-  # debug 'x' of d
-  # debug 'y' of d
-  # debug '30201', IDLX.parse '⿻串⿰立&jzr#x1234;' # [ '⿻', '串', [ '⿰', '立', '&jzr#x1234;' ] ], ]
-  # debug '30201', IDLX.parse "⿱丶⿵𠘨§" #,["⿱","丶",["⿵","𠘨","§"]]
+  # demo_errors = ->
+  #   sources = [
+  #     ""
+  #     "⿺"
+  #     "走"
+  #     "走⿹◰口弓戈〓"
+  #     "⿺走x"
+  #     "⿺走⿹◰口弓戈〓"
+  #     ]
+  #   for source in sources
+  #     try
+  #       d = IDLX.parse_tree source
+  #     catch error
+  #       info error[ 'message' ]
 
 ###
-
-
-use PipeDreams tap to implement benchmarks
 
 detect bogus occurrences of solitaires in non-minimal formulas
 
 remove stack and other unused properties of _new_parse
 
-implement brackets
-
 ###
-
-
-
-
-
-
-
-
-
-
