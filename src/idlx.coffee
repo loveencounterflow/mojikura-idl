@@ -54,7 +54,7 @@ IDL                       = require './idl'
 @_get_next_token = ( me, mode ) ->
   R = me.tokens[ me.idx ]
   unless R?
-    @_err me, me.idx - 1, "syntax error: premature end of source"
+    @_err me, me.idx - 1, "IDLX: premature end of source"
   @_advance me unless mode is 'peek'
   return R
 
@@ -78,20 +78,20 @@ IDL                       = require './idl'
         continue
       #.....................................................................................................
       when 'rbracket'
-        @_err me, me.idx - 1, "syntax error: unexpected right bracket"
+        @_err me, me.idx - 1, "IDLX: unexpected right bracket"
       #.....................................................................................................
       when 'operator'
         #...................................................................................................
         if advance
           unless token.a > 1
-            @_err me, me.idx - 1, "syntax error: cannot bracket unary operator"
+            @_err me, me.idx - 1, "IDLX: cannot bracket unary operator"
           target = [ token, ]
           #.................................................................................................
           loop
             next_token = @_peek_next_token me
             if @_token_is_rbracket next_token
               unless target.length - 1 > token.a
-                @_err me, me.idx, "syntax error: too few constituents"
+                @_err me, me.idx, "IDLX: too few constituents"
               @_advance me
               break
             else if @_token_is_constituent next_token
@@ -111,12 +111,12 @@ IDL                       = require './idl'
       #.....................................................................................................
       when 'component', 'solitaire', 'proxy'
         if ( type is 'solitaire' ) and ( me.idx isnt 1 )
-          @_err me, me.idx - 1, "syntax error: cannot have a solitaire here"
+          @_err me, me.idx - 1, "IDLX: cannot have a solitaire here"
         if R? then  R.push token
         else        R = token
       #.....................................................................................................
       else
-        @_err me, me.idx - 1, "syntax error: illegal token #{rpr token.s} (type #{rpr type})"
+        @_err me, me.idx - 1, "IDLX: illegal token #{rpr token.s} (type #{rpr type})"
     break
   #.........................................................................................................
   return R

@@ -174,17 +174,17 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
-    ["木","syntax error: lone token of type 'component' [  ✘ 木 ✘  ]"]
+    ["木","IDL: lone token of type 'component' [  ✘ 木 ✘  ]"]
     [42,"expected a text, got a number"]
-    ["","syntax error: empty text"]
-    ["⿱⿰亻式⿱目八木木木","syntax error: extra token(s) [ ⿱⿰亻式⿱目八 ✘ 木 ✘ 木木 ]"]
-    ["⿺廴聿123","syntax error: extra token(s) [ ⿺廴聿 ✘ 1 ✘ 23 ]"]
-    ["⿺","syntax error: premature end of source [  ✘ ⿺ ✘  ]"]
-    ["⿺⿺⿺⿺","syntax error: premature end of source [ ⿺⿺⿺ ✘ ⿺ ✘  ]"]
-    ["⿺12","syntax error: illegal token '1' (type 'other') [ ⿺ ✘ 1 ✘ 2 ]"]
-    ["(⿰亻聿式)","syntax error: illegal token '(' (type 'other') [  ✘ ( ✘ ⿰亻聿式) ]"]
-    ["≈〇","syntax error: illegal token '≈' (type 'other') [  ✘ ≈ ✘ 〇 ]"]
-    ["●","syntax error: illegal token '●' (type 'other') [  ✘ ● ✘  ]"]
+    ["","IDL: empty text"]
+    ["⿱⿰亻式⿱目八木木木","IDL: extra token(s) [ ⿱⿰亻式⿱目八 ✘ 木 ✘ 木木 ]"]
+    ["⿺廴聿123","IDL: extra token(s) [ ⿺廴聿 ✘ 1 ✘ 23 ]"]
+    ["⿺","IDL: premature end of source [  ✘ ⿺ ✘  ]"]
+    ["⿺⿺⿺⿺","IDL: premature end of source [ ⿺⿺⿺ ✘ ⿺ ✘  ]"]
+    ["⿺12","IDL: illegal token '1' (type 'other') [ ⿺ ✘ 1 ✘ 2 ]"]
+    ["(⿰亻聿式)","IDL: illegal token '(' (type 'other') [  ✘ ( ✘ ⿰亻聿式) ]"]
+    ["≈〇","IDL: illegal token '≈' (type 'other') [  ✘ ≈ ✘ 〇 ]"]
+    ["●","IDL: illegal token '●' (type 'other') [  ✘ ● ✘  ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -218,14 +218,14 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
-    ["木","syntax error: lone token of type 'component' [  ✘ 木 ✘  ]"]
+    ["木","IDL: lone token of type 'component' [  ✘ 木 ✘  ]"]
     [42,"expected a text, got a number"]
-    ["","syntax error: empty text"]
-    ["⿱⿰亻式⿱目八木木木","syntax error: extra token(s) [ ⿱⿰亻式⿱目八 ✘ 木 ✘ 木木 ]"]
-    ["⿺廴聿123","syntax error: extra token(s) [ ⿺廴聿 ✘ 1 ✘ 23 ]"]
-    ["⿺","syntax error: premature end of source [  ✘ ⿺ ✘  ]"]
-    ["⿺⿺⿺⿺","syntax error: premature end of source [ ⿺⿺⿺ ✘ ⿺ ✘  ]"]
-    ["⿺12","syntax error: illegal token '1' (type 'other') [ ⿺ ✘ 1 ✘ 2 ]"]
+    ["","IDL: empty text"]
+    ["⿱⿰亻式⿱目八木木木","IDL: extra token(s) [ ⿱⿰亻式⿱目八 ✘ 木 ✘ 木木 ]"]
+    ["⿺廴聿123","IDL: extra token(s) [ ⿺廴聿 ✘ 1 ✘ 23 ]"]
+    ["⿺","IDLX: premature end of source [  ✘ ⿺ ✘  ]"]
+    ["⿺⿺⿺⿺","IDLX: premature end of source [ ⿺⿺⿺ ✘ ⿺ ✘  ]"]
+    ["⿺12","IDLX: illegal token '1' (type 'other') [ ⿺ ✘ 1 ✘ 2 ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -241,7 +241,7 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject IDL operators with arity 3" ] = ( T ) ->
   probes_and_matchers = [
-    ["⿲木木木","syntax error: extra token(s) [ ⿲ ✘ 木 ✘ 木木 ]"]
+    ["⿲木木木","IDL: extra token(s) [ ⿲ ✘ 木 ✘ 木木 ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -312,16 +312,16 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas (bracketed)" ] = ( T ) ->
   probes_and_matchers = [
-    ["()","syntax error: unexpected right bracket [ ( ✘ ) ✘  ]"]
-    ["(⿰)","syntax error: too few constituents [ (⿰ ✘ ) ✘  ]"]
-    ["(聿)","syntax error: extra token(s) [ (聿 ✘ ) ✘  ]"]
-    [")","syntax error: unexpected right bracket [  ✘ ) ✘  ]"]
-    ["⿰)","syntax error: unexpected right bracket [ ⿰ ✘ ) ✘  ]"]
-    ["聿)","syntax error: extra token(s) [ 聿 ✘ ) ✘  ]"]
-    ["(⿰亻聿)","syntax error: too few constituents [ (⿰亻聿 ✘ ) ✘  ]"]
-    ["(⿰亻)","syntax error: too few constituents [ (⿰亻 ✘ ) ✘  ]"]
-    ["(⿰亻)聿","syntax error: too few constituents [ (⿰亻 ✘ ) ✘ 聿 ]"]
-    ["(≈北㓁)","syntax error: cannot bracket unary operator [ ( ✘ ≈ ✘ 北㓁) ]"]
+    ["()","IDLX: unexpected right bracket [ ( ✘ ) ✘  ]"]
+    ["(⿰)","IDLX: too few constituents [ (⿰ ✘ ) ✘  ]"]
+    ["(聿)","IDL: extra token(s) [ (聿 ✘ ) ✘  ]"]
+    [")","IDLX: unexpected right bracket [  ✘ ) ✘  ]"]
+    ["⿰)","IDLX: unexpected right bracket [ ⿰ ✘ ) ✘  ]"]
+    ["聿)","IDL: extra token(s) [ 聿 ✘ ) ✘  ]"]
+    ["(⿰亻聿)","IDLX: too few constituents [ (⿰亻聿 ✘ ) ✘  ]"]
+    ["(⿰亻)","IDLX: too few constituents [ (⿰亻 ✘ ) ✘  ]"]
+    ["(⿰亻)聿","IDLX: too few constituents [ (⿰亻 ✘ ) ✘ 聿 ]"]
+    ["(≈北㓁)","IDLX: cannot bracket unary operator [ ( ✘ ≈ ✘ 北㓁) ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -337,14 +337,14 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas (solitaires)" ] = ( T ) ->
   probes_and_matchers = [
-    ["⿱〓▽","syntax error: cannot have a solitaire here [ ⿱〓 ✘ ▽ ✘  ]"]
-    ["↻●","syntax error: cannot have a solitaire here [ ↻ ✘ ● ✘  ]"]
-    ["↔≈▽","syntax error: cannot have a solitaire here [ ↔≈ ✘ ▽ ✘  ]"]
-    ["●亻","syntax error: extra token(s) [ ● ✘ 亻 ✘  ]"]
-    ["(●亻式)","syntax error: cannot have a solitaire here [ ( ✘ ● ✘ 亻式) ]"]
-    ["(⿰亻●式)","syntax error: cannot have a solitaire here [ (⿰亻 ✘ ● ✘ 式) ]"]
-    ["(⿱▽㓁允)","syntax error: cannot have a solitaire here [ (⿱ ✘ ▽ ✘ 㓁允) ]"]
-    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人●丨))","syntax error: cannot have a solitaire here [ ⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人 ✘ ● ✘ 丨)) ]"]
+    ["⿱〓▽","IDLX: cannot have a solitaire here [ ⿱〓 ✘ ▽ ✘  ]"]
+    ["↻●","IDLX: cannot have a solitaire here [ ↻ ✘ ● ✘  ]"]
+    ["↔≈▽","IDLX: cannot have a solitaire here [ ↔≈ ✘ ▽ ✘  ]"]
+    ["●亻","IDL: extra token(s) [ ● ✘ 亻 ✘  ]"]
+    ["(●亻式)","IDLX: cannot have a solitaire here [ ( ✘ ● ✘ 亻式) ]"]
+    ["(⿰亻●式)","IDLX: cannot have a solitaire here [ (⿰亻 ✘ ● ✘ 式) ]"]
+    ["(⿱▽㓁允)","IDLX: cannot have a solitaire here [ (⿱ ✘ ▽ ✘ 㓁允) ]"]
+    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人●丨))","IDLX: cannot have a solitaire here [ ⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人 ✘ ● ✘ 丨)) ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -397,8 +397,3 @@ unless module.parent?
   #     catch error
   #       info error[ 'message' ]
 
-###
-
-remove stack and other unused properties of _new_parse
-
-###

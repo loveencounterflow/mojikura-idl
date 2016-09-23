@@ -112,15 +112,15 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @parse_tree = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
-  throw new Error "syntax error: empty text" unless source.length > 0
+  throw new Error "IDL: empty text" unless source.length > 0
   me  = @_new_parse   source
   R   = @_parse_tree  me
   #.........................................................................................................
   if me.idx isnt me.tokens.length
-    @_err me, me.idx, "syntax error: extra token(s)"
+    @_err me, me.idx, "IDL: extra token(s)"
   #.........................................................................................................
   if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )
-    @_err me, 0, "syntax error: lone token of type #{rpr type}"
+    @_err me, 0, "IDL: lone token of type #{rpr type}"
   #.........................................................................................................
   return R
 
@@ -128,7 +128,7 @@ O                         = require './options'
 @_parse_tree = ( me, R = null ) ->
   token     = me.tokens[ me.idx ]
   unless token?
-    @_err me, me.idx - 1, "syntax error: premature end of source"
+    @_err me, me.idx - 1, "IDL: premature end of source"
   me.idx   += +1
   target    = null
   arity     = null
@@ -148,7 +148,7 @@ O                         = require './options'
       else        R = token
     #.......................................................................................................
     else
-      @_err me, me.idx - 1, "syntax error: illegal token #{rpr token.s} (type #{rpr type})"
+      @_err me, me.idx - 1, "IDL: illegal token #{rpr token.s} (type #{rpr type})"
   #.........................................................................................................
   return R
 
