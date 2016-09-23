@@ -85,6 +85,9 @@ IDL                       = require './idl'
       when 'operator'
         #.....................................................................................................
         if advance
+          unless token.a > 1
+            tokens_txt = @_rpr_tokens me, me.idx - 1
+            throw new Error "syntax error: cannot bracket unary operator #{tokens_txt}"
           target = [ token, ]
           #...................................................................................................
           loop
@@ -112,6 +115,9 @@ IDL                       = require './idl'
         else        R = target
       #.......................................................................................................
       when 'component', 'solitaire', 'proxy'
+        if ( type is 'solitaire' ) and ( me.idx isnt 1 )
+          tokens_txt = @_rpr_tokens me, me.idx - 1
+          throw new Error "syntax error: cannot have a solitaire here #{tokens_txt}"
         if R? then  R.push token
         else        R = token
       #.......................................................................................................

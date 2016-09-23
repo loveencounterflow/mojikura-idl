@@ -315,7 +315,7 @@ resume_next = ( T, method ) ->
     ["(⿰亻聿)","syntax error: too few constituents in [ (⿰亻聿 ✘ ) ✘  ]"]
     ["(⿰亻)","syntax error: too few constituents in [ (⿰亻 ✘ ) ✘  ]"]
     ["(⿰亻)聿","syntax error: too few constituents in [ (⿰亻 ✘ ) ✘ 聿 ]"]
-    ["(≈北㓁)","??????"]
+    ["(≈北㓁)","syntax error: cannot bracket unary operator [ ( ✘ ≈ ✘ 北㓁) ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -331,12 +331,14 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas (solitaires)" ] = ( T ) ->
   probes_and_matchers = [
-    [ '⿱〓▽', [ '⿱', '〓', '〓' ]]
-    [ '↻●', [ '↻', '正', ], ]
-    [ '↔≈▽', [ '↔', [ '≈', '匕' ] ], ]
-    ["(⿰亻●式)",["⿰","亻","聿","式"]]
-    ["(⿱▽㓁允)",["⿱","北","㓁","允"]]
-    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人●丨))",["⿹","弓",["⿰",["⿱","人","人","丨"],["⿱","人","人","丨"],["⿱","人","人","丨"]]]]
+    ["⿱〓▽","syntax error: cannot have a solitaire here [ ⿱〓 ✘ ▽ ✘  ]"]
+    ["↻●","syntax error: cannot have a solitaire here [ ↻ ✘ ● ✘  ]"]
+    ["↔≈▽","syntax error: cannot have a solitaire here [ ↔≈ ✘ ▽ ✘  ]"]
+    ["●亻","syntax error: extra token(s) in [ ● ✘ 亻 ✘  ]"]
+    ["(●亻式)","syntax error: cannot have a solitaire here [ ( ✘ ● ✘ 亻式) ]"]
+    ["(⿰亻●式)","syntax error: cannot have a solitaire here [ (⿰亻 ✘ ● ✘ 式) ]"]
+    ["(⿱▽㓁允)","syntax error: cannot have a solitaire here [ (⿱ ✘ ▽ ✘ 㓁允) ]"]
+    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人●丨))","syntax error: cannot have a solitaire here [ ⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人 ✘ ● ✘ 丨)) ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -369,6 +371,7 @@ unless module.parent?
     "(IDLX) parse extended formulas (plain)"
     "(IDLX) parse extended formulas (bracketed)"
     "(IDLX) reject bogus formulas (bracketed)"
+    "(IDLX) reject bogus formulas (solitaires)"
     ]
   @_prune()
   @_main()
