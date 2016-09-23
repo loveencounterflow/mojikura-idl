@@ -312,6 +312,12 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas (bracketed)" ] = ( T ) ->
   probes_and_matchers = [
+    ["()","syntax error: unexpected right bracket [ ( ✘ ) ✘  ]"]
+    ["(⿰)","syntax error: too few constituents in [ (⿰ ✘ ) ✘  ]"]
+    ["(聿)","syntax error: extra token(s) in [ (聿 ✘ ) ✘  ]"]
+    [")","syntax error: unexpected right bracket [  ✘ ) ✘  ]"]
+    ["⿰)","syntax error: unexpected right bracket [ ⿰ ✘ ) ✘  ]"]
+    ["聿)","syntax error: extra token(s) in [ 聿 ✘ ) ✘  ]"]
     ["(⿰亻聿)","syntax error: too few constituents in [ (⿰亻聿 ✘ ) ✘  ]"]
     ["(⿰亻)","syntax error: too few constituents in [ (⿰亻 ✘ ) ✘  ]"]
     ["(⿰亻)聿","syntax error: too few constituents in [ (⿰亻 ✘ ) ✘ 聿 ]"]
@@ -392,10 +398,6 @@ unless module.parent?
   #       info error[ 'message' ]
 
 ###
-
-detect bogus occurrences of solitaires in non-minimal formulas
-
-detect bogus occurrences of bracketed unary operators (e.g. '(≈北㓁)')
 
 remove stack and other unused properties of _new_parse
 

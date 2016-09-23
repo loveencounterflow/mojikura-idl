@@ -30,7 +30,6 @@ O                         = require './options'
   R =
    '~isa':    'MOJIKURA-IDL/parse'
    source:    source
-   stack:     []
    idx:       0
   R.tokens = @_tokenize R, source
   return R
