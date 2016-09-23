@@ -114,7 +114,6 @@ O                         = require './options'
   #.........................................................................................................
   if me.idx isnt me.tokens.length
     tokens_txt = @_rpr_tokens me
-    debug '55091', me
     throw new Error "syntax error: extra token(s) in #{tokens_txt}"
   #.........................................................................................................
   if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )

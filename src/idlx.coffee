@@ -90,6 +90,8 @@ IDL                       = require './idl'
           loop
             next_token = @_peek_next_token me
             if @_token_is_rbracket next_token
+              debug '77401', me
+              debug '77401', target
               @_advance me
               break
             else if @_token_is_constituent next_token
