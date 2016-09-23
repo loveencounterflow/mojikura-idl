@@ -45,20 +45,27 @@ IDL                       = require './idl'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_isa_rbracket = ( x ) -> ( @_isa_token x ) and x.name is 'rbracket'
+@_token_is_rbracket     = ( x ) -> ( @_isa_token x ) and x.name is 'rbracket'
+@_token_is_constituent  = ( x ) -> ( @_isa_token x ) and x.t in [ 'component', 'proxy', ]
 
 #===========================================================================================================
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
-@_parse_tree = ( me, R = null, advance = false ) ->
-  token     = me.tokens[ me.idx ]
-  #.........................................................................................................
-  unless token?
+@_get_next_token = ( me, mode ) ->
+  R = me.tokens[ me.idx ]
+  unless R?
     tokens_txt = @_rpr_tokens me, me.idx - 1
-    debug '12000', me
     throw new Error "syntax error: premature end of source in #{tokens_txt})"
-  #.........................................................................................................
-  me.idx   += +1
+  @_advance me unless mode is 'peek'
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
+@_peek_next_token = ( me ) -> @_get_next_token me, 'peek'
+@_advance         = ( me ) -> me.idx += +1
+
+#-----------------------------------------------------------------------------------------------------------
+@_parse_tree = ( me, R = null, advance = false ) ->
+  token     = @_get_next_token me
   target    = null
   arity     = null
   #.........................................................................................................
@@ -71,17 +78,25 @@ IDL                       = require './idl'
     #.......................................................................................................
     when 'rbracket'
       R = token
-      # me.idx += +1
     #.......................................................................................................
     when 'operator'
-      arity   = token.a
-      target  = [ token, ]
       if advance
+        next_token  = @_get_next_token me
+        target      = [ next_token, ]
+        #...................................................................................................
+        unless next_token.t is 'operator'
+          tokens_txt = @_rpr_tokens me, me.idx - 1
+          throw new Error "syntax error: expected operator in #{tokens_txt}"
+        #...................................................................................................
         loop
-          next_expression = @_parse_tree me
-          debug '20110', next_expression
-          break if @_isa_rbracket next_expression
+          next_token = @_peek_next_token me
+          if @_token_is_rbracket next_expression
+            @_advance me
+            break
+          target.push @_parse_tree me
       else
+        arity   = token.a
+        target  = [ token, ]
         for count in [ 1 .. arity ] by +1
           @_parse_tree me, target
       if R? then  R.push target

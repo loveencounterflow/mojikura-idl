@@ -40,6 +40,8 @@ module.exports = O =
 
   idlx:
     operators:
+      '???':  { name: 'variable-operator', arity: null, }
+      # '???':  { name: 'null-operator', arity: 0, }
       '⿰':  { name: 'left-right',     arity: 2, }
       '⿱':  { name: 'top/down',       arity: 2, }
       '⿴':  { name: 'surround',       arity: 2, }
@@ -65,6 +67,7 @@ module.exports = O =
       '▽':  { name: 'inhibitor',                }
 
     proxies:
+      '???':  { name: 'variable-component',                 }
       '〓':  { name: 'getamark',                 }
       '§':  { name: 'curl',                     }
 
