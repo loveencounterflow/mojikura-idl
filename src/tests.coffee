@@ -340,7 +340,11 @@ unless module.parent?
     # "(IDLX) reject bogus bracketed formulas"
     ]
   @_prune()
-  @_main()
+  # @_main()
+
+  info IDLX.parse '⿰亻聿'      # [ '⿰', '亻', '聿', ]
+  info IDLX.parse '(⿰亻聿式)'   # [ '⿰', '亻', '聿', '式', ]
+
 
   demo_errors = ->
     # urge IDL.parse "⿱癶⿰弓貝"

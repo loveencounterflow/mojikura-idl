@@ -45,7 +45,7 @@ IDL                       = require './idl'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_token_is_rbracket     = ( x ) -> ( @_isa_token x ) and x.name is 'rbracket'
+@_token_is_rbracket     = ( x ) -> ( @_isa_token x ) and x.t is 'rbracket'
 @_token_is_constituent  = ( x ) -> ( @_isa_token x ) and x.t in [ 'component', 'proxy', ]
 
 #===========================================================================================================
@@ -62,53 +62,73 @@ IDL                       = require './idl'
 #-----------------------------------------------------------------------------------------------------------
 @_peek_next_token = ( me ) -> @_get_next_token me, 'peek'
 @_advance         = ( me ) -> me.idx += +1
+@_try_to_advance  = ( me ) -> me.idx += +1 if me.idx < me.tokens.length - 1
 
 #-----------------------------------------------------------------------------------------------------------
-@_parse_tree = ( me, R = null, advance = false ) ->
-  token     = @_get_next_token me
-  target    = null
-  arity     = null
+@_parse_tree = ( me, R = null ) ->
+  advance = false
+  # stay_in_outer_loop = no
   #.........................................................................................................
-  switch type = token.t
-    #.......................................................................................................
-    when 'lbracket'
-      expression = @_parse_tree me, null, yes
-      if R? then  R.push expression
-      else        R = expression
-    #.......................................................................................................
-    when 'rbracket'
-      R = token
-    #.......................................................................................................
-    when 'operator'
-      if advance
-        next_token  = @_get_next_token me
-        target      = [ next_token, ]
-        #...................................................................................................
-        unless next_token.t is 'operator'
-          tokens_txt = @_rpr_tokens me, me.idx - 1
-          throw new Error "syntax error: expected operator in #{tokens_txt}"
-        #...................................................................................................
-        loop
-          next_token = @_peek_next_token me
-          if @_token_is_rbracket next_expression
-            @_advance me
-            break
-          target.push @_parse_tree me
+  loop
+    token     = @_get_next_token me
+    target    = null
+    arity     = null
+    urge '30200', token
+    switch type = token.t
+      #.......................................................................................................
+      when 'lbracket'
+        # expression = @_parse_tree me, null, yes
+        # if R? then  R.push expression
+        # else        R = expression
+        advance = yes
+        continue
+      #.......................................................................................................
+      when 'rbracket'
+        R = token
+        debug '67300', target
+        debug '67300', R
+        throw new Error "MEH"
+      #.......................................................................................................
+      when 'operator'
+        debug '30201', token.s, advance
+        #.....................................................................................................
+        if advance
+          target = [ token, ]
+          #...................................................................................................
+          loop
+            next_token = @_peek_next_token me
+            help '30202', next_token, @_token_is_rbracket next_token
+            if @_token_is_rbracket next_token
+              @_advance me
+              # @_try_to_advance me
+              # stay_in_outer_loop = yes
+              break
+            else if @_token_is_constituent next_token
+              target.push next_token
+              @_advance me
+            else
+              target.push @_parse_tree me
+        #.....................................................................................................
+        else
+          arity   = token.a
+          target  = [ token, ]
+          for count in [ 1 .. arity ] by +1
+            @_parse_tree me, target
+        #.....................................................................................................
+        if R? then  R.push target
+        else        R = target
+        debug '88111', target
+        # debug '88112', stay_in_outer_loop
+        # break unless stay_in_outer_loop
+      #.......................................................................................................
+      when 'component', 'solitaire', 'proxy'
+        if R? then  R.push token
+        else        R = token
+      #.......................................................................................................
       else
-        arity   = token.a
-        target  = [ token, ]
-        for count in [ 1 .. arity ] by +1
-          @_parse_tree me, target
-      if R? then  R.push target
-      else        R = target
-    #.......................................................................................................
-    when 'component', 'solitaire', 'proxy'
-      if R? then  R.push token
-      else        R = token
-    #.......................................................................................................
-    else
-      tokens_txt = @_rpr_tokens me, me.idx - 1
-      throw new Error "syntax error: illegal token #{rpr token.s} (type #{rpr type}) in #{tokens_txt}"
+        tokens_txt = @_rpr_tokens me, me.idx - 1
+        throw new Error "syntax error: illegal token #{rpr token.s} (type #{rpr type}) in #{tokens_txt}"
+    break
   #.........................................................................................................
   return R
 
