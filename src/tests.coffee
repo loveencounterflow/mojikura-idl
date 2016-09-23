@@ -323,24 +323,24 @@ resume_next = ( T, method ) ->
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
-    # # "(IDL) demo"
-    # "sanity checks (private methods)"
-    # "sanity checks (grammar data)"
-    # "sanity checks (MKNCR)"
-    # #.......................................................................................................
-    # "(IDL) parse simple formulas"
-    # "(IDL) reject bogus formulas"
-    # "(IDL) parse tree of simple formulas"
-    # #.......................................................................................................
-    # "(IDLX) reject bogus formulas"
-    # "(IDLX) reject IDL operators with arity 3"
-    # "(IDLX) parse simple formulas"
-    # "(IDLX) parse extended formulas (plain)"
+    # "(IDL) demo"
+    "sanity checks (private methods)"
+    "sanity checks (grammar data)"
+    "sanity checks (MKNCR)"
+    #.......................................................................................................
+    "(IDL) parse simple formulas"
+    "(IDL) reject bogus formulas"
+    "(IDL) parse tree of simple formulas"
+    #.......................................................................................................
+    "(IDLX) reject bogus formulas"
+    "(IDLX) reject IDL operators with arity 3"
+    "(IDLX) parse simple formulas"
+    "(IDLX) parse extended formulas (plain)"
     "(IDLX) parse extended formulas (bracketed)"
     # "(IDLX) reject bogus bracketed formulas"
     ]
   @_prune()
-  # @_main()
+  @_main()
 
   info IDLX.parse '⿰亻聿'      # [ '⿰', '亻', '聿', ]
   info IDLX.parse '(⿰亻聿式)'   # [ '⿰', '亻', '聿', '式', ]

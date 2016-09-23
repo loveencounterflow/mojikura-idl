@@ -73,35 +73,25 @@ IDL                       = require './idl'
     token     = @_get_next_token me
     target    = null
     arity     = null
-    urge '30200', token
     switch type = token.t
       #.......................................................................................................
       when 'lbracket'
-        # expression = @_parse_tree me, null, yes
-        # if R? then  R.push expression
-        # else        R = expression
         advance = yes
         continue
       #.......................................................................................................
       when 'rbracket'
         R = token
-        debug '67300', target
-        debug '67300', R
         throw new Error "MEH"
       #.......................................................................................................
       when 'operator'
-        debug '30201', token.s, advance
         #.....................................................................................................
         if advance
           target = [ token, ]
           #...................................................................................................
           loop
             next_token = @_peek_next_token me
-            help '30202', next_token, @_token_is_rbracket next_token
             if @_token_is_rbracket next_token
               @_advance me
-              # @_try_to_advance me
-              # stay_in_outer_loop = yes
               break
             else if @_token_is_constituent next_token
               target.push next_token
@@ -117,9 +107,6 @@ IDL                       = require './idl'
         #.....................................................................................................
         if R? then  R.push target
         else        R = target
-        debug '88111', target
-        # debug '88112', stay_in_outer_loop
-        # break unless stay_in_outer_loop
       #.......................................................................................................
       when 'component', 'solitaire', 'proxy'
         if R? then  R.push token
