@@ -54,8 +54,7 @@ IDL                       = require './idl'
 @_get_next_token = ( me, mode ) ->
   R = me.tokens[ me.idx ]
   unless R?
-    tokens_txt = @_rpr_tokens me, me.idx - 1
-    throw new Error "syntax error: premature end of source in #{tokens_txt})"
+    @_err me, me.idx - 1, "syntax error: premature end of source"
   @_advance me unless mode is 'peek'
   return R
 
@@ -79,24 +78,20 @@ IDL                       = require './idl'
         continue
       #.....................................................................................................
       when 'rbracket'
-        tokens_txt = @_rpr_tokens me, me.idx - 1
-        throw new Error "syntax error: unexpected right bracket #{tokens_txt}"
+        @_err me, me.idx - 1, "syntax error: unexpected right bracket"
       #.....................................................................................................
       when 'operator'
         #...................................................................................................
         if advance
           unless token.a > 1
-            tokens_txt = @_rpr_tokens me, me.idx - 1
-            throw new Error "syntax error: cannot bracket unary operator #{tokens_txt}"
+            @_err me, me.idx - 1, "syntax error: cannot bracket unary operator"
           target = [ token, ]
           #.................................................................................................
           loop
             next_token = @_peek_next_token me
             if @_token_is_rbracket next_token
-              # debug '77401', me
               unless target.length - 1 > token.a
-                tokens_txt = @_rpr_tokens me #, me.idx - 1
-                throw new Error "syntax error: too few constituents in #{tokens_txt}"
+                @_err me, me.idx, "syntax error: too few constituents"
               @_advance me
               break
             else if @_token_is_constituent next_token
@@ -116,14 +111,12 @@ IDL                       = require './idl'
       #.....................................................................................................
       when 'component', 'solitaire', 'proxy'
         if ( type is 'solitaire' ) and ( me.idx isnt 1 )
-          tokens_txt = @_rpr_tokens me, me.idx - 1
-          throw new Error "syntax error: cannot have a solitaire here #{tokens_txt}"
+          @_err me, me.idx - 1, "syntax error: cannot have a solitaire here"
         if R? then  R.push token
         else        R = token
       #.....................................................................................................
       else
-        tokens_txt = @_rpr_tokens me, me.idx - 1
-        throw new Error "syntax error: illegal token #{rpr token.s} (type #{rpr type}) in #{tokens_txt}"
+        @_err me, me.idx - 1, "syntax error: illegal token #{rpr token.s} (type #{rpr type})"
     break
   #.........................................................................................................
   return R

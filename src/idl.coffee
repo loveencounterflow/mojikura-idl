@@ -105,6 +105,11 @@ O                         = require './options'
   return ( @_parse token for token in element )
 
 #-----------------------------------------------------------------------------------------------------------
+@_err = ( me, idx, message ) ->
+  tokens_txt = @_rpr_tokens me, idx
+  throw new Error "#{message} #{tokens_txt}"
+
+#-----------------------------------------------------------------------------------------------------------
 @parse_tree = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "syntax error: empty text" unless source.length > 0
@@ -112,12 +117,10 @@ O                         = require './options'
   R   = @_parse_tree  me
   #.........................................................................................................
   if me.idx isnt me.tokens.length
-    tokens_txt = @_rpr_tokens me
-    throw new Error "syntax error: extra token(s) in #{tokens_txt}"
+    @_err me, me.idx, "syntax error: extra token(s)"
   #.........................................................................................................
   if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )
-    tokens_txt = @_rpr_tokens me, 0
-    throw new Error "syntax error: lone token of type #{rpr type} in #{tokens_txt}"
+    @_err me, 0, "syntax error: lone token of type #{rpr type}"
   #.........................................................................................................
   return R
 
@@ -125,8 +128,7 @@ O                         = require './options'
 @_parse_tree = ( me, R = null ) ->
   token     = me.tokens[ me.idx ]
   unless token?
-    tokens_txt = @_rpr_tokens me, me.idx - 1
-    throw new Error "syntax error: premature end of source in #{tokens_txt})"
+    @_err me, me.idx - 1, "syntax error: premature end of source"
   me.idx   += +1
   target    = null
   arity     = null
@@ -146,8 +148,7 @@ O                         = require './options'
       else        R = token
     #.......................................................................................................
     else
-      tokens_txt = @_rpr_tokens me, me.idx - 1
-      throw new Error "syntax error: illegal token #{rpr token.s} (type #{rpr type}) in #{tokens_txt}"
+      @_err me, me.idx - 1, "syntax error: illegal token #{rpr token.s} (type #{rpr type})"
   #.........................................................................................................
   return R
 
