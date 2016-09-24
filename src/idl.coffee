@@ -19,18 +19,17 @@ MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
 
 #===========================================================================================================
-# GRAMMAR
+#
 #-----------------------------------------------------------------------------------------------------------
-@grammar = O.idl
+@_parser_settings = O.idl
 
-#===========================================================================================================
-# PARSE
 #-----------------------------------------------------------------------------------------------------------
 @_new_parse = ( source ) ->
   R =
-   '~isa':    'MOJIKURA-IDL/parse'
-   source:    source
-   idx:       0
+    '~isa':   'MOJIKURA-IDL/parse'
+    source:   source
+    idx:      0
+    grammar:  @_parser_settings
   R.tokens = @_tokenize R, source
   return R
 
@@ -75,14 +74,14 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_operator_from_symbol = ( me, symbol ) ->
-  unless ( R = @grammar.operators[ symbol ] )?
+  unless ( R = me.grammar.operators[ symbol ] )?
     throw new Error "unknown operator #{rpr symbol}"
   return R
 
 #-----------------------------------------------------------------------------------------------------------
 @_describe_symbol       = ( me, symbol ) -> MKNCR.describe symbol
 @_tags_from_symbol      = ( me, symbol ) -> ( @_describe_symbol me, symbol ).tag ? []
-@_symbol_is_operator    = ( me, symbol ) -> symbol of @grammar.operators
+@_symbol_is_operator    = ( me, symbol ) -> symbol of me.grammar.operators
 @_symbol_is_component   = ( me, symbol ) -> 'cjk' in @_tags_from_symbol me, symbol
 
 #-----------------------------------------------------------------------------------------------------------

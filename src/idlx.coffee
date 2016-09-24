@@ -21,19 +21,20 @@ MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
 IDL                       = require './idl'
 
+
 #===========================================================================================================
-# GRAMMAR
+#
 #-----------------------------------------------------------------------------------------------------------
-@grammar = O.idlx
+@_parser_settings = O.idlx
 
 
 #===========================================================================================================
 # TOKENS
 #-----------------------------------------------------------------------------------------------------------
-@_symbol_is_solitaire   = ( me, symbol ) -> symbol of @grammar.solitaires
-@_symbol_is_proxy       = ( me, symbol ) -> symbol of @grammar.proxies
-@_symbol_is_lbracket    = ( me, symbol ) -> @grammar.brackets[ symbol ]?.name is 'lbracket'
-@_symbol_is_rbracket    = ( me, symbol ) -> @grammar.brackets[ symbol ]?.name is 'rbracket'
+@_symbol_is_solitaire   = ( me, symbol ) -> symbol of me.grammar.solitaires
+@_symbol_is_proxy       = ( me, symbol ) -> symbol of me.grammar.proxies
+@_symbol_is_lbracket    = ( me, symbol ) -> me.grammar.brackets[ symbol ]?.name is 'lbracket'
+@_symbol_is_rbracket    = ( me, symbol ) -> me.grammar.brackets[ symbol ]?.name is 'rbracket'
 
 #-----------------------------------------------------------------------------------------------------------
 @_type_of_symbol = ( me, symbol ) ->

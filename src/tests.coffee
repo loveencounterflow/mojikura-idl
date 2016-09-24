@@ -78,42 +78,42 @@ resume_next = ( T, method ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @[ "sanity checks (grammar data)" ] = ( T ) ->
-  T.ok '⿰' of IDL.grammar.operators
-  T.ok '⿱' of IDL.grammar.operators
-  T.ok '⿴' of IDL.grammar.operators
-  T.ok '⿵' of IDL.grammar.operators
-  T.ok '⿶' of IDL.grammar.operators
-  T.ok '⿷' of IDL.grammar.operators
-  T.ok '⿸' of IDL.grammar.operators
-  T.ok '⿹' of IDL.grammar.operators
-  T.ok '⿺' of IDL.grammar.operators
-  T.ok '⿻' of IDL.grammar.operators
-  T.ok '⿲' of IDL.grammar.operators
-  T.ok '⿳' of IDL.grammar.operators
+  T.ok '⿰' of IDL._parser_settings.operators
+  T.ok '⿱' of IDL._parser_settings.operators
+  T.ok '⿴' of IDL._parser_settings.operators
+  T.ok '⿵' of IDL._parser_settings.operators
+  T.ok '⿶' of IDL._parser_settings.operators
+  T.ok '⿷' of IDL._parser_settings.operators
+  T.ok '⿸' of IDL._parser_settings.operators
+  T.ok '⿹' of IDL._parser_settings.operators
+  T.ok '⿺' of IDL._parser_settings.operators
+  T.ok '⿻' of IDL._parser_settings.operators
+  T.ok '⿲' of IDL._parser_settings.operators
+  T.ok '⿳' of IDL._parser_settings.operators
   #.........................................................................................................
-  T.ok '⿰' of IDLX.grammar.operators
-  T.ok '⿱' of IDLX.grammar.operators
-  T.ok '⿴' of IDLX.grammar.operators
-  T.ok '⿵' of IDLX.grammar.operators
-  T.ok '⿶' of IDLX.grammar.operators
-  T.ok '⿷' of IDLX.grammar.operators
-  T.ok '⿸' of IDLX.grammar.operators
-  T.ok '⿹' of IDLX.grammar.operators
-  T.ok '⿺' of IDLX.grammar.operators
-  T.ok '⿻' of IDLX.grammar.operators
-  T.ok '⿲' not of IDLX.grammar.operators
-  T.ok '⿳' not of IDLX.grammar.operators
-  T.ok '◰' of IDLX.grammar.operators
-  T.ok '≈' of IDLX.grammar.operators
-  T.ok '↻' of IDLX.grammar.operators
-  T.ok '↔' of IDLX.grammar.operators
-  T.ok '↕' of IDLX.grammar.operators
-  T.ok '●' of IDLX.grammar.solitaires
+  T.ok '⿰' of IDLX._parser_settings.operators
+  T.ok '⿱' of IDLX._parser_settings.operators
+  T.ok '⿴' of IDLX._parser_settings.operators
+  T.ok '⿵' of IDLX._parser_settings.operators
+  T.ok '⿶' of IDLX._parser_settings.operators
+  T.ok '⿷' of IDLX._parser_settings.operators
+  T.ok '⿸' of IDLX._parser_settings.operators
+  T.ok '⿹' of IDLX._parser_settings.operators
+  T.ok '⿺' of IDLX._parser_settings.operators
+  T.ok '⿻' of IDLX._parser_settings.operators
+  T.ok '⿲' not of IDLX._parser_settings.operators
+  T.ok '⿳' not of IDLX._parser_settings.operators
+  T.ok '◰' of IDLX._parser_settings.operators
+  T.ok '≈' of IDLX._parser_settings.operators
+  T.ok '↻' of IDLX._parser_settings.operators
+  T.ok '↔' of IDLX._parser_settings.operators
+  T.ok '↕' of IDLX._parser_settings.operators
+  T.ok '●' of IDLX._parser_settings.solitaires
   #.........................................................................................................
-  T.ok IDL.grammar           isnt IDLX.grammar
-  T.ok IDL.grammar.operators isnt IDLX.grammar.operators
-  T.ok not CND.equals IDL.grammar,            IDLX.grammar
-  T.ok not CND.equals IDL.grammar.operators,  IDLX.grammar.operators
+  T.ok IDL._parser_settings           isnt IDLX._parser_settings
+  T.ok IDL._parser_settings.operators isnt IDLX._parser_settings.operators
+  T.ok not CND.equals IDL._parser_settings,            IDLX._parser_settings
+  T.ok not CND.equals IDL._parser_settings.operators,  IDLX._parser_settings.operators
   #.........................................................................................................
   return null
 
