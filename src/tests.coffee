@@ -149,7 +149,7 @@ resume_next = ( T, method ) ->
     ["⿺辶言",["⿺","辶","言"]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = resume_next T, -> IDL.parse probe
+    result = resume_next T, -> IDL.diagram_from_source probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -205,7 +205,7 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
-      result = IDL.parse probe
+      result = IDL.diagram_from_source probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
       message = CND.remove_colors error[ 'message' ]
@@ -226,7 +226,7 @@ resume_next = ( T, method ) ->
     ["⿺辶言",["⿺","辶","言"]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = resume_next T, -> IDLX.parse probe
+    result = resume_next T, -> IDLX.diagram_from_source probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -246,7 +246,7 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
-      result = IDLX.parse probe
+      result = IDLX.diagram_from_source probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
       message = CND.remove_colors error[ 'message' ]
@@ -263,7 +263,7 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
-      result = IDLX.parse probe
+      result = IDLX.diagram_from_source probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
       message = CND.remove_colors error[ 'message' ]
@@ -297,7 +297,7 @@ resume_next = ( T, method ) ->
       # [ '𡦹:⿱丶⿵𠘨§', [ '⿱', '§', '&jzr#xe199;' ], ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = resume_next T, -> IDLX.parse probe
+    result = resume_next T, -> IDLX.diagram_from_source probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -320,8 +320,8 @@ resume_next = ( T, method ) ->
     ["(⿱厶(⿰刃工刃)一(⿰丶丶丶)口)",["⿱","厶",["⿰","刃","工","刃"],"一",["⿰","丶","丶","丶"],"口"]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    # result = resume_next T, -> IDLX.parse probe
-    result = IDLX.parse probe
+    # result = resume_next T, -> IDLX.diagram_from_source probe
+    result = IDLX.diagram_from_source probe
     urge JSON.stringify [ probe, result, ]
     # T.eq result, matcher
   #.........................................................................................................
@@ -343,7 +343,7 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
-      result = IDLX.parse probe
+      result = IDLX.diagram_from_source probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
       message = CND.remove_colors error[ 'message' ]
@@ -366,7 +366,7 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
-      result = IDLX.parse probe
+      result = IDLX.diagram_from_source probe
       T.fail "expected an exception, got result #{rpr result}"
     catch error
       message = CND.remove_colors error[ 'message' ]
@@ -452,9 +452,9 @@ unless module.parent?
   #       info error[ 'message' ]
 
 
-  debug ( IDLX.parse '⿺走日' )
-  debug ( IDLX.parse '(⿱山人儿)' ) # ⿱山.*儿, ⿱人儿
-  debug ( IDLX.parse '⿺辶〓' )
+  debug ( IDLX.diagram_from_source '⿺走日' )
+  debug ( IDLX.diagram_from_source '(⿱山人儿)' ) # ⿱山.*儿, ⿱人儿
+  debug ( IDLX.diagram_from_source '⿺辶〓' )
 
 
 

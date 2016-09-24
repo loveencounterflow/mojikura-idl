@@ -51,10 +51,7 @@ O                         = require './options'
 #===========================================================================================================
 # TOKENS
 #-----------------------------------------------------------------------------------------------------------
-@tokenize = ( source ) -> @_tokenize @_new_ctx source
-
-#-----------------------------------------------------------------------------------------------------------
-@_tokenize = ( me ) ->
+@_get_tokenlist = ( me ) ->
   R         = []
   chrs      = MKNCR.chrs_from_text me.source
   for lexeme, idx in chrs
@@ -110,10 +107,6 @@ O                         = require './options'
 #===========================================================================================================
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
-@parse = @diagram_from_source = ( source ) ->
-  return @_diagram_from_tokentree @tokentree_from_source source
-
-#-----------------------------------------------------------------------------------------------------------
 @_diagram_from_tokentree = ( tokentree ) ->
   ### A 'diagram' is a 'lexeme tree', i.e. the simplified version of a token tree, minus all the
   additional data, leaving just nested lists of lexemes. ###
@@ -121,16 +114,12 @@ O                         = require './options'
   return ( @_diagram_from_tokentree token for token in tokentree )
 
 #-----------------------------------------------------------------------------------------------------------
-@tokentree_from_source = ( source ) ->
-  return @_ctx_from_from_source source
-
-#-----------------------------------------------------------------------------------------------------------
-@_ctx_from_from_source = ( source ) ->
-  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
-  throw new Error "IDL: empty text" unless source.length > 0
-  me      = @_new_ctx source
-  tokens  = @_tokenize      me
-  R       = @_get_tokentree me
+@_get_tokentree = ( me ) ->
+  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of me.source ) is 'text'
+  throw new Error "IDL: empty text" unless me.source.length > 0
+  # me      = @_new_ctx         me.source
+  tokens  = @_get_tokenlist   me
+  R       = @_build_tokentree me
   #.........................................................................................................
   if me.idx isnt me.tokens.length
     @_err me, me.idx, "IDL: extra token(s)"
@@ -142,7 +131,7 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_get_tokentree = ( me, R = null ) ->
+@_build_tokentree = ( me, R = null ) ->
   token     = me.tokens[ me.idx ]
   unless token?
     @_err me, me.idx - 1, "IDL: premature end of source"
@@ -156,7 +145,7 @@ O                         = require './options'
       arity   = token.a
       target  = [ token, ]
       for count in [ 1 .. arity ] by +1
-        @_get_tokentree me, target
+        @_build_tokentree me, target
       if R? then  R.push target
       else        R = target
     #.......................................................................................................
@@ -181,10 +170,18 @@ O                         = require './options'
   return R.join ''
 
 
+#===========================================================================================================
+# PUBLIC API
+#-----------------------------------------------------------------------------------------------------------
+@diagram_from_source    = ( source ) -> @_diagram_from_tokentree  @tokentree_from_source  source
+@tokenlist_from_source  = ( source ) -> @_get_tokenlist           @_new_ctx               source
+@tokentree_from_source  = ( source ) -> @_get_tokentree           @_new_ctx               source
 
-
-
-
-
+#-----------------------------------------------------------------------------------------------------------
+@parse = ( source ) ->
+  R = @_new_ctx source
+  @_get_tokenlist      R
+  @_get_tokentree R
+  return R
 
 
