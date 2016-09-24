@@ -36,27 +36,30 @@ O                         = require './options'
 @_parser_settings = O.idl
 
 #-----------------------------------------------------------------------------------------------------------
-@_new_parse = ( source ) ->
+@_new_ctx = ( source ) ->
   R =
-    '~isa':     'MOJIKURA-IDL/parse'
+    '~isa':     'MOJIKURA-IDL/ctx'
     source:     source
     idx:        0
     settings:   @_parser_settings
-  R.tokens = @_tokenize R, source
+    tokens:     null
+    tokentree:  null
+    diagram:    null
   return R
 
 
 #===========================================================================================================
 # TOKENS
 #-----------------------------------------------------------------------------------------------------------
-@tokenize = ( source ) -> ( @_new_parse source ).tokens
+@tokenize = ( source ) -> @_tokenize @_new_ctx source
 
 #-----------------------------------------------------------------------------------------------------------
-@_tokenize = ( me, source ) ->
-  R       = []
-  chrs    = MKNCR.chrs_from_text source
+@_tokenize = ( me ) ->
+  R         = []
+  chrs      = MKNCR.chrs_from_text me.source
   for lexeme, idx in chrs
     R.push @_new_token me, lexeme, idx
+  me.tokens = R
   return R
 
 #-----------------------------------------------------------------------------------------------------------
@@ -111,18 +114,23 @@ O                         = require './options'
   return @_diagram_from_tokentree @tokentree_from_source source
 
 #-----------------------------------------------------------------------------------------------------------
-@_diagram_from_tokentree = ( element ) ->
+@_diagram_from_tokentree = ( tokentree ) ->
   ### A 'diagram' is a 'lexeme tree', i.e. the simplified version of a token tree, minus all the
   additional data, leaving just nested lists of lexemes. ###
-  return element.s if @_isa_token null, element
-  return ( @_diagram_from_tokentree token for token in element )
+  return tokentree.s if @_isa_token null, tokentree
+  return ( @_diagram_from_tokentree token for token in tokentree )
 
 #-----------------------------------------------------------------------------------------------------------
 @tokentree_from_source = ( source ) ->
+  return @_ctx_from_from_source source
+
+#-----------------------------------------------------------------------------------------------------------
+@_ctx_from_from_source = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "IDL: empty text" unless source.length > 0
-  me  = @_new_parse       source
-  R   = @_get_tokentree   me
+  me      = @_new_ctx source
+  tokens  = @_tokenize      me
+  R       = @_get_tokentree me
   #.........................................................................................................
   if me.idx isnt me.tokens.length
     @_err me, me.idx, "IDL: extra token(s)"
@@ -130,6 +138,7 @@ O                         = require './options'
   if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )
     @_err me, 0, "IDL: lone token of type #{rpr type}"
   #.........................................................................................................
+  me.tokentree = R
   return R
 
 #-----------------------------------------------------------------------------------------------------------
