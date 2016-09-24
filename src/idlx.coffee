@@ -31,10 +31,10 @@ IDL                       = require './idl'
 #===========================================================================================================
 # TOKENS
 #-----------------------------------------------------------------------------------------------------------
-@_symbol_is_solitaire   = ( me, symbol ) -> symbol of me.grammar.solitaires
-@_symbol_is_proxy       = ( me, symbol ) -> symbol of me.grammar.proxies
-@_symbol_is_lbracket    = ( me, symbol ) -> me.grammar.brackets[ symbol ]?.name is 'lbracket'
-@_symbol_is_rbracket    = ( me, symbol ) -> me.grammar.brackets[ symbol ]?.name is 'rbracket'
+@_symbol_is_solitaire   = ( me, symbol ) -> symbol of me.settings.solitaires
+@_symbol_is_proxy       = ( me, symbol ) -> symbol of me.settings.proxies
+@_symbol_is_lbracket    = ( me, symbol ) -> me.settings.brackets[ symbol ]?.name is 'lbracket'
+@_symbol_is_rbracket    = ( me, symbol ) -> me.settings.brackets[ symbol ]?.name is 'rbracket'
 
 #-----------------------------------------------------------------------------------------------------------
 @_type_of_symbol = ( me, symbol ) ->

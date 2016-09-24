@@ -18,9 +18,21 @@ echo                      = CND.echo.bind CND
 MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
 
+
+
+#===========================================================================================================
+# HELPERS
+#-----------------------------------------------------------------------------------------------------------
+@_err = ( me, idx, message ) ->
+  ### Format error message with colors and token hiliting. ###
+  tokens_txt = @_rpr_tokens me, idx
+  throw new Error "#{message} #{tokens_txt}"
+
+
 #===========================================================================================================
 #
 #-----------------------------------------------------------------------------------------------------------
+### Parser settings contain lists of operators with symbolic names, arity and so on. ###
 @_parser_settings = O.idl
 
 #-----------------------------------------------------------------------------------------------------------
@@ -29,9 +41,10 @@ O                         = require './options'
     '~isa':   'MOJIKURA-IDL/parse'
     source:   source
     idx:      0
-    grammar:  @_parser_settings
+    settings: @_parser_settings
   R.tokens = @_tokenize R, source
   return R
+
 
 #===========================================================================================================
 # TOKENS
@@ -74,14 +87,14 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_operator_from_symbol = ( me, symbol ) ->
-  unless ( R = me.grammar.operators[ symbol ] )?
+  unless ( R = me.settings.operators[ symbol ] )?
     throw new Error "unknown operator #{rpr symbol}"
   return R
 
 #-----------------------------------------------------------------------------------------------------------
 @_describe_symbol       = ( me, symbol ) -> MKNCR.describe symbol
 @_tags_from_symbol      = ( me, symbol ) -> ( @_describe_symbol me, symbol ).tag ? []
-@_symbol_is_operator    = ( me, symbol ) -> symbol of me.grammar.operators
+@_symbol_is_operator    = ( me, symbol ) -> symbol of me.settings.operators
 @_symbol_is_component   = ( me, symbol ) -> 'cjk' in @_tags_from_symbol me, symbol
 
 #-----------------------------------------------------------------------------------------------------------
@@ -95,17 +108,12 @@ O                         = require './options'
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
 @parse = ( source ) ->
-  return @_parse @parse_tree source
+  return @_symboltree_from_tokentree @parse_tree source
 
 #-----------------------------------------------------------------------------------------------------------
-@_parse = ( element ) ->
+@_symboltree_from_tokentree = ( element ) ->
   return element.s if @_isa_token null, element
-  return ( @_parse token for token in element )
-
-#-----------------------------------------------------------------------------------------------------------
-@_err = ( me, idx, message ) ->
-  tokens_txt = @_rpr_tokens me, idx
-  throw new Error "#{message} #{tokens_txt}"
+  return ( @_symboltree_from_tokentree token for token in element )
 
 #-----------------------------------------------------------------------------------------------------------
 @parse_tree = ( source ) ->
