@@ -31,18 +31,18 @@ IDL                       = require './idl'
 #===========================================================================================================
 # TOKENS
 #-----------------------------------------------------------------------------------------------------------
-@_symbol_is_solitaire   = ( me, symbol ) -> symbol of me.settings.solitaires
-@_symbol_is_proxy       = ( me, symbol ) -> symbol of me.settings.proxies
-@_symbol_is_lbracket    = ( me, symbol ) -> me.settings.brackets[ symbol ]?.name is 'lbracket'
-@_symbol_is_rbracket    = ( me, symbol ) -> me.settings.brackets[ symbol ]?.name is 'rbracket'
+@_lexeme_is_solitaire   = ( me, lexeme ) -> lexeme of me.settings.solitaires
+@_lexeme_is_proxy       = ( me, lexeme ) -> lexeme of me.settings.proxies
+@_lexeme_is_lbracket    = ( me, lexeme ) -> me.settings.brackets[ lexeme ]?.name is 'lbracket'
+@_lexeme_is_rbracket    = ( me, lexeme ) -> me.settings.brackets[ lexeme ]?.name is 'rbracket'
 
 #-----------------------------------------------------------------------------------------------------------
-@_type_of_symbol = ( me, symbol ) ->
-  R = IDL._type_of_symbol.call IDLX, me, symbol
-  return 'solitaire'  if @_symbol_is_solitaire  me, symbol
-  return 'proxy'      if @_symbol_is_proxy      me, symbol
-  return 'lbracket'   if @_symbol_is_lbracket   me, symbol
-  return 'rbracket'   if @_symbol_is_rbracket   me, symbol
+@_type_of_lexeme = ( me, lexeme ) ->
+  R = IDL._type_of_lexeme.call IDLX, me, lexeme
+  return 'solitaire'  if @_lexeme_is_solitaire  me, lexeme
+  return 'proxy'      if @_lexeme_is_proxy      me, lexeme
+  return 'lbracket'   if @_lexeme_is_lbracket   me, lexeme
+  return 'rbracket'   if @_lexeme_is_rbracket   me, lexeme
   return R
 
 #-----------------------------------------------------------------------------------------------------------

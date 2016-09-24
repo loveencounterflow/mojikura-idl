@@ -71,7 +71,7 @@ resume_next = ( T, method ) ->
     ["a",["assigned"]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = IDL._tags_from_symbol  null, probe
+    result = IDL._tags_from_lexeme null, probe
     help JSON.stringify [ probe, result, ]
     T.eq result, matcher
   return null
@@ -165,7 +165,7 @@ resume_next = ( T, method ) ->
     ["⿺辶言",[{"~isa":"MOJIKURA-IDL/token","s":"⿺","idx":0,"t":"operator","a":2,"n":"leftbottom"},{"~isa":"MOJIKURA-IDL/token","s":"辶","idx":1,"t":"component"},{"~isa":"MOJIKURA-IDL/token","s":"言","idx":2,"t":"component"}]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = resume_next T, -> IDL.parse_tree probe
+    result = resume_next T, -> IDL.tokentree_from_source probe
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -181,8 +181,8 @@ resume_next = ( T, method ) ->
     ["⿺辶言","⿺辶言"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    parse_tree  = resume_next T, -> IDL.parse_tree          probe
-    result      = resume_next T, -> IDL._parsetree_as_text  null, parse_tree
+    tokentree   = resume_next T, -> IDL.tokentree_from_source probe
+    result      = resume_next T, -> IDL._parsetree_as_text    null, tokentree
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -401,8 +401,8 @@ resume_next = ( T, method ) ->
     ["⿰臣(⿱𠂉(⿰人人人)(⿰古古古))","???"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    parse_tree  = IDLX.parse_tree         probe
-    result      = IDLX._parsetree_as_text null, parse_tree
+    tokentree   = IDLX.tokentree_from_source  probe
+    result      = IDLX._parsetree_as_text     null, tokentree
     urge JSON.stringify [ probe, result, ]
     # T.eq result, matcher
   #.........................................................................................................
@@ -447,7 +447,7 @@ unless module.parent?
   #     ]
   #   for source in sources
   #     try
-  #       d = IDLX.parse_tree source
+  #       d = IDLX.tokentree_from_source source
   #     catch error
   #       info error[ 'message' ]
 

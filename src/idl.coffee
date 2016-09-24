@@ -38,10 +38,10 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_new_parse = ( source ) ->
   R =
-    '~isa':   'MOJIKURA-IDL/parse'
-    source:   source
-    idx:      0
-    settings: @_parser_settings
+    '~isa':     'MOJIKURA-IDL/parse'
+    source:     source
+    idx:        0
+    settings:   @_parser_settings
   R.tokens = @_tokenize R, source
   return R
 
@@ -55,20 +55,20 @@ O                         = require './options'
 @_tokenize = ( me, source ) ->
   R       = []
   chrs    = MKNCR.chrs_from_text source
-  for symbol, idx in chrs
-    R.push @_new_token me, symbol, idx
+  for lexeme, idx in chrs
+    R.push @_new_token me, lexeme, idx
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_new_token = ( me, symbol, idx ) ->
-  type    = @_type_of_symbol me, symbol
-  symbol  = MKNCR.jzr_as_uchr symbol
+@_new_token = ( me, lexeme, idx ) ->
+  type    = @_type_of_lexeme me, lexeme
+  lexeme  = MKNCR.jzr_as_uchr lexeme
   ### `t` for 'type' ###
-  R       = { '~isa': 'MOJIKURA-IDL/token', s: symbol, idx, t: type, }
+  R       = { '~isa': 'MOJIKURA-IDL/token', s: lexeme, idx, t: type, }
   #.........................................................................................................
   switch type
     when 'operator'
-      operator  = @_operator_from_symbol me, symbol
+      operator  = @_operator_from_lexeme me, lexeme
       R.a       = operator.arity
       R.n       = operator.name
   #.........................................................................................................
@@ -86,37 +86,39 @@ O                         = require './options'
   return CND.white "[ #{R.join ''} ]"
 
 #-----------------------------------------------------------------------------------------------------------
-@_operator_from_symbol = ( me, symbol ) ->
-  unless ( R = me.settings.operators[ symbol ] )?
-    throw new Error "unknown operator #{rpr symbol}"
+@_operator_from_lexeme = ( me, lexeme ) ->
+  unless ( R = me.settings.operators[ lexeme ] )?
+    throw new Error "unknown operator #{rpr lexeme}"
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_describe_symbol       = ( me, symbol ) -> MKNCR.describe symbol
-@_tags_from_symbol      = ( me, symbol ) -> ( @_describe_symbol me, symbol ).tag ? []
-@_symbol_is_operator    = ( me, symbol ) -> symbol of me.settings.operators
-@_symbol_is_component   = ( me, symbol ) -> 'cjk' in @_tags_from_symbol me, symbol
+@_describe_lexeme       = ( me, lexeme ) -> MKNCR.describe lexeme
+@_tags_from_lexeme      = ( me, lexeme ) -> ( @_describe_lexeme me, lexeme ).tag ? []
+@_lexeme_is_operator    = ( me, lexeme ) -> lexeme of me.settings.operators
+@_lexeme_is_component   = ( me, lexeme ) -> 'cjk' in @_tags_from_lexeme me, lexeme
 
 #-----------------------------------------------------------------------------------------------------------
-@_type_of_symbol = ( me, symbol ) ->
-  return 'operator'   if @_symbol_is_operator   me, symbol
-  return 'component'  if @_symbol_is_component  me, symbol
+@_type_of_lexeme = ( me, lexeme ) ->
+  return 'operator'   if @_lexeme_is_operator   me, lexeme
+  return 'component'  if @_lexeme_is_component  me, lexeme
   return 'other'
 
 
 #===========================================================================================================
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
-@parse = ( source ) ->
-  return @_symboltree_from_tokentree @parse_tree source
+@parse = @diagram_from_source = ( source ) ->
+  return @_diagram_from_tokentree @tokentree_from_source source
 
 #-----------------------------------------------------------------------------------------------------------
-@_symboltree_from_tokentree = ( element ) ->
+@_diagram_from_tokentree = ( element ) ->
+  ### A 'diagram' is a 'lexeme tree', i.e. the simplified version of a token tree, minus all the
+  additional data, leaving just nested lists of lexemes. ###
   return element.s if @_isa_token null, element
-  return ( @_symboltree_from_tokentree token for token in element )
+  return ( @_diagram_from_tokentree token for token in element )
 
 #-----------------------------------------------------------------------------------------------------------
-@parse_tree = ( source ) ->
+@tokentree_from_source = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "IDL: empty text" unless source.length > 0
   me  = @_new_parse   source
