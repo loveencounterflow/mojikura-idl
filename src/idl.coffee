@@ -121,8 +121,8 @@ O                         = require './options'
 @tokentree_from_source = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "IDL: empty text" unless source.length > 0
-  me  = @_new_parse   source
-  R   = @_parse_tree  me
+  me  = @_new_parse       source
+  R   = @_get_tokentree   me
   #.........................................................................................................
   if me.idx isnt me.tokens.length
     @_err me, me.idx, "IDL: extra token(s)"
@@ -133,7 +133,7 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_parse_tree = ( me, R = null ) ->
+@_get_tokentree = ( me, R = null ) ->
   token     = me.tokens[ me.idx ]
   unless token?
     @_err me, me.idx - 1, "IDL: premature end of source"
@@ -147,7 +147,7 @@ O                         = require './options'
       arity   = token.a
       target  = [ token, ]
       for count in [ 1 .. arity ] by +1
-        @_parse_tree me, target
+        @_get_tokentree me, target
       if R? then  R.push target
       else        R = target
     #.......................................................................................................
@@ -161,13 +161,13 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_parsetree_as_text = ( me, parse_tree ) ->
+@_tokentree_as_text = ( me, parse_tree ) ->
   R = []
   for element in parse_tree
     if @_isa_token me, element
       R.push element.s
     else
-      R.push @_parsetree_as_text me, element
+      R.push @_tokentree_as_text me, element
   #.........................................................................................................
   return R.join ''
 

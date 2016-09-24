@@ -172,7 +172,7 @@ resume_next = ( T, method ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@[ "(IDL) _parsetree_as_text" ] = ( T ) ->
+@[ "(IDL) _tokentree_as_text" ] = ( T ) ->
   probes_and_matchers = [
     ["⿲木木木","⿲木木木"]
     ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
@@ -182,7 +182,7 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     tokentree   = resume_next T, -> IDL.tokentree_from_source probe
-    result      = resume_next T, -> IDL._parsetree_as_text    null, tokentree
+    result      = resume_next T, -> IDL._tokentree_as_text    null, tokentree
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -376,7 +376,7 @@ resume_next = ( T, method ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@[ "(IDLX) _parsetree_as_text" ] = ( T ) ->
+@[ "(IDLX) _tokentree_as_text" ] = ( T ) ->
   probes_and_matchers = [
     ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
     ["⿱⿰亻式貝","⿱⿰亻式貝"]
@@ -402,7 +402,7 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     tokentree   = IDLX.tokentree_from_source  probe
-    result      = IDLX._parsetree_as_text     null, tokentree
+    result      = IDLX._tokentree_as_text     null, tokentree
     urge JSON.stringify [ probe, result, ]
     # T.eq result, matcher
   #.........................................................................................................
@@ -421,7 +421,7 @@ unless module.parent?
     "(IDL) parse simple formulas"
     "(IDL) reject bogus formulas"
     "(IDL) parse tree of simple formulas"
-    "(IDL) _parsetree_as_text"
+    "(IDL) _tokentree_as_text"
     #.......................................................................................................
     "(IDLX) reject bogus formulas"
     "(IDLX) reject IDL operators with arity 3"
@@ -430,7 +430,7 @@ unless module.parent?
     "(IDLX) parse extended formulas (bracketed)"
     "(IDLX) reject bogus formulas (bracketed)"
     "(IDLX) reject bogus formulas (solitaires)"
-    # "(IDLX) _parsetree_as_text"
+    # "(IDLX) _tokentree_as_text"
     ]
   @_prune()
   @_main()

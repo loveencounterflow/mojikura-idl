@@ -65,7 +65,7 @@ IDL                       = require './idl'
 @_try_to_advance  = ( me ) -> me.idx += +1 if me.idx < me.tokens.length - 1
 
 #-----------------------------------------------------------------------------------------------------------
-@_parse_tree = ( me, R = null ) ->
+@_get_tokentree = ( me, R = null ) ->
   advance = false
   #.........................................................................................................
   loop
@@ -99,13 +99,13 @@ IDL                       = require './idl'
               target.push next_token
               @_advance me
             else
-              target.push @_parse_tree me
+              target.push @_get_tokentree me
         #...................................................................................................
         else
           arity   = token.a
           target  = [ token, ]
           for count in [ 1 .. arity ] by +1
-            @_parse_tree me, target
+            @_get_tokentree me, target
         #...................................................................................................
         if R? then  R.push target
         else        R = target
