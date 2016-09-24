@@ -172,6 +172,23 @@ resume_next = ( T, method ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
+@[ "(IDL) _parsetree_as_text" ] = ( T ) ->
+  probes_and_matchers = [
+    ["⿲木木木","⿲木木木"]
+    ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
+    ["⿱⿰亻式貝","⿱⿰亻式貝"]
+    ["⿱⿰亻式⿱目八","⿱⿰亻式⿱目八"]
+    ["⿺辶言","⿺辶言"]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    parse_tree  = resume_next T, -> IDL.parse_tree          probe
+    result      = resume_next T, -> IDL._parsetree_as_text  null, parse_tree
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
     ["木","IDL: lone token of type 'component' [  ✘ 木 ✘  ]"]
@@ -242,6 +259,7 @@ resume_next = ( T, method ) ->
 @[ "(IDLX) reject IDL operators with arity 3" ] = ( T ) ->
   probes_and_matchers = [
     ["⿲木木木","IDL: extra token(s) [ ⿲ ✘ 木 ✘ 木木 ]"]
+    ["⿳木木木","IDL: extra token(s) [ ⿳ ✘ 木 ✘ 木木 ]"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
@@ -340,7 +358,7 @@ resume_next = ( T, method ) ->
     ["⿱〓▽","IDLX: cannot have a solitaire here [ ⿱〓 ✘ ▽ ✘  ]"]
     ["↻●","IDLX: cannot have a solitaire here [ ↻ ✘ ● ✘  ]"]
     ["↔≈▽","IDLX: cannot have a solitaire here [ ↔≈ ✘ ▽ ✘  ]"]
-    ["●亻","IDL: extra token(s) [ ● ✘ 亻 ✘  ]"]
+    ["●亻","IDLX: cannot have a solitaire here [  ✘ ● ✘ 亻 ]"]
     ["(●亻式)","IDLX: cannot have a solitaire here [ ( ✘ ● ✘ 亻式) ]"]
     ["(⿰亻●式)","IDLX: cannot have a solitaire here [ (⿰亻 ✘ ● ✘ 式) ]"]
     ["(⿱▽㓁允)","IDLX: cannot have a solitaire here [ (⿱ ✘ ▽ ✘ 㓁允) ]"]
@@ -357,6 +375,39 @@ resume_next = ( T, method ) ->
   #.........................................................................................................
   return null
 
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) _parsetree_as_text" ] = ( T ) ->
+  probes_and_matchers = [
+    ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
+    ["⿱⿰亻式貝","⿱⿰亻式貝"]
+    ["⿱⿰亻式⿱目八","⿱⿰亻式⿱目八"]
+    ["⿺辶言","⿺辶言"]
+    [ '●', '●', ]
+    [ '〓', '〓', ]
+    [ '▽', '▽', ]
+    [ '≈〇', "???", ]
+    [ '⿱〓〓', "???", ]
+    [ '↻正', "???", ]
+    [ '↔≈匕', "???", ]
+    [ '↔正', "???", ]
+    [ '⿱丶乂', "???", ]
+    [ '⿺走⿹◰口戈日', "???", ]
+    ['≈匚', "???", ]
+    ["≈&jzr#xe174;","???", ]
+    ["(⿱北㓁允)","???", ]
+    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","???"]
+    ["(⿱&jzr#xe223;一八⿰(⿱&jzr#xe223;一八)(⿱&jzr#xe223;一八))","???"]
+    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","???"]
+    ["⿰臣(⿱𠂉(⿰人人人)(⿰古古古))","???"]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    parse_tree  = IDLX.parse_tree         probe
+    result      = IDLX._parsetree_as_text null, parse_tree
+    urge JSON.stringify [ probe, result, ]
+    # T.eq result, matcher
+  #.........................................................................................................
+  return null
+
 
 ############################################################################################################
 unless module.parent?
@@ -370,6 +421,7 @@ unless module.parent?
     "(IDL) parse simple formulas"
     "(IDL) reject bogus formulas"
     "(IDL) parse tree of simple formulas"
+    "(IDL) _parsetree_as_text"
     #.......................................................................................................
     "(IDLX) reject bogus formulas"
     "(IDLX) reject IDL operators with arity 3"
@@ -378,9 +430,11 @@ unless module.parent?
     "(IDLX) parse extended formulas (bracketed)"
     "(IDLX) reject bogus formulas (bracketed)"
     "(IDLX) reject bogus formulas (solitaires)"
+    # "(IDLX) _parsetree_as_text"
     ]
   @_prune()
   @_main()
+
 
   # demo_errors = ->
   #   sources = [
@@ -396,4 +450,26 @@ unless module.parent?
   #       d = IDLX.parse_tree source
   #     catch error
   #       info error[ 'message' ]
+
+
+  debug ( IDLX.parse '⿺走日' )
+  debug ( IDLX.parse '(⿱山人儿)' ) # ⿱山.*儿, ⿱人儿
+  debug ( IDLX.parse '⿺辶〓' )
+
+
+
+###
+
+unify static methods
+@f = ( _, x, y ) ->
+
+
+
+###
+
+
+
+
+
+
 

@@ -63,7 +63,7 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_isa_token = ( x ) -> CND.isa x, 'MOJIKURA-IDL/token'
+@_isa_token = ( me, x ) -> CND.isa x, 'MOJIKURA-IDL/token'
 
 #-----------------------------------------------------------------------------------------------------------
 @_rpr_tokens = ( me, error_idx = null ) ->
@@ -71,7 +71,6 @@ O                         = require './options'
   R           = []
   for token, idx in me.tokens
     R.push if idx is error_idx then CND.red " ✘ #{token.s} ✘ " else CND.white "#{token.s}"
-  # offending_token.error = yes if ( offending_token = me.tokens[ error_idx ] )?
   return CND.white "[ #{R.join ''} ]"
 
 #-----------------------------------------------------------------------------------------------------------
@@ -101,7 +100,7 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_parse = ( element ) ->
-  return element.s if @_isa_token element
+  return element.s if @_isa_token null, element
   return ( @_parse token for token in element )
 
 #-----------------------------------------------------------------------------------------------------------
@@ -151,4 +150,23 @@ O                         = require './options'
       @_err me, me.idx - 1, "IDL: illegal token #{rpr token.s} (type #{rpr type})"
   #.........................................................................................................
   return R
+
+#-----------------------------------------------------------------------------------------------------------
+@_parsetree_as_text = ( me, parse_tree ) ->
+  R = []
+  for element in parse_tree
+    if @_isa_token me, element
+      R.push element.s
+    else
+      R.push @_parsetree_as_text me, element
+  #.........................................................................................................
+  return R.join ''
+
+
+
+
+
+
+
+
 

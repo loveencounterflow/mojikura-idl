@@ -45,8 +45,8 @@ IDL                       = require './idl'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_token_is_rbracket     = ( x ) -> ( @_isa_token x ) and x.t is 'rbracket'
-@_token_is_constituent  = ( x ) -> ( @_isa_token x ) and x.t in [ 'component', 'proxy', ]
+@_token_is_rbracket     = ( me, x ) -> ( @_isa_token me, x ) and x.t is 'rbracket'
+@_token_is_constituent  = ( me, x ) -> ( @_isa_token me, x ) and x.t in [ 'component', 'proxy', ]
 
 #===========================================================================================================
 # PARSING
@@ -89,12 +89,12 @@ IDL                       = require './idl'
           #.................................................................................................
           loop
             next_token = @_peek_next_token me
-            if @_token_is_rbracket next_token
+            if @_token_is_rbracket me, next_token
               unless target.length - 1 > token.a
                 @_err me, me.idx, "IDLX: too few constituents"
               @_advance me
               break
-            else if @_token_is_constituent next_token
+            else if @_token_is_constituent me, next_token
               target.push next_token
               @_advance me
             else
@@ -110,7 +110,7 @@ IDL                       = require './idl'
         else        R = target
       #.....................................................................................................
       when 'component', 'solitaire', 'proxy'
-        if ( type is 'solitaire' ) and ( me.idx isnt 1 )
+        if ( type is 'solitaire' ) and ( ( me.idx isnt 1 ) or ( me.tokens.length > 1 ) )
           @_err me, me.idx - 1, "IDLX: cannot have a solitaire here"
         if R? then  R.push token
         else        R = token
