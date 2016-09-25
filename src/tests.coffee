@@ -172,23 +172,6 @@ resume_next = ( T, method ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@[ "(IDL) _tokentree_as_text" ] = ( T ) ->
-  probes_and_matchers = [
-    ["⿲木木木","⿲木木木"]
-    ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
-    ["⿱⿰亻式貝","⿱⿰亻式貝"]
-    ["⿱⿰亻式⿱目八","⿱⿰亻式⿱目八"]
-    ["⿺辶言","⿺辶言"]
-    ]
-  for [ probe, matcher, ] in probes_and_matchers
-    tokentree   = resume_next T, -> IDL.tokentree_from_source probe
-    result      = resume_next T, -> IDL._tokentree_as_text    null, tokentree
-    urge JSON.stringify [ probe, result, ]
-    T.eq result, matcher
-  #.........................................................................................................
-  return null
-
-#-----------------------------------------------------------------------------------------------------------
 @[ "(IDL) reject bogus formulas" ] = ( T ) ->
   probes_and_matchers = [
     ["木","IDL: lone token of type 'component' [  ✘ 木 ✘  ]"]
@@ -375,30 +358,71 @@ resume_next = ( T, method ) ->
   #.........................................................................................................
   return null
 
+
+#===========================================================================================================
+# RENDERING
 #-----------------------------------------------------------------------------------------------------------
-@[ "(IDLX) _tokentree_as_text" ] = ( T ) ->
+@[ "(IDL) _tokentree_as_text" ] = ( T ) ->
   probes_and_matchers = [
+    ["⿲木木木","⿲木木木"]
     ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
     ["⿱⿰亻式貝","⿱⿰亻式貝"]
     ["⿱⿰亻式⿱目八","⿱⿰亻式⿱目八"]
     ["⿺辶言","⿺辶言"]
-    [ '●', '●', ]
-    [ '〓', '〓', ]
-    [ '▽', '▽', ]
-    [ '≈〇', "???", ]
-    [ '⿱〓〓', "???", ]
-    [ '↻正', "???", ]
-    [ '↔≈匕', "???", ]
-    [ '↔正', "???", ]
-    [ '⿱丶乂', "???", ]
-    [ '⿺走⿹◰口戈日', "???", ]
-    ['≈匚', "???", ]
-    ["≈&jzr#xe174;","???", ]
-    ["(⿱北㓁允)","???", ]
-    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","???"]
-    ["(⿱&jzr#xe223;一八⿰(⿱&jzr#xe223;一八)(⿱&jzr#xe223;一八))","???"]
-    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","???"]
-    ["⿰臣(⿱𠂉(⿰人人人)(⿰古古古))","???"]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    tokentree   = resume_next T, -> IDL.tokentree_from_source probe
+    result      = resume_next T, -> IDL._tokentree_as_text    null, tokentree
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) _tokentree_as_text" ] = ( T ) ->
+  ### TAINT configurables:
+  * whether to render JZR codepoints as PUA codepoints or as XNCRs
+  * whether to fix systematic IDL blunders such as ⿺辶言
+  * other normalizations (e.g. order of operators / terms)?
+  ###
+  probes_and_matchers = [
+    # ["●","●"]
+    # ["〓","〓"]
+    ["⿺辶言","⿺辶言"]
+    ["⿺辶〓","⿺辶〓"]
+    # ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
+    # ["⿱⿰亻式貝","⿱⿰亻式貝"]
+    # ["⿱⿰亻式⿱目八","⿱⿰亻式⿱目八"]
+    # ["▽","▽"]
+    # ["≈〇","≈〇"]
+    # ["⿱〓〓","⿱〓〓"]
+    # ["↻正","↻正"]
+    # ["↔≈匕","↔≈匕"]
+    # ["↔正","↔正"]
+    # ["⿱丶乂","⿱丶乂"]
+    # ["⿺走⿹◰口戈日","⿺走⿹◰口戈日"]
+    # ["≈匚","≈匚"]
+    # ["≈&jzr#xe174;","≈&jzr#xe174;"]
+    # ["(⿱北㓁允)","(⿱北㓁允)"]
+    # ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))"]
+    # ["(⿱&jzr#xe223;一八⿰(⿱&jzr#xe223;一八)(⿱&jzr#xe223;一八))","(⿱&jzr#xe223;一八⿰(⿱&jzr#xe223;一八)(⿱&jzr#xe223;一八))"]
+    # ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))"]
+    # ["⿰臣(⿱𠂉(⿰人人人)(⿰古古古))","⿰臣(⿱𠂉(⿰人人人)(⿰古古古))"]
+    ]
+  debug '30121', IDL.parse "⿺辶〓"
+  for [ probe, matcher, ] in probes_and_matchers
+    tokentree   = IDLX.tokentree_from_source  probe
+    result      = IDLX._tokentree_as_text     null, tokentree
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(experimental) using arbitrary characters as components" ] = ( T ) ->
+  probes_and_matchers = [
+    ["⿱´a",""]
+    ["⿺Lx",""]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     tokentree   = IDLX.tokentree_from_source  probe
@@ -407,7 +431,6 @@ resume_next = ( T, method ) ->
     # T.eq result, matcher
   #.........................................................................................................
   return null
-
 
 ############################################################################################################
 unless module.parent?
@@ -421,7 +444,6 @@ unless module.parent?
     "(IDL) parse simple formulas"
     "(IDL) reject bogus formulas"
     "(IDL) parse tree of simple formulas"
-    "(IDL) _tokentree_as_text"
     #.......................................................................................................
     "(IDLX) reject bogus formulas"
     "(IDLX) reject IDL operators with arity 3"
@@ -430,7 +452,11 @@ unless module.parent?
     "(IDLX) parse extended formulas (bracketed)"
     "(IDLX) reject bogus formulas (bracketed)"
     "(IDLX) reject bogus formulas (solitaires)"
+    #.......................................................................................................
+    "(IDL) _tokentree_as_text"
     # "(IDLX) _tokentree_as_text"
+    # #.......................................................................................................
+    # "(experimental) using arbitrary characters as components"
     ]
   @_prune()
   @_main()
@@ -451,19 +477,39 @@ unless module.parent?
   #     catch error
   #       info error[ 'message' ]
 
-
-  debug ( IDLX.diagram_from_source '⿺走日' )
-  debug ( IDLX.diagram_from_source '(⿱山人儿)' ) # ⿱山.*儿, ⿱人儿
-  debug ( IDLX.diagram_from_source '⿺辶〓' )
-
+  demo_new_api = ->
+    debug ( IDLX.diagram_from_source '⿺走日' )
+    debug ( IDLX.diagram_from_source '(⿱山人儿)' ) # ⿱山.*儿, ⿱人儿
+    debug ( IDLX.diagram_from_source '⿺辶〓' )
+    ### 'u-cjk-xb/2a18d' 𪆍 ###
+    debug ( IDLX.diagram_from_source '⿰⿹勹⿱从⿰个个鳥' )
+    # debug ( IDLX.diagram_from_source '⿰⿹勹(⿱从⿰个个)鳥' )
+    debug ( IDLX.diagram_from_source '⿰⿹勹(⿱从从⿰个个)鳥' )
+    debug ( IDLX.diagram_from_source '⿰⿹勹(⿱从⿰个个个)鳥' )
+    debug()
+    debug IDLX.parse                  '⿰阝⿱甘罕'
+    debug IDLX.diagram_from_source    '⿰阝⿱甘罕'
+    debug IDLX.tokenlist_from_source  '⿰阝⿱甘罕'
+    debug IDLX.tokentree_from_source  '⿰阝⿱甘罕'
 
 
 ###
 
-unify static methods
-@f = ( _, x, y ) ->
+need tests for IDL.parse
 
+_tokentree_as_text not working
 
+## Future
+
+basic version should not use mingkwai-ncr; instead, use
+Steven Levithan's XRegExp to confine valid components to
+non-whitespace, non-meta codepoints
+
+allow meta codepoints as components when escaped?
+
+incorporate full set of JZR IDL operators
+
+IDL algebra
 
 ###
 

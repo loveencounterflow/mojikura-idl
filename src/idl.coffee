@@ -37,6 +37,8 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_new_ctx = ( source ) ->
+  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
+  throw new Error "IDL: empty text" unless source.length > 0
   R =
     '~isa':     'MOJIKURA-IDL/ctx'
     source:     source
@@ -107,19 +109,24 @@ O                         = require './options'
 #===========================================================================================================
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
-@_diagram_from_tokentree = ( tokentree ) ->
+@_get_diagram = ( me ) ->
+  @_get_tokentree me unless me.tokentree?
+  R           = @_diagram_from_tokentree me, me.tokentree
+  me.diagram  = R
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
+@_diagram_from_tokentree = ( me, tokentree ) ->
   ### A 'diagram' is a 'lexeme tree', i.e. the simplified version of a token tree, minus all the
   additional data, leaving just nested lists of lexemes. ###
   return tokentree.s if @_isa_token null, tokentree
-  return ( @_diagram_from_tokentree token for token in tokentree )
+  return ( @_diagram_from_tokentree me, token for token in tokentree )
 
 #-----------------------------------------------------------------------------------------------------------
 @_get_tokentree = ( me ) ->
-  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of me.source ) is 'text'
-  throw new Error "IDL: empty text" unless me.source.length > 0
   # me      = @_new_ctx         me.source
-  tokens  = @_get_tokenlist   me
-  R       = @_build_tokentree me
+  @_get_tokenlist me unless me.tokens?
+  R = @_build_tokentree me
   #.........................................................................................................
   if me.idx isnt me.tokens.length
     @_err me, me.idx, "IDL: extra token(s)"
@@ -162,6 +169,7 @@ O                         = require './options'
 @_tokentree_as_text = ( me, parse_tree ) ->
   R = []
   for element in parse_tree
+    debug '50322', JSON.stringify element
     if @_isa_token me, element
       R.push element.s
     else
@@ -173,15 +181,16 @@ O                         = require './options'
 #===========================================================================================================
 # PUBLIC API
 #-----------------------------------------------------------------------------------------------------------
-@diagram_from_source    = ( source ) -> @_diagram_from_tokentree  @tokentree_from_source  source
-@tokenlist_from_source  = ( source ) -> @_get_tokenlist           @_new_ctx               source
-@tokentree_from_source  = ( source ) -> @_get_tokentree           @_new_ctx               source
+@tokenlist_from_source  = ( source ) -> @_get_tokenlist @_new_ctx source
+@tokentree_from_source  = ( source ) -> @_get_tokentree @_new_ctx source
+@diagram_from_source    = ( source ) -> @_get_diagram   @_new_ctx source
 
 #-----------------------------------------------------------------------------------------------------------
 @parse = ( source ) ->
   R = @_new_ctx source
-  @_get_tokenlist      R
-  @_get_tokentree R
+  # @_get_tokenlist R
+  # @_get_tokentree R
+  @_get_diagram   R
   return R
 
 

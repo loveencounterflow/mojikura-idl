@@ -67,7 +67,7 @@ module.exports = O =
       '▽':  { name: 'inhibitor',                }
 
     proxies:
-      '???':  { name: 'variable-component',                 }
+      '???':  { name: 'variable-component',      }
       '〓':  { name: 'getamark',                 }
       '§':  { name: 'curl',                     }
 
