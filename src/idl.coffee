@@ -54,6 +54,8 @@ O                         = require './options'
 # TOKENS
 #-----------------------------------------------------------------------------------------------------------
 @_get_tokenlist = ( me ) ->
+  ### TAINT use proper caching pattern ###
+  # return R if ( R = me.tokens )?
   R         = []
   chrs      = MKNCR.chrs_from_text me.source
   for lexeme, idx in chrs
@@ -166,16 +168,27 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@_tokentree_as_text = ( me, parse_tree ) ->
-  R = []
-  for element in parse_tree
-    debug '50322', JSON.stringify element
+@_token_as_text = ( me, token ) ->
+  ### TAINT this is highly application-specific and shouldn't be here ###
+  ### TAINT make output format configurable ###
+  return token.s
+  # R = token.s
+  # return MKNCR.as_xncr  if ( MKNCR.rsg R ) is 'u-pua'
+
+#-----------------------------------------------------------------------------------------------------------
+@_tokentree_as_text = ( me, tokentree ) ->
+  return ( @_token_as_text me, tokentree ) if @_isa_token me, tokentree
+  R             = []
+  has_brackets  = ( tokentree[ 0 ] ).a isnt tokentree.length - 1
+  for element in tokentree
+    # debug '50322', JSON.stringify element
     if @_isa_token me, element
       R.push element.s
     else
       R.push @_tokentree_as_text me, element
   #.........................................................................................................
-  return R.join ''
+  return '(' + ( R.join '' ) + ')' if has_brackets
+  return         R.join ''
 
 
 #===========================================================================================================
@@ -188,9 +201,7 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @parse = ( source ) ->
   R = @_new_ctx source
-  # @_get_tokenlist R
-  # @_get_tokentree R
-  @_get_diagram   R
+  @_get_diagram R
   return R
 
 

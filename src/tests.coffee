@@ -306,7 +306,7 @@ resume_next = ( T, method ) ->
     # result = resume_next T, -> IDLX.diagram_from_source probe
     result = IDLX.diagram_from_source probe
     urge JSON.stringify [ probe, result, ]
-    # T.eq result, matcher
+    T.eq result, matcher
   #.........................................................................................................
   return null
 
@@ -371,8 +371,8 @@ resume_next = ( T, method ) ->
     ["⿺辶言","⿺辶言"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    tokentree   = resume_next T, -> IDL.tokentree_from_source probe
-    result      = resume_next T, -> IDL._tokentree_as_text    null, tokentree
+    ctx     = IDL.parse probe
+    result  = IDL._tokentree_as_text ctx, ctx.tokentree
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -386,33 +386,34 @@ resume_next = ( T, method ) ->
   * other normalizations (e.g. order of operators / terms)?
   ###
   probes_and_matchers = [
-    # ["●","●"]
-    # ["〓","〓"]
     ["⿺辶言","⿺辶言"]
     ["⿺辶〓","⿺辶〓"]
-    # ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
-    # ["⿱⿰亻式貝","⿱⿰亻式貝"]
-    # ["⿱⿰亻式⿱目八","⿱⿰亻式⿱目八"]
-    # ["▽","▽"]
-    # ["≈〇","≈〇"]
-    # ["⿱〓〓","⿱〓〓"]
-    # ["↻正","↻正"]
-    # ["↔≈匕","↔≈匕"]
-    # ["↔正","↔正"]
-    # ["⿱丶乂","⿱丶乂"]
-    # ["⿺走⿹◰口戈日","⿺走⿹◰口戈日"]
-    # ["≈匚","≈匚"]
+    #.......................................................................................................
+    ["●","●"]
+    ["〓","〓"]
+    ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
+    ["⿱⿰亻式貝","⿱⿰亻式貝"]
+    ["⿱⿰亻式⿱目八","⿱⿰亻式⿱目八"]
+    ["▽","▽"]
+    ["≈〇","≈〇"]
+    ["⿱〓〓","⿱〓〓"]
+    ["↻正","↻正"]
+    ["↔≈匕","↔≈匕"]
+    ["↔正","↔正"]
+    ["⿱丶乂","⿱丶乂"]
+    ["⿺走⿹◰口戈日","⿺走⿹◰口戈日"]
+    ["≈匚","≈匚"]
+    ["(⿱北㓁允)","(⿱北㓁允)"]
+    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))"]
+    ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))"]
+    ["⿰臣(⿱𠂉(⿰人人人)(⿰古古古))","⿰臣(⿱𠂉(⿰人人人)(⿰古古古))"]
     # ["≈&jzr#xe174;","≈&jzr#xe174;"]
-    # ["(⿱北㓁允)","(⿱北㓁允)"]
-    # ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))"]
     # ["(⿱&jzr#xe223;一八⿰(⿱&jzr#xe223;一八)(⿱&jzr#xe223;一八))","(⿱&jzr#xe223;一八⿰(⿱&jzr#xe223;一八)(⿱&jzr#xe223;一八))"]
-    # ["⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))","⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))"]
-    # ["⿰臣(⿱𠂉(⿰人人人)(⿰古古古))","⿰臣(⿱𠂉(⿰人人人)(⿰古古古))"]
     ]
-  debug '30121', IDL.parse "⿺辶〓"
   for [ probe, matcher, ] in probes_and_matchers
-    tokentree   = IDLX.tokentree_from_source  probe
-    result      = IDLX._tokentree_as_text     null, tokentree
+    ctx     = IDLX.parse probe
+    # help JSON.stringify IDLX._get_diagram ctx
+    result  = IDLX._tokentree_as_text ctx, ctx.tokentree
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
@@ -454,7 +455,7 @@ unless module.parent?
     "(IDLX) reject bogus formulas (solitaires)"
     #.......................................................................................................
     "(IDL) _tokentree_as_text"
-    # "(IDLX) _tokentree_as_text"
+    "(IDLX) _tokentree_as_text"
     # #.......................................................................................................
     # "(experimental) using arbitrary characters as components"
     ]
