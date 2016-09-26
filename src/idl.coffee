@@ -51,7 +51,10 @@ O                         = require './options'
 @_get_tokenlist = ( me ) ->
   return R if ( R = me.tokenlist )?
   R         = []
+  ### MOJIKURA
   chrs      = MKNCR.chrs_from_text me.source
+  ###
+  chrs      = Array.from me.source
   for lexeme, idx in chrs
     R.push @_new_token me, lexeme, idx
   me.tokenlist = R
@@ -66,6 +69,7 @@ O                         = require './options'
   if me.idx isnt me.tokenlist.length
     @_err me, me.idx, "IDL: extra token(s)"
   #.........................................................................................................
+  ### TAINT review the below condition ###
   if ( me.tokenlist.length is 1 ) and ( ( type = me.tokenlist[ 0 ].t ) in [ 'other', 'component', ] )
     @_err me, 0, "IDL: lone token of type #{rpr type}"
   #.........................................................................................................
@@ -86,7 +90,9 @@ O                         = require './options'
 #-----------------------------------------------------------------------------------------------------------
 @_new_token = ( me, lexeme, idx ) ->
   type    = @_type_of_lexeme me, lexeme
+  ### MOJIKURA
   lexeme  = MKNCR.jzr_as_uchr lexeme
+  ###
   ### `t` for 'type' ###
   R       = { '~isa': 'MOJIKURA-IDL/token', s: lexeme, idx, t: type, }
   #.........................................................................................................
@@ -108,16 +114,23 @@ O                         = require './options'
   return R
 
 #-----------------------------------------------------------------------------------------------------------
+### MOJIKURA
 @_describe_lexeme       = ( me, lexeme ) -> MKNCR.describe lexeme
 @_tags_from_lexeme      = ( me, lexeme ) -> ( @_describe_lexeme me, lexeme ).tag ? []
-@_lexeme_is_operator    = ( me, lexeme ) -> lexeme of me.settings.operators
 @_lexeme_is_component   = ( me, lexeme ) -> 'cjk' in @_tags_from_lexeme me, lexeme
+###
+@_lexeme_is_operator    = ( me, lexeme ) -> lexeme of me.settings.operators
+@_lexeme_is_component   = ( me, lexeme ) -> not @_lexeme_is_operator me, lexeme
 
 #-----------------------------------------------------------------------------------------------------------
 @_type_of_lexeme = ( me, lexeme ) ->
   return 'operator'   if @_lexeme_is_operator   me, lexeme
+  return 'component'
+
+### MOJIKURA
   return 'component'  if @_lexeme_is_component  me, lexeme
   return 'other'
+###
 
 
 #===========================================================================================================
