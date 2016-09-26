@@ -460,7 +460,7 @@ unless module.parent?
     # "(experimental) using arbitrary characters as components"
     ]
   @_prune()
-  @_main()
+  # @_main()
 
 
   # demo_errors = ->
@@ -493,6 +493,28 @@ unless module.parent?
     debug IDLX.tokenlist_from_source  '⿰阝⿱甘罕'
     debug IDLX.tokentree_from_source  '⿰阝⿱甘罕'
 
+  demo_glyph_conversion = ->
+    #-----------------------------------------------------------------------------------------------------------
+    MKNCR.chr_from_cid_and_csg = ( cid, csg  ) -> @as_chr cid, { csg: csg }
+    # #-----------------------------------------------------------------------------------------------------------
+    # MKNCR.normalize_to_xncr = ( glyph ) ->
+    #   # throw new Error "do we need this method?"
+    #   cid = @as_cid glyph
+    #   csg = if ( @as_rsg glyph ) is 'u-pua' then 'jzr' else @as_csg glyph
+    #   return @chr_from_cid_and_csg cid, 'jzr'
+    #-----------------------------------------------------------------------------------------------------------
+    MKNCR.jzr_as_xncr = ( glyph ) ->
+      nfo = @analyze glyph
+      return glyph unless ( nfo.rsg is 'u-pua' ) or ( nfo.csg is 'jzr' )
+      return @chr_from_cid_and_csg nfo.cid, 'jzr'
+    #-----------------------------------------------------------------------------------------------------------
+    glyph       = "&jzr#xe234;"
+    glyph_uchr  = MKNCR.jzr_as_uchr glyph
+    glyph_r1    = MKNCR.jzr_as_xncr glyph
+    glyph_r2    = MKNCR.jzr_as_xncr glyph_uchr
+    debug '32900', [ glyph, glyph_uchr, glyph_r1, glyph_r2, ]
+    debug '32900', MKNCR.jzr_as_xncr 'x'
+  demo_glyph_conversion()
 
 ###
 
