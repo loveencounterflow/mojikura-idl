@@ -19,24 +19,19 @@ MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
 
 
-
 #===========================================================================================================
-# HELPERS
-#-----------------------------------------------------------------------------------------------------------
-@_err = ( me, idx, message ) ->
-  ### Format error message with colors and token hiliting. ###
-  tokens_txt = @_rpr_tokens me, idx
-  throw new Error "#{message} #{tokens_txt}"
-
-
-#===========================================================================================================
-#
+# CONTEXTS
 #-----------------------------------------------------------------------------------------------------------
 ### Parser settings contain lists of operators with symbolic names, arity and so on. ###
 @_parser_settings = O.idl
 
 #-----------------------------------------------------------------------------------------------------------
 @_new_ctx = ( source ) ->
+  ### Context contains state of current parsing process. At first, only the `source` property is set,
+  then—explicitly by calling a dedicated method or implicitly by calling a dependent method—the `tokenlist`,
+  `tokentree` and `diagram` properties are set. In theory, it's possible to intervene e.g. after
+  tokenization and correct one or more properties of the context so as to affect the resulting diagram.
+  ###
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "IDL: empty text" unless source.length > 0
   R =
@@ -44,25 +39,50 @@ O                         = require './options'
     source:     source
     idx:        0
     settings:   @_parser_settings
-    tokens:     null
+    tokenlist:  null
     tokentree:  null
     diagram:    null
   return R
 
 
 #===========================================================================================================
-# TOKENS
+# GETTERS
 #-----------------------------------------------------------------------------------------------------------
 @_get_tokenlist = ( me ) ->
   ### TAINT use proper caching pattern ###
-  # return R if ( R = me.tokens )?
+  # return R if ( R = me.tokenlist )?
   R         = []
   chrs      = MKNCR.chrs_from_text me.source
   for lexeme, idx in chrs
     R.push @_new_token me, lexeme, idx
-  me.tokens = R
+  me.tokenlist = R
   return R
 
+#-----------------------------------------------------------------------------------------------------------
+@_get_tokentree = ( me ) ->
+  # me      = @_new_ctx         me.source
+  @_get_tokenlist me unless me.tokenlist?
+  R = @_build_tokentree me
+  #.........................................................................................................
+  if me.idx isnt me.tokenlist.length
+    @_err me, me.idx, "IDL: extra token(s)"
+  #.........................................................................................................
+  if ( me.tokenlist.length is 1 ) and ( ( type = me.tokenlist[ 0 ].t ) in [ 'other', 'component', ] )
+    @_err me, 0, "IDL: lone token of type #{rpr type}"
+  #.........................................................................................................
+  me.tokentree = R
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
+@_get_diagram = ( me ) ->
+  @_get_tokentree me unless me.tokentree?
+  R           = @_diagram_from_tokentree me, me.tokentree
+  me.diagram  = R
+  return R
+
+
+#===========================================================================================================
+# TOKENS
 #-----------------------------------------------------------------------------------------------------------
 @_new_token = ( me, lexeme, idx ) ->
   type    = @_type_of_lexeme me, lexeme
@@ -80,14 +100,6 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_isa_token = ( me, x ) -> CND.isa x, 'MOJIKURA-IDL/token'
-
-#-----------------------------------------------------------------------------------------------------------
-@_rpr_tokens = ( me, error_idx = null ) ->
-  error_idx  ?= me.idx
-  R           = []
-  for token, idx in me.tokens
-    R.push if idx is error_idx then CND.red " ✘ #{token.s} ✘ " else CND.white "#{token.s}"
-  return CND.white "[ #{R.join ''} ]"
 
 #-----------------------------------------------------------------------------------------------------------
 @_operator_from_lexeme = ( me, lexeme ) ->
@@ -111,13 +123,6 @@ O                         = require './options'
 #===========================================================================================================
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
-@_get_diagram = ( me ) ->
-  @_get_tokentree me unless me.tokentree?
-  R           = @_diagram_from_tokentree me, me.tokentree
-  me.diagram  = R
-  return R
-
-#-----------------------------------------------------------------------------------------------------------
 @_diagram_from_tokentree = ( me, tokentree ) ->
   ### A 'diagram' is a 'lexeme tree', i.e. the simplified version of a token tree, minus all the
   additional data, leaving just nested lists of lexemes. ###
@@ -125,23 +130,8 @@ O                         = require './options'
   return ( @_diagram_from_tokentree me, token for token in tokentree )
 
 #-----------------------------------------------------------------------------------------------------------
-@_get_tokentree = ( me ) ->
-  # me      = @_new_ctx         me.source
-  @_get_tokenlist me unless me.tokens?
-  R = @_build_tokentree me
-  #.........................................................................................................
-  if me.idx isnt me.tokens.length
-    @_err me, me.idx, "IDL: extra token(s)"
-  #.........................................................................................................
-  if ( me.tokens.length is 1 ) and ( ( type = me.tokens[ 0 ].t ) in [ 'other', 'component', ] )
-    @_err me, 0, "IDL: lone token of type #{rpr type}"
-  #.........................................................................................................
-  me.tokentree = R
-  return R
-
-#-----------------------------------------------------------------------------------------------------------
 @_build_tokentree = ( me, R = null ) ->
-  token     = me.tokens[ me.idx ]
+  token     = me.tokenlist[ me.idx ]
   unless token?
     @_err me, me.idx - 1, "IDL: premature end of source"
   me.idx   += +1
@@ -167,13 +157,18 @@ O                         = require './options'
   #.........................................................................................................
   return R
 
+
+#===========================================================================================================
+# SERIALIZATION
 #-----------------------------------------------------------------------------------------------------------
 @_token_as_text = ( me, token ) ->
   ### TAINT this is highly application-specific and shouldn't be here ###
   ### TAINT make output format configurable ###
   return token.s
-  # R = token.s
-  # return MKNCR.as_xncr  if ( MKNCR.rsg R ) is 'u-pua'
+  ### MOJIKURA
+  R = token.s
+  return MKNCR.as_xncr  if ( MKNCR.rsg R ) is 'u-pua'
+  ###
 
 #-----------------------------------------------------------------------------------------------------------
 @_tokentree_as_text = ( me, tokentree ) ->
@@ -181,7 +176,6 @@ O                         = require './options'
   R             = []
   has_brackets  = ( tokentree[ 0 ] ).a isnt tokentree.length - 1
   for element in tokentree
-    # debug '50322', JSON.stringify element
     if @_isa_token me, element
       R.push element.s
     else
@@ -189,6 +183,23 @@ O                         = require './options'
   #.........................................................................................................
   return '(' + ( R.join '' ) + ')' if has_brackets
   return         R.join ''
+
+#-----------------------------------------------------------------------------------------------------------
+@_tokenlist_as_text = ( me, error_idx = null ) ->
+  error_idx  ?= me.idx
+  R           = []
+  for token, idx in me.tokenlist
+    R.push if idx is error_idx then CND.red " ✘ #{token.s} ✘ " else CND.white "#{token.s}"
+  return CND.white "[ #{R.join ''} ]"
+
+
+#===========================================================================================================
+# EXCEPTIONS
+#-----------------------------------------------------------------------------------------------------------
+@_err = ( me, idx, message ) ->
+  ### Format error message with colors and token hiliting. ###
+  tokenlist_txt = @_tokenlist_as_text me, idx
+  throw new Error "#{message} #{tokenlist_txt}"
 
 
 #===========================================================================================================

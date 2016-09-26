@@ -53,7 +53,7 @@ IDL                       = require './idl'
 # PARSING
 #-----------------------------------------------------------------------------------------------------------
 @_get_next_token = ( me, mode ) ->
-  R = me.tokens[ me.idx ]
+  R = me.tokenlist[ me.idx ]
   unless R?
     @_err me, me.idx - 1, "IDLX: premature end of source"
   @_advance me unless mode is 'peek'
@@ -62,7 +62,7 @@ IDL                       = require './idl'
 #-----------------------------------------------------------------------------------------------------------
 @_peek_next_token = ( me ) -> @_get_next_token me, 'peek'
 @_advance         = ( me ) -> me.idx += +1
-@_try_to_advance  = ( me ) -> me.idx += +1 if me.idx < me.tokens.length - 1
+@_try_to_advance  = ( me ) -> me.idx += +1 if me.idx < me.tokenlist.length - 1
 
 #-----------------------------------------------------------------------------------------------------------
 @_build_tokentree = ( me, R = null ) ->
@@ -111,7 +111,7 @@ IDL                       = require './idl'
         else        R = target
       #.....................................................................................................
       when 'component', 'solitaire', 'proxy'
-        if ( type is 'solitaire' ) and ( ( me.idx isnt 1 ) or ( me.tokens.length > 1 ) )
+        if ( type is 'solitaire' ) and ( ( me.idx isnt 1 ) or ( me.tokenlist.length > 1 ) )
           @_err me, me.idx - 1, "IDLX: cannot have a solitaire here"
         if R? then  R.push token
         else        R = token

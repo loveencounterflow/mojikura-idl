@@ -498,9 +498,6 @@ unless module.parent?
 
 need tests for IDL.parse
 
-_tokentree_as_text not working
-
-## Future
 
 basic version should not use mingkwai-ncr; instead, use
 Steven Levithan's XRegExp to confine valid components to
