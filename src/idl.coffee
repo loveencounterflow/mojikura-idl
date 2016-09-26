@@ -176,16 +176,12 @@ O                         = require './options'
 #===========================================================================================================
 # SERIALIZATION
 #-----------------------------------------------------------------------------------------------------------
-@_token_as_text = ( me, token ) ->
-  ### TAINT this is highly application-specific and shouldn't be here ###
-  ### TAINT make output format configurable ###
-  ### PLAIN-IDL
-  return token.s
-  ###
-  warn "unfinished: _token_as_text"
-  # R = token.s
-  # return MKNCR.as_xncr if ( MKNCR.rsg R ) is 'u-pua'
-  return token.s
+### TAINT this is highly application-specific and shouldn't be here ###
+### TAINT make output format configurable ###
+### PLAIN-IDL
+return token.s
+###
+@_token_as_text = ( me, token ) -> MKNCR.jzr_as_xncr token.s
 
 #-----------------------------------------------------------------------------------------------------------
 @_tokentree_as_text = ( me, tokentree ) ->
@@ -193,10 +189,8 @@ O                         = require './options'
   R             = []
   has_brackets  = ( tokentree[ 0 ] ).a isnt tokentree.length - 1
   for element in tokentree
-    if @_isa_token me, element
-      R.push element.s
-    else
-      R.push @_tokentree_as_text me, element
+    if @_isa_token me, element then R.push     @_token_as_text me, element
+    else                            R.push @_tokentree_as_text me, element
   #.........................................................................................................
   return '(' + ( R.join '' ) + ')' if has_brackets
   return         R.join ''
