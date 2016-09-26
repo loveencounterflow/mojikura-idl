@@ -27,11 +27,11 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_new_ctx = ( source ) ->
-  ### Context contains state of current parsing process. At first, only the `source` property is set,
-  then—explicitly by calling a dedicated method or implicitly by calling a dependent method—the `tokenlist`,
-  `tokentree` and `diagram` properties are set. In theory, it's possible to intervene e.g. after
-  tokenization and correct one or more properties of the context so as to affect the resulting diagram.
-  ###
+  ### A context contains the state of the current parsing process. At first, only the `source` property is
+  set, then—explicitly by calling a dedicated method or implicitly by calling a dependent method—the
+  `tokenlist`, `tokentree` and `diagram` properties are set. In theory, it's possible to intervene e.g.
+  after tokenization and correct one or more properties of the context so as to affect the resulting
+  diagram. ###
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "IDL: empty text" unless source.length > 0
   R =
@@ -49,8 +49,7 @@ O                         = require './options'
 # GETTERS
 #-----------------------------------------------------------------------------------------------------------
 @_get_tokenlist = ( me ) ->
-  ### TAINT use proper caching pattern ###
-  # return R if ( R = me.tokenlist )?
+  return R if ( R = me.tokenlist )?
   R         = []
   chrs      = MKNCR.chrs_from_text me.source
   for lexeme, idx in chrs
@@ -60,8 +59,8 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_get_tokentree = ( me ) ->
-  # me      = @_new_ctx         me.source
-  @_get_tokenlist me unless me.tokenlist?
+  return R if ( R = me.tokentree )?
+  @_get_tokenlist me
   R = @_build_tokentree me
   #.........................................................................................................
   if me.idx isnt me.tokenlist.length
@@ -75,7 +74,8 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_get_diagram = ( me ) ->
-  @_get_tokentree me unless me.tokentree?
+  return R if ( R = me.diagram )?
+  @_get_tokentree me
   R           = @_diagram_from_tokentree me, me.tokentree
   me.diagram  = R
   return R
