@@ -35,13 +35,17 @@ O                         = require './options'
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "IDL: empty text" unless source.length > 0
   R =
-    '~isa':     'MOJIKURA-IDL/ctx'
-    source:     source
-    idx:        0
-    settings:   @_parser_settings
-    tokenlist:  null
-    tokentree:  null
-    diagram:    null
+    '~isa':         'MOJIKURA-IDL/ctx'
+    source:         source
+    idx:            0
+    settings:       @_parser_settings
+    tokenlist:      null
+    tokentree:      null
+    diagram:        null
+    formula_uchr:   null
+    formula_xncr:   null
+    sexpr_uchr:     null
+    sexpr_xncr:     null
   return R
 
 
@@ -57,8 +61,8 @@ O                         = require './options'
   chrs      = MKNCR.chrs_from_text me.source
   for lexeme, idx in chrs
     R.push @_new_token me, lexeme, idx
-  me.tokenlist = R
-  return R
+  #.........................................................................................................
+  return me.tokenlist = R
 
 #-----------------------------------------------------------------------------------------------------------
 @_get_tokentree = ( me ) ->
@@ -73,16 +77,37 @@ O                         = require './options'
   if ( me.tokenlist.length is 1 ) and ( ( type = me.tokenlist[ 0 ].t ) in [ 'other', 'component', ] )
     @_err me, 0, "IDL: lone token of type #{rpr type}"
   #.........................................................................................................
-  me.tokentree = R
-  return R
+  return me.tokentree = R
 
 #-----------------------------------------------------------------------------------------------------------
 @_get_diagram = ( me ) ->
   return R if ( R = me.diagram )?
   @_get_tokentree me
-  R           = @_diagram_from_tokentree me, me.tokentree
-  me.diagram  = R
-  return R
+  return me.diagram = @_diagram_from_tokentree me, me.tokentree
+
+#-----------------------------------------------------------------------------------------------------------
+@_get_formula = ( me, jzr_mode ) ->
+  switch jzr_mode
+    when 'uchr'
+      return R if ( R = me.formula_uchr )?
+      return me.formula_uchr = @_tokentree_as_formula me, ( @_get_tokentree me ), jzr_mode
+    when 'xncr'
+      return R if ( R = me.formula_xncr )?
+      return me.formula_xncr = @_tokentree_as_formula me, ( @_get_tokentree me ), jzr_mode
+    else throw new Error "expected 'uchr' or 'xncr' for JZR mode, got #{rpr jzr_mode}"
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@_get_sexpr = ( me, jzr_mode ) ->
+  switch jzr_mode
+    when 'uchr'
+      return R if ( R = me.sexpr_uchr )?
+      return me.sexpr_uchr = @_tokentree_as_sexpr me, ( @_get_tokentree me ), jzr_mode
+    when 'xncr'
+      return R if ( R = me.sexpr_xncr )?
+      return me.sexpr_xncr = @_tokentree_as_sexpr me, ( @_get_tokentree me ), jzr_mode
+    else throw new Error "expected 'uchr' or 'xncr' for JZR mode, got #{rpr jzr_mode}"
+  return null
 
 
 #===========================================================================================================
@@ -176,24 +201,46 @@ O                         = require './options'
 #===========================================================================================================
 # SERIALIZATION
 #-----------------------------------------------------------------------------------------------------------
-### TAINT this is highly application-specific and shouldn't be here ###
-### TAINT make output format configurable ###
-### PLAIN-IDL
-return token.s
-###
-@_token_as_text = ( me, token ) -> MKNCR.jzr_as_xncr token.s
+@_token_as_text = ( me, token, jzr_mode ) ->
+  ### TAINT this is highly application-specific and shouldn't be here ###
+  ### TAINT make output format configurable ###
+  ### PLAIN-IDL
+  return token.s
+  ###
+  switch jzr_mode
+    when 'uchr' then return MKNCR.jzr_as_uchr token.s
+    when 'xncr' then return MKNCR.jzr_as_xncr token.s
+    else throw new Error "expected 'uchr' or 'xncr' for JZR mode, got #{rpr jzr_mode}"
+  return null
 
 #-----------------------------------------------------------------------------------------------------------
-@_tokentree_as_text = ( me, tokentree ) ->
-  return ( @_token_as_text me, tokentree ) if @_isa_token me, tokentree
+@_tokentree_as_formula = ( me, tokentree, jzr_mode ) ->
+  return ( @_token_as_text me, tokentree, jzr_mode ) if @_isa_token me, tokentree
   R             = []
   has_brackets  = ( tokentree[ 0 ] ).a isnt tokentree.length - 1
   for element in tokentree
-    if @_isa_token me, element then R.push     @_token_as_text me, element
-    else                            R.push @_tokentree_as_text me, element
+    if @_isa_token me, element then R.push        @_token_as_text me, element, jzr_mode
+    else                            R.push @_tokentree_as_formula me, element, jzr_mode
   #.........................................................................................................
   return '(' + ( R.join '' ) + ')' if has_brackets
   return         R.join ''
+
+# #-----------------------------------------------------------------------------------------------------------
+# @_token_as_sexpr = ( me, token ) ->
+#   return MKNCR.jzr_as_xncr token.s
+
+#-----------------------------------------------------------------------------------------------------------
+@_tokentree_as_sexpr = ( me, tokentree, jzr_mode, level = 0 ) ->
+  if @_isa_token me, tokentree
+    R = ( @_token_as_text me, tokentree, jzr_mode )
+    R = '( ' + R + ' )' if level is 0
+    return R
+  R = []
+  for element in tokentree
+    if @_isa_token me, element then R.push     @_token_as_text  me, element, jzr_mode
+    else                            R.push @_tokentree_as_sexpr me, element, jzr_mode, level + 1
+  #.........................................................................................................
+  return '( ' + ( R.join ' ' ) + ' )'
 
 #-----------------------------------------------------------------------------------------------------------
 @_tokenlist_as_text = ( me, error_idx = null ) ->
@@ -216,9 +263,11 @@ return token.s
 #===========================================================================================================
 # PUBLIC API
 #-----------------------------------------------------------------------------------------------------------
-@tokenlist_from_source  = ( source ) -> @_get_tokenlist @_new_ctx source
-@tokentree_from_source  = ( source ) -> @_get_tokentree @_new_ctx source
-@diagram_from_source    = ( source ) -> @_get_diagram   @_new_ctx source
+@tokenlist_from_source  = ( source            ) -> @_get_tokenlist @_new_ctx source
+@tokentree_from_source  = ( source            ) -> @_get_tokentree @_new_ctx source
+@diagram_from_source    = ( source            ) -> @_get_diagram   @_new_ctx source
+@formula_from_source    = ( source, jzr_mode  ) -> @_get_formula ( @_new_ctx source ), jzr_mode
+@sexpr_from_source      = ( source, jzr_mode  ) -> @_get_sexpr   ( @_new_ctx source ), jzr_mode
 
 #-----------------------------------------------------------------------------------------------------------
 @parse = ( source ) ->

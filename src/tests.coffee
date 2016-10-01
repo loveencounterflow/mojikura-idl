@@ -362,7 +362,7 @@ resume_next = ( T, method ) ->
 #===========================================================================================================
 # RENDERING
 #-----------------------------------------------------------------------------------------------------------
-@[ "(IDL) _tokentree_as_text" ] = ( T ) ->
+@[ "(IDL) _tokentree_as_formula" ] = ( T ) ->
   probes_and_matchers = [
     ["⿲木木木","⿲木木木"]
     ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
@@ -372,14 +372,14 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     ctx     = IDL.parse probe
-    result  = IDL._tokentree_as_text ctx, ctx.tokentree
+    result  = IDL._tokentree_as_formula ctx, ctx.tokentree, 'uchr'
     urge JSON.stringify [ probe, result, ]
     T.eq result, matcher
   #.........................................................................................................
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@[ "(IDLX) _tokentree_as_text" ] = ( T ) ->
+@[ "(IDLX) _tokentree_as_formula" ] = ( T ) ->
   ### TAINT configurables:
   * whether to render JZR codepoints as PUA codepoints or as XNCRs
   * whether to fix systematic IDL blunders such as ⿺辶言
@@ -388,7 +388,6 @@ resume_next = ( T, method ) ->
   probes_and_matchers = [
     ["⿺辶言","⿺辶言"]
     ["⿺辶〓","⿺辶〓"]
-    #.......................................................................................................
     ["●","●"]
     ["〓","〓"]
     ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
@@ -413,8 +412,71 @@ resume_next = ( T, method ) ->
   for [ probe, matcher, ] in probes_and_matchers
     ctx     = IDLX.parse probe
     # help JSON.stringify IDLX._get_diagram ctx
-    result  = IDLX._tokentree_as_text ctx, ctx.tokentree
+    result  = IDLX._tokentree_as_formula ctx, ctx.tokentree, 'xncr'
     urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) formula_from_source (1)" ] = ( T ) ->
+  probes_and_matchers = [
+    ["(⿱亠口冖一口十)","(⿱亠口冖一口十)"]
+    ["(⿱𠚤冖丿&cdp#x88c6;一八)","(⿱𠚤冖丿&cdp#x88c6;一八)"]
+    ["(⿱卄亠口冖口毛)","(⿱卄亠口冖口毛)"]
+    ["⿱卄⿰木貝","⿱卄⿰木貝"]
+    ["⿱艸⿰白⿹&jzr#xe19f;灬","⿱艸⿰白⿹&jzr#xe19f;灬"]
+    ]
+  #.........................................................................................................
+  for [ probe, matcher, ] in probes_and_matchers
+    result = IDLX.formula_from_source probe, 'xncr'
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) formula_from_source (2)" ] = ( T ) ->
+  probes_and_matchers = [
+    ["(⿱亠口冖一口十)","(⿱亠口冖一口十)"]
+    ["(⿱𠚤冖丿&cdp#x88c6;一八)","(⿱𠚤冖丿&cdp#x88c6;一八)"]
+    ["(⿱卄亠口冖口毛)","(⿱卄亠口冖口毛)"]
+    ["⿱卄⿰木貝","⿱卄⿰木貝"]
+    ["⿱艸⿰白⿹&jzr#xe19f;灬","⿱艸⿰白⿹灬"]
+    ]
+  #.........................................................................................................
+  for [ probe, matcher, ] in probes_and_matchers
+    result = IDLX.formula_from_source probe, 'uchr'
+    urge JSON.stringify [ probe, result, ]
+    T.eq result, matcher
+  #.........................................................................................................
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDLX) sexpr_from_source" ] = ( T ) ->
+  probes_and_matchers = [
+    ["●","( ● )"]
+    ["〓","( 〓 )"]
+    ["▽","( ▽ )"]
+    ["⿺辶言","( ⿺ 辶 言 )"]
+    ["⿺辶〓","( ⿺ 辶 〓 )"]
+    ["⿱癶⿰弓貝","( ⿱ 癶 ( ⿰ 弓 貝 ) )"]
+    ["⿱⿰亻式貝","( ⿱ ( ⿰ 亻 式 ) 貝 )"]
+    ["⿱⿰亻式⿱目八","( ⿱ ( ⿰ 亻 式 ) ( ⿱ 目 八 ) )"]
+    ["≈〇","( ≈ 〇 )"]
+    ["⿱〓〓","( ⿱ 〓 〓 )"]
+    ["↻正","( ↻ 正 )"]
+    ["(⿱亠口冖一口十)","( ⿱ 亠 口 冖 一 口 十 )"]
+    ["(⿱𠚤冖丿&cdp#x88c6;一八)","( ⿱ 𠚤 冖 丿 &cdp#x88c6; 一 八 )"]
+    ["(⿱卄亠口冖口毛)","( ⿱ 卄 亠 口 冖 口 毛 )"]
+    ["⿱卄⿰木貝","( ⿱ 卄 ( ⿰ 木 貝 ) )"]
+    ["⿱艸⿰白⿹&jzr#xe19f;灬","( ⿱ 艸 ( ⿰ 白 ( ⿹ &jzr#xe19f; 灬 ) ) )"]
+    ]
+  #.........................................................................................................
+  for [ probe, matcher, ] in probes_and_matchers
+    result = IDLX.sexpr_from_source probe, 'xncr'
+    # urge JSON.stringify [ probe, result, ]
+    urge ( CND.grey probe ), ( CND.lime result )
     T.eq result, matcher
   #.........................................................................................................
   return null
@@ -427,7 +489,7 @@ resume_next = ( T, method ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     tokentree   = IDLX.tokentree_from_source  probe
-    result      = IDLX._tokentree_as_text     null, tokentree
+    result      = IDLX._tokentree_as_formula     null, tokentree
     urge JSON.stringify [ probe, result, ]
     # T.eq result, matcher
   #.........................................................................................................
@@ -454,8 +516,11 @@ unless module.parent?
     "(IDLX) reject bogus formulas (bracketed)"
     "(IDLX) reject bogus formulas (solitaires)"
     #.......................................................................................................
-    "(IDL) _tokentree_as_text"
-    "(IDLX) _tokentree_as_text"
+    "(IDL) _tokentree_as_formula"
+    "(IDLX) _tokentree_as_formula"
+    "(IDLX) formula_from_source (1)"
+    "(IDLX) formula_from_source (2)"
+    "(IDLX) sexpr_from_source"
     # #.......................................................................................................
     # "(experimental) using arbitrary characters as components"
     ]
@@ -530,6 +595,8 @@ allow meta codepoints as components when escaped?
 incorporate full set of JZR IDL operators
 
 IDL algebra
+
+collect operator, component statistics while building the tokentree
 
 ###
 
