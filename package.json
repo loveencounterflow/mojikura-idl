@@ -28,6 +28,6 @@
   "dependencies": {
     "cnd": "^4.2.0",
     "mingkwai-ncr": "^0.2.1",
-    "pipedreams": "^6.1.0"
+    "pipedreams": "^6.3.2"
   }
 }
