@@ -46,6 +46,7 @@ O                         = require './options'
     formula_xncr:   null
     sexpr_uchr:     null
     sexpr_xncr:     null
+  R.settings.sexpr = O.sexpr
   return R
 
 
@@ -231,16 +232,19 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_tokentree_as_sexpr = ( me, tokentree, jzr_mode, level = 0 ) ->
+  mid   =       me.settings.sexpr.spacer
+  left  =       me.settings.sexpr.opener + mid
+  right = mid + me.settings.sexpr.closer
   if @_isa_token me, tokentree
     R = ( @_token_as_text me, tokentree, jzr_mode )
-    R = '( ' + R + ' )' if level is 0
+    R = left + R + right if level is 0
     return R
   R = []
   for element in tokentree
     if @_isa_token me, element then R.push     @_token_as_text  me, element, jzr_mode
     else                            R.push @_tokentree_as_sexpr me, element, jzr_mode, level + 1
   #.........................................................................................................
-  return '( ' + ( R.join ' ' ) + ' )'
+  return left + ( R.join mid ) + right
 
 #-----------------------------------------------------------------------------------------------------------
 @_tokenlist_as_text = ( me, error_idx = null ) ->
