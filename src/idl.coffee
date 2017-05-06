@@ -75,7 +75,7 @@ O                         = require './options'
     @_err me, me.idx, "IDL: extra token(s)"
   #.........................................................................................................
   ### TAINT review the below condition ###
-  if ( me.tokenlist.length is 1 ) and ( ( type = me.tokenlist[ 0 ].t ) in [ 'other', 'component', ] )
+  if ( me.tokenlist.length is 1 ) and ( ( type = me.tokenlist[ 0 ].t ) is 'component' )
     @_err me, 0, "IDL: lone token of type #{rpr type}"
   #.........................................................................................................
   return me.tokentree = R
@@ -142,23 +142,12 @@ O                         = require './options'
 
 #-----------------------------------------------------------------------------------------------------------
 @_lexeme_is_operator    = ( me, lexeme ) -> lexeme of me.settings.operators
-### PLAIN-IDL
 @_lexeme_is_component   = ( me, lexeme ) -> not @_lexeme_is_operator me, lexeme
-###
-@_describe_lexeme       = ( me, lexeme ) -> MKNCR.describe lexeme
-@_tags_from_lexeme      = ( me, lexeme ) -> ( @_describe_lexeme me, lexeme ).tag ? []
-@_lexeme_is_component   = ( me, lexeme ) -> 'cjk' in @_tags_from_lexeme me, lexeme
-
 
 #-----------------------------------------------------------------------------------------------------------
 @_type_of_lexeme = ( me, lexeme ) ->
   return 'operator'   if @_lexeme_is_operator   me, lexeme
-  return 'component'  if @_lexeme_is_component  me, lexeme
-  ### PLAIN-IDL
   return 'component'
-  ###
-  return 'other'
-
 
 
 #===========================================================================================================
