@@ -27,7 +27,7 @@
   "homepage": "https://github.com/loveencounterflow/mojikura-idl",
   "dependencies": {
     "cnd": "^4.2.2",
-    "mingkwai-ncr": "^0.4.1",
+    "ncr": "^0.5.0",
     "pipedreams": "^6.3.2"
   }
 }

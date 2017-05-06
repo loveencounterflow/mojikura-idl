@@ -15,8 +15,24 @@ help                      = CND.get_logger 'help',      badge
 urge                      = CND.get_logger 'urge',      badge
 echo                      = CND.echo.bind CND
 #...........................................................................................................
-MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
+
+#===========================================================================================================
+# COMPATIBILITY WITH MKNCR
+#-----------------------------------------------------------------------------------------------------------
+@NCR = Object.create require 'ncr'
+@NCR._input_default = 'xncr'
+@NCR.jzr_as_uchr = ( glyph ) ->
+  # return @as_uchr glyph, input: 'xncr' if ( @as_csg glyph, input: 'xncr' ) is 'jzr'
+  return @as_uchr glyph if ( @as_csg glyph ) is 'jzr'
+  return glyph
+
+#-----------------------------------------------------------------------------------------------------------
+@NCR.jzr_as_xncr = ( glyph ) ->
+  # nfo = @analyze glyph, input: 'xncr'
+  nfo = @analyze glyph
+  return glyph unless ( nfo.rsg is 'u-pua' ) or ( nfo.csg is 'jzr' )
+  return @as_chr nfo.cid, { csg: 'jzr', }
 
 
 #===========================================================================================================
@@ -46,7 +62,8 @@ O                         = require './options'
     formula_xncr:   null
     sexpr_uchr:     null
     sexpr_xncr:     null
-  R.settings.sexpr = O.sexpr
+  R.settings.sexpr    = O.sexpr
+  R.settings.formula  = O.formula
   return R
 
 
@@ -56,10 +73,8 @@ O                         = require './options'
 @_get_tokenlist = ( me ) ->
   return R if ( R = me.tokenlist )?
   R         = []
-  ### PLAIN-IDL
-  chrs      = Array.from me.source
-  ###
-  chrs      = MKNCR.chrs_from_text me.source
+  # chrs      = @NCR.chrs_from_text me.source, input: 'xncr'
+  chrs      = @NCR.chrs_from_text me.source
   for lexeme, idx in chrs
     R.push @_new_token me, lexeme, idx
   #.........................................................................................................
@@ -119,7 +134,7 @@ O                         = require './options'
   ### PLAIN-IDL
   null
   ###
-  lexeme  = MKNCR.jzr_as_uchr lexeme
+  lexeme  = @NCR.jzr_as_uchr lexeme
   ### `t` for 'type' ###
   R       = { '~isa': 'MOJIKURA-IDL/token', s: lexeme, idx, t: type, }
   #.........................................................................................................
@@ -198,26 +213,30 @@ O                         = require './options'
   return token.s
   ###
   switch jzr_mode
-    when 'uchr' then return MKNCR.jzr_as_uchr token.s
-    when 'xncr' then return MKNCR.jzr_as_xncr token.s
+    when 'uchr' then return @NCR.jzr_as_uchr token.s
+    when 'xncr' then return @NCR.jzr_as_xncr token.s
     else throw new Error "expected 'uchr' or 'xncr' for JZR mode, got #{rpr jzr_mode}"
   return null
 
 #-----------------------------------------------------------------------------------------------------------
 @_tokentree_as_formula = ( me, tokentree, jzr_mode ) ->
   return ( @_token_as_text me, tokentree, jzr_mode ) if @_isa_token me, tokentree
-  R             = []
-  has_brackets  = ( tokentree[ 0 ] ).a isnt tokentree.length - 1
+  R = []
   for element in tokentree
     if @_isa_token me, element then R.push        @_token_as_text me, element, jzr_mode
     else                            R.push @_tokentree_as_formula me, element, jzr_mode
   #.........................................................................................................
-  return '(' + ( R.join '' ) + ')' if has_brackets
-  return         R.join ''
+  ### TAINT parametrize ###
+  has_brackets  = ( tokentree[ 0 ] ).a isnt tokentree.length - 1
+  mid           =       me.settings.formula.spacer
+  left          =       me.settings.formula.opener + mid
+  right         = mid + me.settings.formula.closer
+  return left + ( R.join mid ) + right if has_brackets
+  return          R.join mid
 
 # #-----------------------------------------------------------------------------------------------------------
 # @_token_as_sexpr = ( me, token ) ->
-#   return MKNCR.jzr_as_xncr token.s
+#   return @NCR.jzr_as_xncr token.s
 
 #-----------------------------------------------------------------------------------------------------------
 @_tokentree_as_sexpr = ( me, tokentree, jzr_mode, level = 0 ) ->

@@ -18,7 +18,6 @@ echo                      = CND.echo.bind CND
 #...........................................................................................................
 test                      = require 'guy-test'
 { IDL, IDLX, }            = require './main'
-MKNCR                     = require 'mingkwai-ncr'
 
 
 #===========================================================================================================
@@ -488,7 +487,7 @@ resume_next = ( T, method ) ->
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
-    # "(IDL) demo"
+    "(IDL) demo"
     "sanity checks (grammar data)"
     #.......................................................................................................
     "(IDL) parse simple formulas"
@@ -510,7 +509,7 @@ unless module.parent?
     "(IDLX) sexpr_from_source"
     #.......................................................................................................
     "(IDLX) doubt mark"
-    # # "(experimental) using arbitrary characters as components"
+    # "(experimental) using arbitrary characters as components"
     ]
   @_prune()
   @_main()
@@ -548,25 +547,25 @@ unless module.parent?
 
   demo_glyph_conversion = ->
     #-----------------------------------------------------------------------------------------------------------
-    # MKNCR.chr_from_cid_and_csg = ( cid, csg  ) -> @as_chr cid, { csg: csg }
+    # IDL.NCR.chr_from_cid_and_csg = ( cid, csg  ) -> @as_chr cid, { csg: csg }
     # #-----------------------------------------------------------------------------------------------------------
-    # MKNCR.normalize_to_xncr = ( glyph ) ->
+    # IDL.NCR.normalize_to_xncr = ( glyph ) ->
     #   # throw new Error "do we need this method?"
     #   cid = @as_cid glyph
     #   csg = if ( @as_rsg glyph ) is 'u-pua' then 'jzr' else @as_csg glyph
     #   return @chr_from_cid_and_csg cid, 'jzr'
     #-----------------------------------------------------------------------------------------------------------
-    MKNCR.jzr_as_xncr = ( glyph ) ->
+    IDL.NCR.jzr_as_xncr = ( glyph ) ->
       nfo = @analyze glyph
       return glyph unless ( nfo.rsg is 'u-pua' ) or ( nfo.csg is 'jzr' )
       return @as_chr nfo.cid, { csg: 'jzr', }
     #-----------------------------------------------------------------------------------------------------------
     glyph       = "&jzr#xe234;"
-    glyph_uchr  = MKNCR.jzr_as_uchr glyph
-    glyph_r1    = MKNCR.jzr_as_xncr glyph
-    glyph_r2    = MKNCR.jzr_as_xncr glyph_uchr
+    glyph_uchr  = IDL.NCR.jzr_as_uchr glyph
+    glyph_r1    = IDL.NCR.jzr_as_xncr glyph
+    glyph_r2    = IDL.NCR.jzr_as_xncr glyph_uchr
     debug '32900', [ glyph, glyph_uchr, glyph_r1, glyph_r2, ]
-    debug '32900', MKNCR.jzr_as_xncr 'x'
+    debug '32900', IDL.NCR.jzr_as_xncr 'x'
   # demo_glyph_conversion()
 
 ###

@@ -17,7 +17,6 @@ help                      = CND.get_logger 'help',      badge
 urge                      = CND.get_logger 'urge',      badge
 echo                      = CND.echo.bind CND
 #...........................................................................................................
-MKNCR                     = require 'mingkwai-ncr'
 O                         = require './options'
 IDL                       = require './idl'
 

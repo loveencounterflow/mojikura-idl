@@ -28,6 +28,11 @@ module.exports = O =
     closer:     ')'
     spacer:     ' '
 
+  formula:
+    opener:     '('
+    closer:     ')'
+    spacer:     ''
+
   idl:
     operators:
       '⿰': { name: 'left-right',    arity: 2, }
