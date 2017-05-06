@@ -23,6 +23,11 @@ module.exports = O =
     'cjk-chr':              @cjk_chr_matcher
   ###
 
+  sexpr:
+    opener:     '('
+    closer:     ')'
+    spacer:     ' '
+
   idl:
     operators:
       '⿰': { name: 'left-right',    arity: 2, }
@@ -54,6 +59,7 @@ module.exports = O =
       '⿻':  { name: 'interlace',      arity: 2, }
       '◰':  { name: 'topleftcorner',  arity: 2, }
       '≈':  { name: 'similar',        arity: 1, }
+      '?':  { name: 'doubt',          arity: 1, }
       '↻':  { name: 'upsidedown',     arity: 1, }
       '↔':  { name: 'mirror',         arity: 1, }
       '↕':  { name: 'flip',           arity: 1, }
