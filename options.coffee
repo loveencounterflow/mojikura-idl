@@ -50,7 +50,7 @@ module.exports = O =
 
   idlx:
     operators:
-      '???':  { name: 'variable-operator', arity: null, }
+      # '???':  { name: 'variable-operator', arity: null, }
       # '???':  { name: 'null-operator', arity: 0, }
       '⿰':  { name: 'left-right',     arity: 2, }
       '⿱':  { name: 'top/down',       arity: 2, }
@@ -64,6 +64,8 @@ module.exports = O =
       '⿻':  { name: 'interlace',      arity: 2, }
       '◰':  { name: 'topleftcorner',  arity: 2, }
       '≈':  { name: 'similar',        arity: 1, }
+      '<':  { name: 'heavy',          arity: 1, }
+      '>':  { name: 'light',          arity: 1, }
       '?':  { name: 'doubt',          arity: 1, }
       '↻':  { name: 'upsidedown',     arity: 1, }
       '↔':  { name: 'mirror',         arity: 1, }
@@ -78,7 +80,9 @@ module.exports = O =
       '▽':  { name: 'inhibitor',                }
 
     proxies:
-      '???':  { name: 'variable-component',      }
+      'ⓧ':  { name: 'variable-x',               }
+      'ⓨ':  { name: 'variable-y',               }
+      'ⓩ':  { name: 'variable-z',               }
       '〓':  { name: 'getamark',                 }
       '§':  { name: 'curl',                     }
 

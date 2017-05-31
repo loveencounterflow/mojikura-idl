@@ -483,33 +483,102 @@ resume_next = ( T, method ) ->
   #.........................................................................................................
   return null
 
+#-----------------------------------------------------------------------------------------------------------
+@[ "(IDL) normalize formula" ] = ( T ) ->
+  #.........................................................................................................
+  shake_tree = ( ctx ) ->
+    delete ctx.tokenlist
+    delete ctx.diagram
+    _shake_tree ctx.tokentree, 0
+    IDL._get_diagram ctx
+    return ctx
+  #.........................................................................................................
+  _shake_tree = ( tree, delta ) ->
+    # debug '48982', tree
+    throw new Error "### MEH 1 ###" unless ( CND.type_of tree ) is 'list'
+    operator_token  = tree[ 0 ]
+    throw new Error "### MEH 2 ###" unless ( CND.type_of operator_token ) is 'MOJIKURA-IDL/token'
+    throw new Error "### MEH 3 ###" unless operator_token.t is 'operator'
+    operator_symbol = operator_token.s
+    argument_idx    = 0
+    loop
+      argument_idx += +1
+      break if argument_idx > tree.length - 1
+    # for argument_idx in [ 1 .. last_token_idx ] by +1
+      sub_tree = tree[ argument_idx ]
+      unless ( token_type = CND.type_of sub_tree ) is 'list'
+        debug ( CND.white argument_idx ), ( CND.cyan operator_symbol ), ( CND.yellow sub_tree.s )
+        continue
+      sub_operator_token = sub_tree[ 0 ]
+      throw new Error "### MEH 4 ###" unless ( CND.type_of sub_operator_token ) is 'MOJIKURA-IDL/token'
+      throw new Error "### MEH 5 ###" unless sub_operator_token.t is 'operator'
+      sub_operator_symbol = sub_operator_token.s
+      # debug argument_idx, operator_symbol, sub_operator_symbol
+      if operator_symbol is sub_operator_symbol
+        tree[ argument_idx .. argument_idx ] = sub_tree[ 1 .. ]
+        # tokenlist.splice ( sub_operator_token.idx + delta ), 1
+        argument_idx += -1
+        # delta        += +1
+        # debug '33392', tree
+      else
+        _shake_tree sub_tree, delta
+    return null
+  #.........................................................................................................
+  glyphs_probes_and_matchers = [
+    [ '㒚', '⿰亻⿱(⿱爫工彐)心',   ]
+    [ '㒚', '⿰亻⿱爫⿱工⿱彐心',   ]
+    [ '㒚', '⿰亻⿱⿱爫⿱工彐心',   ]
+    [ '㒚', '⿰亻⿱⿱⿱爫工彐心',   ]
+    # [ '㒢', '⿰亻(⿰亼⿰⿰口口口𠕁)', ]
+    # [ '㒦', '⿰亻⿱⿱田⿰田田土',    ]
+    # # [ '㒦', '⿰亻⿱(⿱田⿰田田)土',    ]
+    # [ '㒪', '(⿱人⿰臣臣⿰止豕)',   ]
+    ]
+  #.........................................................................................................
+  for [ glyph, probe, matcher, ] in glyphs_probes_and_matchers
+    ctx = IDLX.parse probe
+    shake_tree ctx
+    # debug '33342', ctx
+    IDLX._get_formula ctx, 'uchr'
+    IDLX._get_sexpr   ctx, 'uchr'
+    debug ( CND.cyan glyph ), ( CND.orange probe ), ( CND.yellow ctx.formula_uchr ), ( CND.lime ctx.diagram )
+    debug IDL._get_formula  ctx, 'uchr'
+    debug IDL._get_sexpr    ctx, 'uchr'
+    debug ctx.tokenlist
+    # _condense = ( ctx, current_operator = null ) ->
+    # _condense = ( tokentree, current_token_idx, current_operator = null ) ->
+    # _shake_tree = ( tree, current_operator = null ) ->
+  #.........................................................................................................
+  return null
+
 ############################################################################################################
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
-    "(IDL) demo"
-    "sanity checks (grammar data)"
-    #.......................................................................................................
-    "(IDL) parse simple formulas"
-    "(IDL) reject bogus formulas"
-    "(IDL) parse tree of simple formulas"
-    #.......................................................................................................
-    "(IDLX) reject bogus formulas"
-    "(IDLX) reject IDL operators with arity 3"
-    "(IDLX) parse simple formulas"
-    "(IDLX) parse extended formulas (plain)"
-    "(IDLX) parse extended formulas (bracketed)"
-    "(IDLX) reject bogus formulas (bracketed)"
-    "(IDLX) reject bogus formulas (solitaires)"
-    #.......................................................................................................
-    "(IDL) _tokentree_as_formula"
-    "(IDLX) _tokentree_as_formula"
-    "(IDLX) formula_from_source (1)"
-    "(IDLX) formula_from_source (2)"
-    "(IDLX) sexpr_from_source"
-    #.......................................................................................................
-    "(IDLX) doubt mark"
-    # "(experimental) using arbitrary characters as components"
+    # "(IDL) demo"
+    # "sanity checks (grammar data)"
+    # #.......................................................................................................
+    # "(IDL) parse simple formulas"
+    # "(IDL) reject bogus formulas"
+    # "(IDL) parse tree of simple formulas"
+    # #.......................................................................................................
+    # "(IDLX) reject bogus formulas"
+    # "(IDLX) reject IDL operators with arity 3"
+    # "(IDLX) parse simple formulas"
+    # "(IDLX) parse extended formulas (plain)"
+    # "(IDLX) parse extended formulas (bracketed)"
+    # "(IDLX) reject bogus formulas (bracketed)"
+    # "(IDLX) reject bogus formulas (solitaires)"
+    # #.......................................................................................................
+    # "(IDL) _tokentree_as_formula"
+    # "(IDLX) _tokentree_as_formula"
+    # "(IDLX) formula_from_source (1)"
+    # "(IDLX) formula_from_source (2)"
+    # "(IDLX) sexpr_from_source"
+    # #.......................................................................................................
+    # "(IDLX) doubt mark"
+    # # "(experimental) using arbitrary characters as components"
+    "(IDL) normalize formula"
     ]
   @_prune()
   @_main()

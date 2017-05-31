@@ -27,6 +27,6 @@
   "homepage": "https://github.com/loveencounterflow/mojikura-idl",
   "dependencies": {
     "cnd": "^4.2.2",
-    "ncr": "^0.5.0"
+    "ncr": "^2.0.0"
   }
 }
