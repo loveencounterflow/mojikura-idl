@@ -121,6 +121,64 @@ IDL                       = require './idl'
   #.........................................................................................................
   return R
 
+#===========================================================================================================
+# TREE-SHAKING
+#-----------------------------------------------------------------------------------------------------------
+@shake_tree = ( ctx ) ->
+  delete ctx.tokenlist
+  delete ctx.diagram
+  @_shake_tree ctx.tokentree
+  @_get_diagram ctx
+  return ctx
+
+#-----------------------------------------------------------------------------------------------------------
+@_shake_tree = ( tree ) ->
+  # debug '48982', tree
+  #.........................................................................................................
+  unless ( type = CND.type_of tree ) is 'list'
+    throw new Error "expected a list, got a #{type}"
+  #.........................................................................................................
+  operator_token  = tree[ 0 ]
+  #.........................................................................................................
+  unless ( type = CND.type_of operator_token ) is 'MOJIKURA-IDL/token'
+    throw new Error "expected a MOJIKURA-IDL/token, got a #{type}"
+  #.........................................................................................................
+  unless ( type = operator_token.t ) is 'operator'
+    throw new Error "expected an operator, got a #{type}"
+  #.........................................................................................................
+  operator_symbol = operator_token.s
+  argument_idx    = 0
+  #.........................................................................................................
+  loop
+    argument_idx += +1
+    break if argument_idx > tree.length - 1
+  # for argument_idx in [ 1 .. last_token_idx ] by +1
+    sub_tree = tree[ argument_idx ]
+    #.......................................................................................................
+    unless ( token_type = CND.type_of sub_tree ) is 'list'
+      # debug ( CND.white argument_idx ), ( CND.cyan operator_symbol ), ( CND.yellow sub_tree.s )
+      continue
+    #.......................................................................................................
+    sub_operator_token = sub_tree[ 0 ]
+    #.......................................................................................................
+    unless ( type = CND.type_of sub_operator_token ) is 'MOJIKURA-IDL/token'
+      throw new Error "expected a MOJIKURA-IDL/token, got a #{type}"
+    #.......................................................................................................
+    unless ( type = sub_operator_token.t ) is 'operator'
+      throw new Error "expected an operator, got a #{type}"
+    #.......................................................................................................
+    sub_operator_symbol = sub_operator_token.s
+    # debug argument_idx, operator_symbol, sub_operator_symbol
+    if operator_symbol is sub_operator_symbol
+      tree[ argument_idx .. argument_idx ] = sub_tree[ 1 .. ]
+      # tokenlist.splice ( sub_operator_token.idx + delta ), 1
+      argument_idx += -1
+      # delta        += +1
+      # debug '33392', tree
+    else
+      @_shake_tree sub_tree
+  return null
+
 
 ############################################################################################################
 ### Poor Man's MultiMix: ###
