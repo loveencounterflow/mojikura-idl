@@ -499,13 +499,27 @@ resume_next = ( T, method ) ->
     ["𠋕","⿰亻⿱⿰工几木",{"formula_uchr":"⿰亻⿱⿰工几木","sexpr_uchr":"( ⿰ 亻 ( ⿱ ( ⿰ 工 几 ) 木 ) )","diagram":["⿰","亻",["⿱",["⿰","工","几"],"木"]]}]
     ["𠋕","⿰<木<几",{"formula_uchr":"⿰<木<几","sexpr_uchr":"( ⿰ ( < 木 ) ( < 几 ) )","diagram":["⿰",["<","木"],["<","几"]]}]
     ]
+  # #.........................................................................................................
+  # f = ->
+  #   #-----------------------------------------------------------------------------------------------------------
+  #   @_rebuild_tokenlist_from_tokentree = ( me ) ->
+
+  #     return R if ( R = me.tokenlist )?
+  #     R         = []
+  #     # chrs      = @NCR.chrs_from_text me.source, input: 'xncr'
+  #     chrs      = @NCR.chrs_from_text me.source
+  #     for lexeme, idx in chrs
+  #       R.push @_new_token me, lexeme, idx
+  #     #.........................................................................................................
+  #     return me.tokenlist = R
+  # f.apply IDLX
   #.........................................................................................................
   for [ glyph, probe, matcher, ] in glyphs_probes_and_matchers
-    ctx = IDLX.parse probe
-    IDLX.shake_tree ctx
-    IDLX._get_formula ctx, 'uchr'
-    IDLX._get_sexpr   ctx, 'uchr'
-    { formula_uchr, sexpr_uchr, diagram, } = ctx
+    old_ctx = IDLX.parse probe
+    new_ctx = IDLX.shake_tree old_ctx
+    IDLX._get_formula new_ctx, 'uchr'
+    IDLX._get_sexpr   new_ctx, 'uchr'
+    { formula_uchr, sexpr_uchr, diagram, } = new_ctx
     # debug JSON.stringify [ glyph, probe, { formula_uchr, sexpr_uchr, diagram, }, ]
     probe_maybe_suboptimal  = IDLX.formula_may_be_suboptimal null, probe
     probe_was_suboptimal    = probe isnt formula_uchr
@@ -523,29 +537,29 @@ resume_next = ( T, method ) ->
 unless module.parent?
   # debug '0980', JSON.stringify ( Object.keys @ ), null '  '
   include = [
-    # "(IDL) demo"
-    # "sanity checks (grammar data)"
-    # #.......................................................................................................
-    # "(IDL) parse simple formulas"
-    # "(IDL) reject bogus formulas"
-    # "(IDL) parse tree of simple formulas"
-    # #.......................................................................................................
-    # "(IDLX) reject bogus formulas"
-    # "(IDLX) reject IDL operators with arity 3"
-    # "(IDLX) parse simple formulas"
-    # "(IDLX) parse extended formulas (plain)"
-    # "(IDLX) parse extended formulas (bracketed)"
-    # "(IDLX) reject bogus formulas (bracketed)"
-    # "(IDLX) reject bogus formulas (solitaires)"
-    # #.......................................................................................................
-    # "(IDL) _tokentree_as_formula"
-    # "(IDLX) _tokentree_as_formula"
-    # "(IDLX) formula_from_source (1)"
-    # "(IDLX) formula_from_source (2)"
-    # "(IDLX) sexpr_from_source"
-    # #.......................................................................................................
-    # "(IDLX) doubt mark"
-    # # "(experimental) using arbitrary characters as components"
+    "(IDL) demo"
+    "sanity checks (grammar data)"
+    #.......................................................................................................
+    "(IDL) parse simple formulas"
+    "(IDL) reject bogus formulas"
+    "(IDL) parse tree of simple formulas"
+    #.......................................................................................................
+    "(IDLX) reject bogus formulas"
+    "(IDLX) reject IDL operators with arity 3"
+    "(IDLX) parse simple formulas"
+    "(IDLX) parse extended formulas (plain)"
+    "(IDLX) parse extended formulas (bracketed)"
+    "(IDLX) reject bogus formulas (bracketed)"
+    "(IDLX) reject bogus formulas (solitaires)"
+    #.......................................................................................................
+    "(IDL) _tokentree_as_formula"
+    "(IDLX) _tokentree_as_formula"
+    "(IDLX) formula_from_source (1)"
+    "(IDLX) formula_from_source (2)"
+    "(IDLX) sexpr_from_source"
+    #.......................................................................................................
+    "(IDLX) doubt mark"
+    # "(experimental) using arbitrary characters as components"
     "(IDLX) tree-shaking"
     ]
   @_prune()

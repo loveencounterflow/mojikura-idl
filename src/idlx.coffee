@@ -134,7 +134,8 @@ IDL                       = require './idl'
   delete ctx.diagram
   @_shake_tree ctx.tokentree
   @_get_diagram ctx
-  return ctx
+  @_get_formula ctx, 'uchr'
+  return @parse ctx.formula_uchr
 
 #-----------------------------------------------------------------------------------------------------------
 @_shake_tree = ( tree ) ->
