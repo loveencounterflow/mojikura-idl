@@ -266,8 +266,10 @@ O                         = require './options'
 #===========================================================================================================
 # TREE-SHAKING
 #-----------------------------------------------------------------------------------------------------------
-@shake_tree   = -> throw new Error "not implemented for IDL dialect"
-@_shake_tree  = -> throw new Error "not implemented for IDL dialect"
+@shake_tree             = -> throw new Error "not implemented for IDL dialect"
+@_shake_tree            = -> throw new Error "not implemented for IDL dialect"
+@_get_treeshaker_litmus = -> throw new Error "not implemented for IDL dialect"
+
 
 #===========================================================================================================
 # EXCEPTIONS

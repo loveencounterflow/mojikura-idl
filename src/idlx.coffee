@@ -124,6 +124,11 @@ IDL                       = require './idl'
 #===========================================================================================================
 # TREE-SHAKING
 #-----------------------------------------------------------------------------------------------------------
+@formula_may_be_suboptimal = ( _, formula ) ->
+  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of formula ) is 'text'
+  return @_get_treeshaker_litmus().test formula
+
+#-----------------------------------------------------------------------------------------------------------
 @shake_tree = ( ctx ) ->
   delete ctx.tokenlist
   delete ctx.diagram
@@ -178,6 +183,32 @@ IDL                       = require './idl'
     else
       @_shake_tree sub_tree
   return null
+
+#-----------------------------------------------------------------------------------------------------------
+@_get_treeshaker_litmus = ->
+  ### When `@_get_treeshaker_litmus.pattern` matches a formula, it *may* be non-optimal; if the pattern
+  does *not* match a formula, there are certainly no opportunities for optimization. The pattern works by
+  trying to match sequences like `/...|(?:O[^MNPQ]*O)|(?:P[^MNOQ]*P)|.../`, where `MNOPQ` are the binary
+  operators. ###
+  return R if ( R = @_get_treeshaker_litmus.pattern )?
+  #.........................................................................................................
+  binary_operators = []
+  for symbol, { arity, } of @_parser_settings.operators
+    binary_operators.push symbol if arity is 2
+  binary_operators = binary_operators[ .. 3 ]
+  # debug '52998', binary_operators
+  pattern = []
+  for operator in binary_operators
+    sub_pattern = []
+    sub_pattern.push '[^'
+    for sub_operator in binary_operators
+      continue if sub_operator is operator
+      sub_pattern.push sub_operator
+    sub_pattern.push ']*'
+    pattern.push '(?:' + operator + ( sub_pattern.join '' ) + operator + ')'
+  #.........................................................................................................
+  return @_get_treeshaker_litmus.pattern = new RegExp pattern.join '|'
+@_get_treeshaker_litmus.pattern = null
 
 
 ############################################################################################################

@@ -492,25 +492,30 @@ resume_next = ( T, method ) ->
     ["㒚","⿰亻⿱爫⿱工⿱彐心",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
     ["㒚","⿰亻⿱⿱爫⿱工彐心",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
     ["㒚","⿰亻⿱⿱⿱爫工彐心",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
-    [ '㒢', '⿰亻(⿱亼⿰⿰口口口𠕁)', ]
-    [ '㒦', '⿰亻⿱⿱田⿰田田土',    ]
-    [ '㒦', '⿰亻(⿱田⿰田田土)',    ]
-    [ '㒪', '(⿱人⿰臣臣⿰止豕)',   ]
+    ["㒢","⿰亻(⿱亼⿰⿰口口口𠕁)",{"formula_uchr":"⿰亻(⿱亼(⿰口口口)𠕁)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 亼 ( ⿰ 口 口 口 ) 𠕁 ) )","diagram":["⿰","亻",["⿱","亼",["⿰","口","口","口"],"𠕁"]]}]
+    ["㒦","⿰亻⿱⿱田⿰田田土",{"formula_uchr":"⿰亻(⿱田⿰田田土)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 田 ( ⿰ 田 田 ) 土 ) )","diagram":["⿰","亻",["⿱","田",["⿰","田","田"],"土"]]}]
+    ["㒦","⿰亻(⿱田⿰田田土)",{"formula_uchr":"⿰亻(⿱田⿰田田土)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 田 ( ⿰ 田 田 ) 土 ) )","diagram":["⿰","亻",["⿱","田",["⿰","田","田"],"土"]]}]
+    ["㒪","(⿱人⿰臣臣⿰止豕)",{"formula_uchr":"(⿱人⿰臣臣⿰止豕)","sexpr_uchr":"( ⿱ 人 ( ⿰ 臣 臣 ) ( ⿰ 止 豕 ) )","diagram":["⿱","人",["⿰","臣","臣"],["⿰","止","豕"]]}]
+    ["𠋕","⿰亻⿱⿰工几木",{"formula_uchr":"⿰亻⿱⿰工几木","sexpr_uchr":"( ⿰ 亻 ( ⿱ ( ⿰ 工 几 ) 木 ) )","diagram":["⿰","亻",["⿱",["⿰","工","几"],"木"]]}]
+    ["𠋕","⿰<木<几",{"formula_uchr":"⿰<木<几","sexpr_uchr":"( ⿰ ( < 木 ) ( < 几 ) )","diagram":["⿰",["<","木"],["<","几"]]}]
     ]
   #.........................................................................................................
   for [ glyph, probe, matcher, ] in glyphs_probes_and_matchers
     ctx = IDLX.parse probe
     IDLX.shake_tree ctx
-    # debug '33342', ctx
     IDLX._get_formula ctx, 'uchr'
     IDLX._get_sexpr   ctx, 'uchr'
-    # debug ( CND.cyan glyph ), ( CND.orange probe ), ( CND.yellow ctx.formula_uchr ), ( CND.lime ctx.diagram )
-    # debug ctx.tokenlist
     { formula_uchr, sexpr_uchr, diagram, } = ctx
-    debug JSON.stringify [ glyph, probe, { formula_uchr, sexpr_uchr, diagram, }, ]
-    # _condense = ( ctx, current_operator = null ) ->
-    # _condense = ( tokentree, current_token_idx, current_operator = null ) ->
-    # _shake_tree = ( tree, current_operator = null ) ->
+    # debug JSON.stringify [ glyph, probe, { formula_uchr, sexpr_uchr, diagram, }, ]
+    probe_maybe_suboptimal  = IDLX.formula_may_be_suboptimal null, probe
+    probe_was_suboptimal    = probe isnt formula_uchr
+    # debug ( CND.truth probe_maybe_suboptimal ), ( CND.truth probe_was_suboptimal )
+    T.eq matcher, { formula_uchr, sexpr_uchr, diagram, }
+    if not probe_maybe_suboptimal
+      if probe_was_suboptimal then  T.fail "check for tree-shaking failed for #{rpr probe} (got #{formula_uchr})"
+      else                          T.ok true
+    else
+      T.ok true
   #.........................................................................................................
   return null
 

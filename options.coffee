@@ -63,7 +63,7 @@ module.exports = O =
       '⿺':  { name: 'leftbottom',     arity: 2, }
       '⿻':  { name: 'interlace',      arity: 2, }
       '◰':  { name: 'topleftcorner',  arity: 2, }
-      '≈':  { name: 'similar',        arity: 1, }
+      '≈':  { name: 'similar',        arity: 1, } # deprecated
       '<':  { name: 'heavy',          arity: 1, }
       '>':  { name: 'light',          arity: 1, }
       '?':  { name: 'doubt',          arity: 1, }
