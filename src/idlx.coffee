@@ -196,7 +196,7 @@ IDL                       = require './idl'
   binary_operators = []
   for symbol, { arity, } of @_parser_settings.operators
     binary_operators.push symbol if arity is 2
-  binary_operators = binary_operators[ .. 3 ]
+  # binary_operators = binary_operators[ .. 3 ]
   # debug '52998', binary_operators
   pattern = []
   for operator in binary_operators

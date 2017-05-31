@@ -499,20 +499,6 @@ resume_next = ( T, method ) ->
     ["𠋕","⿰亻⿱⿰工几木",{"formula_uchr":"⿰亻⿱⿰工几木","sexpr_uchr":"( ⿰ 亻 ( ⿱ ( ⿰ 工 几 ) 木 ) )","diagram":["⿰","亻",["⿱",["⿰","工","几"],"木"]]}]
     ["𠋕","⿰<木<几",{"formula_uchr":"⿰<木<几","sexpr_uchr":"( ⿰ ( < 木 ) ( < 几 ) )","diagram":["⿰",["<","木"],["<","几"]]}]
     ]
-  # #.........................................................................................................
-  # f = ->
-  #   #-----------------------------------------------------------------------------------------------------------
-  #   @_rebuild_tokenlist_from_tokentree = ( me ) ->
-
-  #     return R if ( R = me.tokenlist )?
-  #     R         = []
-  #     # chrs      = @NCR.chrs_from_text me.source, input: 'xncr'
-  #     chrs      = @NCR.chrs_from_text me.source
-  #     for lexeme, idx in chrs
-  #       R.push @_new_token me, lexeme, idx
-  #     #.........................................................................................................
-  #     return me.tokenlist = R
-  # f.apply IDLX
   #.........................................................................................................
   for [ glyph, probe, matcher, ] in glyphs_probes_and_matchers
     old_ctx = IDLX.parse probe
