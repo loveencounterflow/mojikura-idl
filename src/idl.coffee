@@ -90,7 +90,7 @@ O                         = require './options'
     @_err me, me.idx, "IDL: extra token(s)"
   #.........................................................................................................
   ### TAINT review the below condition ###
-  if ( me.tokenlist.length is 1 ) and ( ( type = me.tokenlist[ 0 ].t ) is 'component' )
+  if ( me.tokenlist.length is 1 ) and ( ( type = me.tokenlist[ 0 ].t ) isnt 'solitaire' )
     @_err me, 0, "IDL: lone token of type #{rpr type}"
   #.........................................................................................................
   return me.tokentree = R

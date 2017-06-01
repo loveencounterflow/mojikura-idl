@@ -186,6 +186,7 @@ resume_next = ( T, method ) ->
   probes_and_matchers = [
     ["木","IDL: lone token of type 'component' [  ✘ 木 ✘  ]"]
     [42,"expected a text, got a number"]
+    ["〓","IDL: lone token of type 'proxy' [  ✘ 〓 ✘  ]"]
     ["","IDL: empty text"]
     ["⿱⿰亻式⿱目八木木木","IDL: extra token(s) [ ⿱⿰亻式⿱目八 ✘ 木 ✘ 木木 ]"]
     ["⿺廴聿123","IDL: extra token(s) [ ⿺廴聿 ✘ 1 ✘ 23 ]"]
@@ -223,14 +224,17 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) parse extended formulas (plain)" ] = ( T ) ->
   probes_and_matchers = [
+      # [ 'ⓧ', 'ⓧ', ]
+      # [ 'ⓨ', 'ⓨ', ]
+      # [ 'ⓩ', 'ⓩ', ]
+      [ '●', '●', ]
+      [ '▽', '▽', ]
+      [ '∅', '∅', ]
       [ '≈㐀', [ '≈', '㐀', ], ]
       [ '≈𠀎', [ '≈', '𠀎', ], ]
       [ '≈𪜀', [ '≈', '𪜀', ], ]
       [ '≈〇', [ '≈', '〇', ], ]
-      [ '●', '●', ]
-      [ '〓', '〓', ]
       [ '⿱〓〓', [ '⿱', '〓', '〓' ]]
-      [ '▽', '▽', ]
       [ '↻正', [ '↻', '正', ], ]
       [ '↔≈匕', [ '↔', [ '≈', '匕' ] ], ]
       [ '↔正', [ '↔', '正', ], ]
@@ -303,6 +307,11 @@ resume_next = ( T, method ) ->
 #-----------------------------------------------------------------------------------------------------------
 @[ "(IDLX) reject bogus formulas (solitaires)" ] = ( T ) ->
   probes_and_matchers = [
+    ["〓","IDL: lone token of type 'proxy' [  ✘ 〓 ✘  ]"]
+    ["§","IDL: lone token of type 'proxy' [  ✘ § ✘  ]"]
+    ["⿱式●","IDLX: cannot have a solitaire here [ ⿱式 ✘ ● ✘  ]"]
+    ["⿱式▽","IDLX: cannot have a solitaire here [ ⿱式 ✘ ▽ ✘  ]"]
+    ["⿱式∅","IDLX: cannot have a solitaire here [ ⿱式 ✘ ∅ ✘  ]"]
     ["⿱〓▽","IDLX: cannot have a solitaire here [ ⿱〓 ✘ ▽ ✘  ]"]
     ["↻●","IDLX: cannot have a solitaire here [ ↻ ✘ ● ✘  ]"]
     ["↔≈▽","IDLX: cannot have a solitaire here [ ↔≈ ✘ ▽ ✘  ]"]
@@ -354,11 +363,11 @@ resume_next = ( T, method ) ->
     ["⿺辶言","⿺辶言"]
     ["⿺辶〓","⿺辶〓"]
     ["●","●"]
-    ["〓","〓"]
+    ["∅","∅"]
+    ["▽","▽"]
     ["⿱癶⿰弓貝","⿱癶⿰弓貝"]
     ["⿱⿰亻式貝","⿱⿰亻式貝"]
     ["⿱⿰亻式⿱目八","⿱⿰亻式⿱目八"]
-    ["▽","▽"]
     ["≈〇","≈〇"]
     ["⿱〓〓","⿱〓〓"]
     ["↻正","↻正"]
@@ -421,7 +430,7 @@ resume_next = ( T, method ) ->
 @[ "(IDLX) sexpr_from_source" ] = ( T ) ->
   probes_and_matchers = [
     ["●","( ● )"]
-    ["〓","( 〓 )"]
+    ["∅","( ∅ )"]
     ["▽","( ▽ )"]
     ["⿺辶言","( ⿺ 辶 言 )"]
     ["⿺辶〓","( ⿺ 辶 〓 )"]

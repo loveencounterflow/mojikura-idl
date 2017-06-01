@@ -76,13 +76,14 @@ module.exports = O =
       ')':  { name: 'rbracket',                 }
 
     solitaires:
+      '∅':  { name: 'nosuchformula',           }
       '●':  { name: 'terminator',               }
       '▽':  { name: 'inhibitor',                }
 
     proxies:
-      'ⓧ':  { name: 'variable-x',               }
-      'ⓨ':  { name: 'variable-y',               }
-      'ⓩ':  { name: 'variable-z',               }
+      # 'ⓧ':  { name: 'variable-x',               }
+      # 'ⓨ':  { name: 'variable-y',               }
+      # 'ⓩ':  { name: 'variable-z',               }
       '〓':  { name: 'getamark',                 }
       '§':  { name: 'curl',                     }
 
