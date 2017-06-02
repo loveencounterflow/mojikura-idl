@@ -496,8 +496,8 @@ resume_next = ( T, method ) ->
 @[ "(IDLX) tree-shaking" ] = ( T ) ->
   #.........................................................................................................
   glyphs_probes_and_matchers = [
-    ["㒚","⿰亻(⿱爫工彐心)",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
     ["㒚","⿰亻⿱(⿱爫工彐)心",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
+    ["㒚","⿰亻(⿱爫工彐心)",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
     ["㒚","⿰亻⿱爫⿱工⿱彐心",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
     ["㒚","⿰亻⿱⿱爫⿱工彐心",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
     ["㒚","⿰亻⿱⿱⿱爫工彐心",{"formula_uchr":"⿰亻(⿱爫工彐心)","sexpr_uchr":"( ⿰ 亻 ( ⿱ 爫 工 彐 心 ) )","diagram":["⿰","亻",["⿱","爫","工","彐","心"]]}]
@@ -507,17 +507,28 @@ resume_next = ( T, method ) ->
     ["㒪","(⿱人⿰臣臣⿰止豕)",{"formula_uchr":"(⿱人⿰臣臣⿰止豕)","sexpr_uchr":"( ⿱ 人 ( ⿰ 臣 臣 ) ( ⿰ 止 豕 ) )","diagram":["⿱","人",["⿰","臣","臣"],["⿰","止","豕"]]}]
     ["𠋕","⿰亻⿱⿰工几木",{"formula_uchr":"⿰亻⿱⿰工几木","sexpr_uchr":"( ⿰ 亻 ( ⿱ ( ⿰ 工 几 ) 木 ) )","diagram":["⿰","亻",["⿱",["⿰","工","几"],"木"]]}]
     ["𠋕","⿰<木<几",{"formula_uchr":"⿰<木<几","sexpr_uchr":"( ⿰ ( < 木 ) ( < 几 ) )","diagram":["⿰",["<","木"],["<","几"]]}]
+    ["㐒","⿱⿱刀口乙",{"formula_uchr":"(⿱刀口乙)","sexpr_uchr":"( ⿱ 刀 口 乙 )","diagram":["⿱","刀","口","乙"]}]
+    ["㐥","⿱⿰金⿰且力乙",{"formula_uchr":"⿱(⿰金且力)乙","sexpr_uchr":"( ⿱ ( ⿰ 金 且 力 ) 乙 )","diagram":["⿱",["⿰","金","且","力"],"乙"]}]
+    ["㐯","(⿱亠⿱口口⿱禾日)",{"formula_uchr":"(⿱亠口口禾日)","sexpr_uchr":"( ⿱ 亠 口 口 禾 日 )","diagram":["⿱","亠","口","口","禾","日"]}]
     ]
   #.........................................................................................................
   for [ glyph, probe, matcher, ] in glyphs_probes_and_matchers
     old_ctx = IDLX.parse probe
+    # old_ctx_copy = JSON.parse JSON.stringify old_ctx
+    # debug '22621', CND.truth CND.equals old_ctx, old_ctx_copy
+    # # debug '30303', old_ctx.tokentree
     new_ctx = IDLX.shake_tree old_ctx
+    # # debug '30303', old_ctx.tokentree
+    # debug '22621', CND.truth CND.equals old_ctx, old_ctx_copy
+    # debug '22621', CND.truth old_ctx.tokentree is new_ctx.tokentree
+    # debug '22618', new_ctx.tokenlist
+    # process.exit 1
     IDLX._get_formula new_ctx, 'uchr'
     IDLX._get_sexpr   new_ctx, 'uchr'
     { formula_uchr, sexpr_uchr, diagram, } = new_ctx
-    # debug JSON.stringify [ glyph, probe, { formula_uchr, sexpr_uchr, diagram, }, ]
     probe_maybe_suboptimal  = IDLX.formula_may_be_suboptimal null, probe
     probe_was_suboptimal    = probe isnt formula_uchr
+    # debug JSON.stringify [ glyph, probe, { formula_uchr, sexpr_uchr, diagram, }, ]
     # debug ( CND.truth probe_maybe_suboptimal ), ( CND.truth probe_was_suboptimal )
     T.eq matcher, { formula_uchr, sexpr_uchr, diagram, }
     if not probe_maybe_suboptimal

@@ -130,6 +130,8 @@ IDL                       = require './idl'
 
 #-----------------------------------------------------------------------------------------------------------
 @shake_tree = ( ctx ) ->
+  ### TAINT poor man's deep_copy: ###
+  ctx = JSON.parse JSON.stringify ctx
   delete ctx.tokenlist
   delete ctx.diagram
   @_shake_tree ctx.tokentree

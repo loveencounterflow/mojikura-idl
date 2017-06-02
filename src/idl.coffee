@@ -39,6 +39,7 @@ O                         = require './options'
 # CONTEXTS
 #-----------------------------------------------------------------------------------------------------------
 ### Parser settings contain lists of operators with symbolic names, arity and so on. ###
+### TAINT strange ###
 @_parser_settings = O.idl
 
 #-----------------------------------------------------------------------------------------------------------
@@ -62,6 +63,7 @@ O                         = require './options'
     formula_xncr:   null
     sexpr_uchr:     null
     sexpr_xncr:     null
+  ### TAINT strange ###
   R.settings.sexpr    = O.sexpr
   R.settings.formula  = O.formula
   return R
@@ -233,10 +235,6 @@ O                         = require './options'
   right         = mid + me.settings.formula.closer
   return left + ( R.join mid ) + right if has_brackets
   return          R.join mid
-
-# #-----------------------------------------------------------------------------------------------------------
-# @_token_as_sexpr = ( me, token ) ->
-#   return @NCR.jzr_as_xncr token.s
 
 #-----------------------------------------------------------------------------------------------------------
 @_tokentree_as_sexpr = ( me, tokentree, jzr_mode, level = 0 ) ->
