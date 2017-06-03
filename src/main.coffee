@@ -88,10 +88,13 @@ Idl_lexer::formatError = ( token, message ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @IDL.parse = ( source ) ->
+  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
+  throw new Error "expected a non-empty text, got an empty text" if source.length is 0
   ### TAINT should we rewind()? finish()? parser? ###
   @_parser = new NEARLEY.Parser IDL_GRAMMAR.ParserRules, IDL_GRAMMAR.ParserStart, { lexer: new Idl_lexer(), }
   # @_parser.reset()
   @_parser.feed source
+  throw new Error "Syntax Error: #{rpr source}" unless @_parser.results.length is 1
   return @_parser.results[ 0 ]
 
 # #-----------------------------------------------------------------------------------------------------------

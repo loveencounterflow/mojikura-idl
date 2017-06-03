@@ -10,6 +10,7 @@ do ->
   log                       = CND.get_logger 'plain',     badge
   debug                     = CND.get_logger 'debug',     badge
   info                      = CND.get_logger 'info',      badge
+  silent                    = no
   silent                    = yes
   
   #-----------------------------------------------------------------------------------------------------------
@@ -29,16 +30,17 @@ do ->
   grammar = {
     Lexer: undefined,
     ParserRules: [
+          {"name": "start", "symbols": ["term"], "postprocess": $unpack 'start',       0, 0},
           {"name": "expression$subexpression$1", "symbols": ["term"]},
           {"name": "expression$subexpression$1", "symbols": ["component"]},
-          {"name": "expression", "symbols": ["expression$subexpression$1"], "postprocess": $unpack '1', 0, 0, 0},
+          {"name": "expression", "symbols": ["expression$subexpression$1"], "postprocess": $unpack 'expression',  0, 0, 0},
           {"name": "term$subexpression$1", "symbols": ["binary_term"]},
           {"name": "term$subexpression$1", "symbols": ["trinary_term"]},
-          {"name": "term", "symbols": ["term$subexpression$1"], "postprocess": $unpack '2', 0},
+          {"name": "term", "symbols": ["term$subexpression$1"], "postprocess": $unpack 'term',        0},
           {"name": "binary_term$subexpression$1", "symbols": ["binary_operator", "expression", "expression"]},
-          {"name": "binary_term", "symbols": ["binary_term$subexpression$1"], "postprocess": $unpack '3', 0},
+          {"name": "binary_term", "symbols": ["binary_term$subexpression$1"], "postprocess": $unpack 'binary_term', 0},
           {"name": "trinary_term$subexpression$1", "symbols": ["trinary_operator", "expression", "expression", "expression"]},
-          {"name": "trinary_term", "symbols": ["trinary_term$subexpression$1"], "postprocess": $unpack '4', 0},
+          {"name": "trinary_term", "symbols": ["trinary_term$subexpression$1"], "postprocess": $unpack 'trinary_term',0},
           {"name": "component", "symbols": [/./], "postprocess": 
               ( data, loc, reject ) ->
                 [ { value: chr, }, ] = data
@@ -76,7 +78,7 @@ do ->
           {"name": "pillars", "symbols": [{"literal":"⿲"}], "postprocess": $unpack '17', 0, 'value'},
           {"name": "layers", "symbols": [{"literal":"⿳"}], "postprocess": $unpack '18', 0, 'value'}
       ],
-    ParserStart: "expression"
+    ParserStart: "start"
   }
   if typeof module != 'undefined' && typeof module.exports != 'undefined'
     module.exports = grammar;

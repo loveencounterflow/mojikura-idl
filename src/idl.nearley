@@ -9,6 +9,7 @@ badge                     = 'NEARlEY'
 log                       = CND.get_logger 'plain',     badge
 debug                     = CND.get_logger 'debug',     badge
 info                      = CND.get_logger 'info',      badge
+silent                    = no
 silent                    = yes
 
 #-----------------------------------------------------------------------------------------------------------
@@ -26,10 +27,11 @@ $unpack = ( label, keys... ) ->
 
 %}
 
-expression      ->  ( term | component                                  ) {% $unpack '1', 0, 0, 0 %}
-term            ->  ( binary_term | trinary_term                        ) {% $unpack '2', 0 %}
-binary_term     ->  ( binary_operator  expression expression            ) {% $unpack '3', 0 %}
-trinary_term    ->  ( trinary_operator expression expression expression ) {% $unpack '4', 0 %}
+start           ->  term                                                  {% $unpack 'start',       0, 0 %}
+expression      ->  ( term | component                                  ) {% $unpack 'expression',  0, 0, 0 %}
+term            ->  ( binary_term | trinary_term                        ) {% $unpack 'term',        0 %}
+binary_term     ->  ( binary_operator  expression expression            ) {% $unpack 'binary_term', 0 %}
+trinary_term    ->  ( trinary_operator expression expression expression ) {% $unpack 'trinary_term',0 %}
 
 # component       -> [a-z] {% ( d, loc ) -> [ 'component', loc, d..., ] %}
 # component       -> . {% ( d, loc ) -> [ 'component', loc, d..., ] %}

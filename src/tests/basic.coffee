@@ -137,30 +137,35 @@ TAP.test "(IDL) parse simple formulas", ( T ) ->
 #   #.........................................................................................................
 #   return null
 
-# #-----------------------------------------------------------------------------------------------------------
-# @[ "(IDL) reject bogus formulas" ] = ( T ) ->
-#   probes_and_matchers = [
-#     ["木","IDL: lone token of type 'component' [  ✘ 木 ✘  ]"]
-#     [42,"expected a text, got a number"]
-#     ["","IDL: empty text"]
-#     ["⿱⿰亻式⿱目八木木木","IDL: extra token(s) [ ⿱⿰亻式⿱目八 ✘ 木 ✘ 木木 ]"]
-#     ["⿺廴聿123","IDL: extra token(s) [ ⿺廴聿 ✘ 1 ✘ 23 ]"]
-#     ["⿺","IDL: premature end of source [  ✘ ⿺ ✘  ]"]
-#     ["⿺⿺⿺⿺","IDL: premature end of source [ ⿺⿺⿺ ✘ ⿺ ✘  ]"]
-#     ["(⿰亻聿式)","IDL: extra token(s) [ ( ✘ ⿰ ✘ 亻聿式) ]"]
-#     ["≈〇","IDL: extra token(s) [ ≈ ✘ 〇 ✘  ]"]
-#     ["●","IDL: lone token of type 'component' [  ✘ ● ✘  ]"]
-#     ]
-#   for [ probe, matcher, ] in probes_and_matchers
-#     try
-#       result = IDL.diagram_from_source probe
-#       T.fail "expected an exception, got result #{rpr result}"
-#     catch error
-#       message = CND.remove_colors error[ 'message' ]
-#       warn JSON.stringify [ probe, message, ]
-#       # T.eq message, matcher
-#   #.........................................................................................................
-#   return null
+#-----------------------------------------------------------------------------------------------------------
+TAP.test "(IDL) reject bogus formulas", ( T ) ->
+  probes_and_matchers = [
+    ["木","invalid syntax at index 0 (木)\nUnexpected \"木\"\n"]
+    [42,"expected a text, got a number"]
+    ["","expected a non-empty text, got an empty text"]
+    ["⿱⿰亻式⿱目八木木木","invalid syntax at index 7 (⿱⿰亻式⿱目八木木木)\nUnexpected \"木\"\n"]
+    ["⿺廴聿123","invalid syntax at index 3 (⿺廴聿123)\nUnexpected \"1\"\n"]
+    ["⿺","Syntax Error: '⿺'"]
+    ["⿺⿺⿺⿺","Syntax Error: '⿺⿺⿺⿺'"]
+    ["(⿰亻聿式)","invalid syntax at index 0 ((⿰亻聿式))\nUnexpected \"(\"\n"]
+    ["≈〇","invalid syntax at index 0 (≈〇)\nUnexpected \"≈\"\n"]
+    ["●","invalid syntax at index 0 (●)\nUnexpected \"●\"\n"]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    try
+      result = IDL.parse probe
+      debug ( rpr probe ), ( rpr result )
+      warn "expected an exception, got result #{rpr result}"
+      T.fail "expected an exception, got result #{rpr result}"
+    catch error
+      { message, } = error
+      urge JSON.stringify [ probe, message, ]
+     T.ok CND.equals message, matcher
+  #.........................................................................................................
+  T.end()
+  return null
+###
+###
 
 
 # #===========================================================================================================
