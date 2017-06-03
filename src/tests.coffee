@@ -513,11 +513,11 @@ resume_next = ( T, method ) ->
     ]
   #.........................................................................................................
   for [ glyph, probe, matcher, ] in glyphs_probes_and_matchers
-    old_ctx = IDLX.parse probe
-    # old_ctx_copy = JSON.parse JSON.stringify old_ctx
-    # debug '22621', CND.truth CND.equals old_ctx, old_ctx_copy
+    old_ctx       = IDLX.parse probe
+    old_ctx_copy  = JSON.parse JSON.stringify old_ctx
     # # debug '30303', old_ctx.tokentree
     new_ctx = IDLX.shake_tree old_ctx
+    T.eq old_ctx, old_ctx_copy
     # # debug '30303', old_ctx.tokentree
     # debug '22621', CND.truth CND.equals old_ctx, old_ctx_copy
     # debug '22621', CND.truth old_ctx.tokentree is new_ctx.tokentree
