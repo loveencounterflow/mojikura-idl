@@ -18,7 +18,9 @@ urge                      = CND.get_logger 'urge',      badge
 whisper                   = CND.get_logger 'whisper',   badge
 echo                      = CND.echo.bind CND
 NEARLEY                   = require 'nearley'
-GRAMMAR                   = require './idl'
+IDL_GRAMMAR               = require './idl'
+# IDLX_GRAMMAR              = require './idlx'
+# @IDL
 
 
 #===========================================================================================================
@@ -48,9 +50,7 @@ Idl_lexer = ->
 
 #-----------------------------------------------------------------------------------------------------------
 Idl_lexer::reset = ( data, state ) ->
-  debug '3321-1', 'Idl_lexer::reset', Array.from arguments
   @buffer = NCR.chrs_from_text data, input: 'xncr'
-  debug '3321-1', @buffer
   @index  = 0
   @line   = if state then state.line else 1
   @prv_nl = if state then -state.col else 0
@@ -58,47 +58,50 @@ Idl_lexer::reset = ( data, state ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 Idl_lexer::next = ->
-  debug '3321-2', 'Idl_lexer::next', Array.from arguments
   if @index < @buffer.length
     chr     = @buffer[ @index ]
     @index += +1
     if chr is '\n'
       @line  += +1
       @prv_nl = @index
-    debug '3321-2', { value: chr, }
+    # return { value: chr, line: @line, col: @index - @prv_nl, }
     return { value: chr, }
   return null
 
 #-----------------------------------------------------------------------------------------------------------
 Idl_lexer::save = ->
-  debug '3321-3', 'Idl_lexer::save', Array.from arguments
   return { line: @line, col: @index - @prv_nl, }
 
 #-----------------------------------------------------------------------------------------------------------
 Idl_lexer::formatError = ( token, message ) ->
-  debug '3321-4', 'Idl_lexer::formatError', Array.from arguments
   R = "#{message} at index #{@index - 1} (#{@buffer.join ''})"
-  debug '3321-4', rpr @index
-  debug '3321-4', rpr R
   return R
 
 
 #===========================================================================================================
 #
 #-----------------------------------------------------------------------------------------------------------
-new_parser = -> new NEARLEY.Parser GRAMMAR.ParserRules, GRAMMAR.ParserStart, { lexer: new Idl_lexer(), }
-help ( new_parser().feed '⿵xx'                          ).results
-help ( new_parser().feed '⿰ab'                          ).results
-help ( new_parser().feed '⿰⿰abc'                       ).results
-# help ( new_parser().feed 'u-cjk-xa-3412   㐒      ⿱⿱刀口乙' ).results
-help ( new_parser().feed '⿱刀口'                         ).results
-help ( new_parser().feed '⿱⿱刀口乙'                        ).results
-help ( new_parser().feed '⿰'                          ).results
-help ( new_parser().feed '⿰a'                          ).results
-help ( new_parser().feed '⿱⿱ 刀口乙'                       ).results
-help ( new_parser().feed '⿱ 刀'                          ).results
-# CND.dir x
+@IDL = {}
 
-# help x.results
+#-----------------------------------------------------------------------------------------------------------
+# @IDL._parser = new NEARLEY.Parser IDL_GRAMMAR.ParserRules, IDL_GRAMMAR.ParserStart, { lexer: new Idl_lexer(), }
+
+#-----------------------------------------------------------------------------------------------------------
+@IDL.parse = ( source ) ->
+  ### TAINT should we rewind()? finish()? parser? ###
+  @_parser = new NEARLEY.Parser IDL_GRAMMAR.ParserRules, IDL_GRAMMAR.ParserStart, { lexer: new Idl_lexer(), }
+  # @_parser.reset()
+  @_parser.feed source
+  return @_parser.results[ 0 ]
+
+# #-----------------------------------------------------------------------------------------------------------
+# @IDLX = # Object.assign Object.create @IDL
+
+#   _parser: new NEARLEY.Parser IDLX_GRAMMAR.ParserRules, IDLX_GRAMMAR.ParserStart, { lexer: new Idlx_lexer(), }
+
+#   parse = ( source ) ->
+#     @_parser.reset()
+#     @_parser().feed source
+#     return parser.results
 
 

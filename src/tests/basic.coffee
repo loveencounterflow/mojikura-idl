@@ -17,7 +17,7 @@ urge                      = CND.get_logger 'urge',      badge
 echo                      = CND.echo.bind CND
 #...........................................................................................................
 TAP                       = require 'tap'
-{ IDL, IDLX, }            = require './main'
+{ IDL, IDLX, }            = require '../..'
 
 
 #===========================================================================================================
@@ -39,17 +39,6 @@ nice_text_rpr = ( text ) ->
   R = R.replace /\n$/g, '\\n'
   R = '\n"""' + R + '"""'
   return R
-
-#-----------------------------------------------------------------------------------------------------------
-@_main = ( handler ) ->
-  test @, 'timeout': 2500
-
-#-----------------------------------------------------------------------------------------------------------
-@_prune = ->
-  for name, value of @
-    continue if name.startsWith '_'
-    delete @[ name ] unless name in include
-  return null
 
 #-----------------------------------------------------------------------------------------------------------
 resume_next = ( T, method ) ->
@@ -110,14 +99,23 @@ resume_next = ( T, method ) ->
 TAP.test "(IDL) parse simple formulas", ( T ) ->
   probes_and_matchers = [
     ["⿲木木木",["⿲","木","木","木"]]
+    ["⿱刀口",["⿱","刀","口"]]
     ["⿱癶⿰弓貝",["⿱","癶",["⿰","弓","貝"]]]
     ["⿱⿰亻式貝",["⿱",["⿰","亻","式"],"貝"]]
     ["⿱⿰亻式⿱目八",["⿱",["⿰","亻","式"],["⿱","目","八"]]]
     ["⿺辶言",["⿺","辶","言"]]
+    ["⿰ab",["⿰","a","b"]]
+    ["⿰⿰abc",["⿰",["⿰","a","b"],"c"]]
+    ["⿱⿱刀口乙",["⿱",["⿱","刀","口"],"乙"]]
+    ["⿱⿱刀口乙",["⿱",["⿱","刀","口"],"乙"]]
+    ["⿱&jzr#xe24a;&jzr#xe11d;",["⿱","&jzr#xe24a;","&jzr#xe11d;"]]
+    ["⿰𠁣𠃛",["⿰","𠁣","𠃛"]]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    result = resume_next T, -> IDL.diagram_from_source probe
-    urge JSON.stringify [ probe, result, ]
+    # result = resume_next T, -> IDL.parse probe
+    result = IDL.parse probe
+    urge ( CND.truth CND.equals result, matcher ), JSON.stringify [ probe, result, ]
+    # urge ( rpr probe ), result
     T.ok CND.equals result, matcher
   #.........................................................................................................
   T.end()

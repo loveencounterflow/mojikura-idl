@@ -1,11 +1,35 @@
 
 @preprocessor coffee
 
+@{%
 
-expression      ->  ( term | component                                  ) {% id %}
-term            ->  ( binary_term | trinary_term                        ) {% id %}
-binary_term     ->  ( binary_operator  expression expression            ) {% id %}
-trinary_term    ->  ( trinary_operator expression expression expression ) {% id %}
+CND                       = require 'cnd'
+rpr                       = CND.rpr
+badge                     = 'NEARlEY'
+log                       = CND.get_logger 'plain',     badge
+debug                     = CND.get_logger 'debug',     badge
+info                      = CND.get_logger 'info',      badge
+silent                    = yes
+
+#-----------------------------------------------------------------------------------------------------------
+$unpack = ( label, keys... ) ->
+  keys.push 0 if keys.length is 0
+  return ( data, loc, reject ) ->
+    R = data
+    for key in keys
+      break if CND.isa_text R
+      R = R[ key ]
+    unless silent
+      R.label = label
+      debug '9982', label, data, rpr R
+    return R
+
+%}
+
+expression      ->  ( term | component                                  ) {% $unpack '1', 0, 0, 0 %}
+term            ->  ( binary_term | trinary_term                        ) {% $unpack '2', 0 %}
+binary_term     ->  ( binary_operator  expression expression            ) {% $unpack '3', 0 %}
+trinary_term    ->  ( trinary_operator expression expression expression ) {% $unpack '4', 0 %}
 
 # component       -> [a-z] {% ( d, loc ) -> [ 'component', loc, d..., ] %}
 # component       -> . {% ( d, loc ) -> [ 'component', loc, d..., ] %}
@@ -16,13 +40,13 @@ trinary_term    ->  ( trinary_operator expression expression expression ) {% id 
 # illegal         -> [\x00-\x20\U{00a0}\U{1680}\U{180e}\U{2000}-\U{200b}\U{202f}\U{205f}\U{3000}\U{feff}] {% ( d, loc, reject ) -> reject %}
 component       -> . {%
   ( data, loc, reject ) ->
-    [ chr, ] = data
-    console.log '33821', ( require 'util' ).inspect data
+    [ { value: chr, }, ] = data
     return reject if /^\s+$/.test chr
     return reject if /^[⿰⿱⿴⿵⿶⿷⿸⿹⿺⿻⿲⿳]$/.test chr
+    info '33821', ( rpr data ), ( rpr chr ) unless silent
     return chr
   # [\x00-\x20\U{00a0}\U{1680}\U{180e}\U{2000}-\U{200b}\U{202f}\U{205f}\U{3000}\U{feff}]
-  #  ( d, loc, reject ) -> throw new Error "#{( require 'util' ).inspect d} at #{( require 'util' ).inspect loc}"
+  #  ( d, loc, reject ) -> throw new Error "#{rpr d} at #{rpr loc}"
    %}
 
 binary_operator -> ( leftright
@@ -34,24 +58,24 @@ binary_operator -> ( leftright
                    | topleft
                    | topright
                    | leftbottom
-                   | interlace ) {% id %}
+                   | interlace ) {% $unpack '5', 0, 0 %}
 
 trinary_operator -> ( pillars
-                  | layers ) {% id %}
+                  | layers ) {% $unpack '6', 0, 0 %}
 
 
-leftright    ->      "⿰" {% id %} # {% ( d, loc ) -> [ 'leftright',   loc, d..., ] %}
-topdown      ->      "⿱" {% id %} # {% ( d, loc ) -> [ 'topdown',     loc, d..., ] %}
-surround     ->      "⿴" {% id %} # {% ( d, loc ) -> [ 'surround',    loc, d..., ] %}
-cap          ->      "⿵" {% id %} # {% ( d, loc ) -> [ 'cap',         loc, d..., ] %}
-cup          ->      "⿶" {% id %} # {% ( d, loc ) -> [ 'cup',         loc, d..., ] %}
-leftembrace  ->      "⿷" {% id %} # {% ( d, loc ) -> [ 'leftembrace', loc, d..., ] %}
-topleft      ->      "⿸" {% id %} # {% ( d, loc ) -> [ 'topleft',     loc, d..., ] %}
-topright     ->      "⿹" {% id %} # {% ( d, loc ) -> [ 'topright',    loc, d..., ] %}
-leftbottom   ->      "⿺" {% id %} # {% ( d, loc ) -> [ 'leftbottom',  loc, d..., ] %}
-interlace    ->      "⿻" {% id %} # {% ( d, loc ) -> [ 'interlace',   loc, d..., ] %}
-pillars      ->      "⿲" {% id %} # {% ( d, loc ) -> [ 'pillars',     loc, d..., ] %}
-layers       ->      "⿳" {% id %} # {% ( d, loc ) -> [ 'layers',      loc, d..., ] %}
+leftright    ->      "⿰" {% $unpack '7', 0, 'value' %} # {% ( d, loc ) -> [ 'leftright',   loc, d..., ] %}
+topdown      ->      "⿱" {% $unpack '8', 0, 'value' %} # {% ( d, loc ) -> [ 'topdown',     loc, d..., ] %}
+surround     ->      "⿴" {% $unpack '9', 0, 'value' %} # {% ( d, loc ) -> [ 'surround',    loc, d..., ] %}
+cap          ->      "⿵" {% $unpack '10', 0, 'value' %} # {% ( d, loc ) -> [ 'cap',         loc, d..., ] %}
+cup          ->      "⿶" {% $unpack '11', 0, 'value' %} # {% ( d, loc ) -> [ 'cup',         loc, d..., ] %}
+leftembrace  ->      "⿷" {% $unpack '12', 0, 'value' %} # {% ( d, loc ) -> [ 'leftembrace', loc, d..., ] %}
+topleft      ->      "⿸" {% $unpack '13', 0, 'value' %} # {% ( d, loc ) -> [ 'topleft',     loc, d..., ] %}
+topright     ->      "⿹" {% $unpack '14', 0, 'value' %} # {% ( d, loc ) -> [ 'topright',    loc, d..., ] %}
+leftbottom   ->      "⿺" {% $unpack '15', 0, 'value' %} # {% ( d, loc ) -> [ 'leftbottom',  loc, d..., ] %}
+interlace    ->      "⿻" {% $unpack '16', 0, 'value' %} # {% ( d, loc ) -> [ 'interlace',   loc, d..., ] %}
+pillars      ->      "⿲" {% $unpack '17', 0, 'value' %} # {% ( d, loc ) -> [ 'pillars',     loc, d..., ] %}
+layers       ->      "⿳" {% $unpack '18', 0, 'value' %} # {% ( d, loc ) -> [ 'layers',      loc, d..., ] %}
 
 
 
