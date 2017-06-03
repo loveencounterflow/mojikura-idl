@@ -4,13 +4,11 @@
   "description": "文字倉字形描述語言 MojiKura Ideographic Description Language",
   "main": "lib/main.js",
   "scripts": {
-    "build": "coffee --map -o lib -c src && coffee --map -o lib -c options.coffee",
-    "push": "git add . && git commit -m'update' && git push",
+    "build": "nearleyc src/idl.nearley -o lib/idl.coffee && coffee --map -o lib -c src && coffee --map -o lib -c options.coffee",
     "doctoc": "doctoc README.md",
     "pub": "npm run build && npm run doctoc && npm run push && npm version patch && npm publish",
     "test-travis": "node lib/tests.js",
-    "mkts": "node lib/cli.js mkts $2",
-    "test": "npm run build && node lib/tests.js"
+    "test": "npm run build && tap lib/tests/*.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +25,9 @@
   "homepage": "https://github.com/loveencounterflow/mojikura-idl",
   "dependencies": {
     "cnd": "^4.2.2",
-    "ncr": "^2.0.0"
+    "ncr": "^2.0.0",
+  },
+  "devDependencies": {
+    "tap": "^10.3.3"
   }
 }
