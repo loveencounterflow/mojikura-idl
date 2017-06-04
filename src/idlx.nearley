@@ -1,6 +1,11 @@
 
 @preprocessor coffee
 
+# NOTE: in the below grammar, rules with two plusses in their names (like `binary_+operator+`, `+proxy+`,
+# `+bracket+ed`) indicate type names. This convention allows us to reverse-engineer the grammar
+# to extract a mapping from type name to literals and from literals to type names.
+
+
 @{%
 
 CND                       = require 'cnd'
