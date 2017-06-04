@@ -20,6 +20,7 @@ echo                      = CND.echo.bind CND
 NEARLEY                   = require 'nearley'
 IDL_GRAMMAR               = require './idl'
 IDLX_GRAMMAR              = require './idlx'
+σ_mojikura                = Symbol.for 'mojikura'
 
 
 #===========================================================================================================
@@ -116,42 +117,15 @@ Idl_lexer::formatError = ( token, message ) ->
   return R
 
 
-condense = ( grammar ) ->
-  registry  = _registry_from_grammar grammar
-  paths     = new Set()
-  _condense registry, ( new Set() ), paths, grammar.ParserStart
-  return Array.from paths
+#===========================================================================================================
+#
+#-----------------------------------------------------------------------------------------------------------
+@IDLX.get_literals_and_types = ( grammar ) =>
+  paths = @IDLX._paths_from_grammar IDLX_GRAMMAR
+  return @IDLX._literals_and_types_from_paths paths
 
-_registry_from_grammar = ( grammar ) ->
-  R = {}
-  for rule in grammar.ParserRules
-    { name, symbols, } = rule
-    for symbol in symbols
-      if CND.isa_pod symbol
-        symbol = '"' + symbol.literal + '"'
-      entry   = R[ symbol ] ?= []
-      target  = R[ name   ] ?= []
-      target.push symbol
-  return R
-
-_condense = ( registry, seen, paths, name, route = [] ) ->
-  return if seen.has name
-  seen. add name
-  symbols         = registry[ name ]
-  is_public_name  = not /\$/.test name
-  route.push name if is_public_name
-  for symbol in symbols
-    entry = registry[ symbol ]
-    if ( entry.length is 0 )
-      route.push symbol
-      paths.add path unless /// (?: \/\/ ) | (?: \/ $ ) ///.test ( path = route.join '/' )
-      route.pop()
-    else
-      _condense registry, seen, paths, symbol, route
-  route.pop() if is_public_name
-  return null
-
-operators_from_paths = ( paths ) ->
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._literals_and_types_from_paths = ( paths ) =>
   R = {}
   for path in paths
     ### TAINT pattern should allow literal double quotes ###
@@ -164,12 +138,64 @@ operators_from_paths = ( paths ) ->
     # ( R[ type ] ?= [] ).push literal
   return R
 
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._paths_from_grammar = ( grammar ) =>
+  registry  = @IDLX._registry_from_grammar grammar
+  paths     = new Set()
+  @IDLX._condense registry, ( new Set() ), paths, grammar.ParserStart
+  return Array.from paths
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._registry_from_grammar = ( grammar ) =>
+  R = {}
+  for rule in grammar.ParserRules
+    { name, symbols, } = rule
+    for symbol in symbols
+      if CND.isa_pod symbol
+        symbol = '"' + symbol.literal + '"'
+      entry   = R[ symbol ] ?= []
+      target  = R[ name   ] ?= []
+      target.push symbol
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._condense = ( registry, seen, paths, name, route = [] ) =>
+  return if seen.has name
+  seen. add name
+  symbols         = registry[ name ]
+  is_public_name  = not /\$/.test name
+  route.push name if is_public_name
+  for symbol in symbols
+    entry = registry[ symbol ]
+    if ( entry.length is 0 )
+      route.push symbol
+      paths.add path unless /// (?: \/\/ ) | (?: \/ $ ) ///.test ( path = route.join '/' )
+      route.pop()
+    else
+      @IDLX._condense registry, seen, paths, symbol, route
+  route.pop() if is_public_name
+  return null
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX.type_from_literal = ( literal ) => IDLX_GRAMMAR[ σ_mojikura ].literals_and_types[ literal ] ? 'other'
+
+############################################################################################################
+IDLX_GRAMMAR[ σ_mojikura ] = {}
+IDLX_GRAMMAR[ σ_mojikura ].literals_and_types = @IDLX.get_literals_and_types IDLX_GRAMMAR
+
 
 ############################################################################################################
 unless module.parent?
     #.........................................................................................................
-    paths = condense IDLX_GRAMMAR
-    info paths
-    help operators_from_paths paths
+    info @IDLX.get_literals_and_types IDLX_GRAMMAR
+    info @IDLX.type_from_literal IDLX_GRAMMAR
+    help '↻', @IDLX.type_from_literal '↻' # 'operator',
+    help '〓', @IDLX.type_from_literal '〓' # 'proxy',
+    help '§', @IDLX.type_from_literal '§' # 'proxy',
+    help '⿰', @IDLX.type_from_literal '⿰' # 'operator',
+    help '⿻', @IDLX.type_from_literal '⿻' # 'operator',
+    help '◰', @IDLX.type_from_literal '◰' # 'operator',
+    help '(', @IDLX.type_from_literal '(' # 'bracket',
+    help 'x', @IDLX.type_from_literal 'x' # 'other',
     process.exit 1
 
