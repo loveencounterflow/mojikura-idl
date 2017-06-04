@@ -14,7 +14,6 @@ silent                    = yes
 
 #-----------------------------------------------------------------------------------------------------------
 $unpack = ( label, keys... ) ->
-  keys.push 0 if keys.length is 0
   return ( data, loc, reject ) ->
     R = data
     for key in keys
@@ -33,13 +32,6 @@ term            ->  ( binary_term | trinary_term                        ) {% $un
 binary_term     ->  ( binary_operator  expression expression            ) {% $unpack 'binary_term', 0 %}
 trinary_term    ->  ( trinary_operator expression expression expression ) {% $unpack 'trinary_term',0 %}
 
-# component       -> [a-z] {% ( d, loc ) -> [ 'component', loc, d..., ] %}
-# component       -> . {% ( d, loc ) -> [ 'component', loc, d..., ] %}
-# component       -> [^⿰⿱⿴⿵⿶⿷⿸⿹⿺⿻⿲⿳\x00-\x20\U{00a0}\U{1680}\U{180e}\U{2000}-\U{200b}\U{202f}\U{205f}\U{3000}\U{feff}] {% ( d, loc ) -> [ 'component', loc, d..., ] %}
-
-
-
-# illegal         -> [\x00-\x20\U{00a0}\U{1680}\U{180e}\U{2000}-\U{200b}\U{202f}\U{205f}\U{3000}\U{feff}] {% ( d, loc, reject ) -> reject %}
 component       -> . {%
   ( data, loc, reject ) ->
     [ { value: chr, }, ] = data
@@ -47,37 +39,35 @@ component       -> . {%
     return reject if /^[⿰⿱⿴⿵⿶⿷⿸⿹⿺⿻⿲⿳]$/.test chr
     info '33821', ( rpr data ), ( rpr chr ) unless silent
     return chr
-  # [\x00-\x20\U{00a0}\U{1680}\U{180e}\U{2000}-\U{200b}\U{202f}\U{205f}\U{3000}\U{feff}]
-  #  ( d, loc, reject ) -> throw new Error "#{rpr d} at #{rpr loc}"
-   %}
+  %}
 
-binary_operator -> ( leftright
-                   | topdown
-                   | surround
-                   | cap
-                   | cup
-                   | leftembrace
-                   | topleft
-                   | topright
-                   | leftbottom
-                   | interlace ) {% $unpack '5', 0, 0 %}
+binary_operator   ->  ( leftright
+                      | topdown
+                      | surround
+                      | cap
+                      | cup
+                      | leftembrace
+                      | topleft
+                      | topright
+                      | leftbottom
+                      | interlace ) {% $unpack 'binary_operator',  0, 0 %}
 
-trinary_operator -> ( pillars
-                  | layers ) {% $unpack '6', 0, 0 %}
+trinary_operator  ->  ( pillars
+                      | layers    ) {% $unpack 'trinary_operator', 0, 0 %}
 
 
-leftright    ->      "⿰" {% $unpack '7', 0, 'value' %} # {% ( d, loc ) -> [ 'leftright',   loc, d..., ] %}
-topdown      ->      "⿱" {% $unpack '8', 0, 'value' %} # {% ( d, loc ) -> [ 'topdown',     loc, d..., ] %}
-surround     ->      "⿴" {% $unpack '9', 0, 'value' %} # {% ( d, loc ) -> [ 'surround',    loc, d..., ] %}
-cap          ->      "⿵" {% $unpack '10', 0, 'value' %} # {% ( d, loc ) -> [ 'cap',         loc, d..., ] %}
-cup          ->      "⿶" {% $unpack '11', 0, 'value' %} # {% ( d, loc ) -> [ 'cup',         loc, d..., ] %}
-leftembrace  ->      "⿷" {% $unpack '12', 0, 'value' %} # {% ( d, loc ) -> [ 'leftembrace', loc, d..., ] %}
-topleft      ->      "⿸" {% $unpack '13', 0, 'value' %} # {% ( d, loc ) -> [ 'topleft',     loc, d..., ] %}
-topright     ->      "⿹" {% $unpack '14', 0, 'value' %} # {% ( d, loc ) -> [ 'topright',    loc, d..., ] %}
-leftbottom   ->      "⿺" {% $unpack '15', 0, 'value' %} # {% ( d, loc ) -> [ 'leftbottom',  loc, d..., ] %}
-interlace    ->      "⿻" {% $unpack '16', 0, 'value' %} # {% ( d, loc ) -> [ 'interlace',   loc, d..., ] %}
-pillars      ->      "⿲" {% $unpack '17', 0, 'value' %} # {% ( d, loc ) -> [ 'pillars',     loc, d..., ] %}
-layers       ->      "⿳" {% $unpack '18', 0, 'value' %} # {% ( d, loc ) -> [ 'layers',      loc, d..., ] %}
+leftright    -> "⿰" {% $unpack 'leftright',    0, 'value' %}
+topdown      -> "⿱" {% $unpack 'topdown',      0, 'value' %}
+surround     -> "⿴" {% $unpack 'surround',     0, 'value' %}
+cap          -> "⿵" {% $unpack 'cap',          0, 'value' %}
+cup          -> "⿶" {% $unpack 'cup',          0, 'value' %}
+leftembrace  -> "⿷" {% $unpack 'leftembrace',  0, 'value' %}
+topleft      -> "⿸" {% $unpack 'topleft',      0, 'value' %}
+topright     -> "⿹" {% $unpack 'topright',     0, 'value' %}
+leftbottom   -> "⿺" {% $unpack 'leftbottom',   0, 'value' %}
+interlace    -> "⿻" {% $unpack 'interlace',    0, 'value' %}
+pillars      -> "⿲" {% $unpack 'pillars',      0, 'value' %}
+layers       -> "⿳" {% $unpack 'layers',       0, 'value' %}
 
 
 

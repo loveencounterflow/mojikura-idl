@@ -15,7 +15,6 @@ do ->
   
   #-----------------------------------------------------------------------------------------------------------
   $unpack = ( label, keys... ) ->
-    keys.push 0 if keys.length is 0
     return ( data, loc, reject ) ->
       R = data
       for key in keys
@@ -48,9 +47,7 @@ do ->
                 return reject if /^[⿰⿱⿴⿵⿶⿷⿸⿹⿺⿻⿲⿳]$/.test chr
                 info '33821', ( rpr data ), ( rpr chr ) unless silent
                 return chr
-              # [\x00-\x20\U{00a0}\U{1680}\U{180e}\U{2000}-\U{200b}\U{202f}\U{205f}\U{3000}\U{feff}]
-              #  ( d, loc, reject ) -> throw new Error "#{rpr d} at #{rpr loc}"
-               },
+              },
           {"name": "binary_operator$subexpression$1", "symbols": ["leftright"]},
           {"name": "binary_operator$subexpression$1", "symbols": ["topdown"]},
           {"name": "binary_operator$subexpression$1", "symbols": ["surround"]},
@@ -61,22 +58,22 @@ do ->
           {"name": "binary_operator$subexpression$1", "symbols": ["topright"]},
           {"name": "binary_operator$subexpression$1", "symbols": ["leftbottom"]},
           {"name": "binary_operator$subexpression$1", "symbols": ["interlace"]},
-          {"name": "binary_operator", "symbols": ["binary_operator$subexpression$1"], "postprocess": $unpack '5', 0, 0},
+          {"name": "binary_operator", "symbols": ["binary_operator$subexpression$1"], "postprocess": $unpack 'binary_operator',  0, 0},
           {"name": "trinary_operator$subexpression$1", "symbols": ["pillars"]},
           {"name": "trinary_operator$subexpression$1", "symbols": ["layers"]},
-          {"name": "trinary_operator", "symbols": ["trinary_operator$subexpression$1"], "postprocess": $unpack '6', 0, 0},
-          {"name": "leftright", "symbols": [{"literal":"⿰"}], "postprocess": $unpack '7', 0, 'value'},
-          {"name": "topdown", "symbols": [{"literal":"⿱"}], "postprocess": $unpack '8', 0, 'value'},
-          {"name": "surround", "symbols": [{"literal":"⿴"}], "postprocess": $unpack '9', 0, 'value'},
-          {"name": "cap", "symbols": [{"literal":"⿵"}], "postprocess": $unpack '10', 0, 'value'},
-          {"name": "cup", "symbols": [{"literal":"⿶"}], "postprocess": $unpack '11', 0, 'value'},
-          {"name": "leftembrace", "symbols": [{"literal":"⿷"}], "postprocess": $unpack '12', 0, 'value'},
-          {"name": "topleft", "symbols": [{"literal":"⿸"}], "postprocess": $unpack '13', 0, 'value'},
-          {"name": "topright", "symbols": [{"literal":"⿹"}], "postprocess": $unpack '14', 0, 'value'},
-          {"name": "leftbottom", "symbols": [{"literal":"⿺"}], "postprocess": $unpack '15', 0, 'value'},
-          {"name": "interlace", "symbols": [{"literal":"⿻"}], "postprocess": $unpack '16', 0, 'value'},
-          {"name": "pillars", "symbols": [{"literal":"⿲"}], "postprocess": $unpack '17', 0, 'value'},
-          {"name": "layers", "symbols": [{"literal":"⿳"}], "postprocess": $unpack '18', 0, 'value'}
+          {"name": "trinary_operator", "symbols": ["trinary_operator$subexpression$1"], "postprocess": $unpack 'trinary_operator', 0, 0},
+          {"name": "leftright", "symbols": [{"literal":"⿰"}], "postprocess": $unpack 'leftright',    0, 'value'},
+          {"name": "topdown", "symbols": [{"literal":"⿱"}], "postprocess": $unpack 'topdown',      0, 'value'},
+          {"name": "surround", "symbols": [{"literal":"⿴"}], "postprocess": $unpack 'surround',     0, 'value'},
+          {"name": "cap", "symbols": [{"literal":"⿵"}], "postprocess": $unpack 'cap',          0, 'value'},
+          {"name": "cup", "symbols": [{"literal":"⿶"}], "postprocess": $unpack 'cup',          0, 'value'},
+          {"name": "leftembrace", "symbols": [{"literal":"⿷"}], "postprocess": $unpack 'leftembrace',  0, 'value'},
+          {"name": "topleft", "symbols": [{"literal":"⿸"}], "postprocess": $unpack 'topleft',      0, 'value'},
+          {"name": "topright", "symbols": [{"literal":"⿹"}], "postprocess": $unpack 'topright',     0, 'value'},
+          {"name": "leftbottom", "symbols": [{"literal":"⿺"}], "postprocess": $unpack 'leftbottom',   0, 'value'},
+          {"name": "interlace", "symbols": [{"literal":"⿻"}], "postprocess": $unpack 'interlace',    0, 'value'},
+          {"name": "pillars", "symbols": [{"literal":"⿲"}], "postprocess": $unpack 'pillars',      0, 'value'},
+          {"name": "layers", "symbols": [{"literal":"⿳"}], "postprocess": $unpack 'layers',       0, 'value'}
       ],
     ParserStart: "start"
   }

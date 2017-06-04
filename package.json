@@ -4,7 +4,7 @@
   "description": "文字倉字形描述語言 MojiKura Ideographic Description Language",
   "main": "lib/main.js",
   "scripts": {
-    "build": "nearleyc src/idl.nearley -o src/idl.coffee && coffee --map -o lib -c src",
+    "build": "nearleyc src/idl.nearley -o src/idl.coffee && nearleyc src/idlx.nearley -o src/idlx.coffee && coffee --map -o lib -c src",
     "railroad": "nearley-railroad src/idl.nearley -o idl.html",
     "doctoc": "doctoc README.md",
     "pub": "npm run build && npm run doctoc && npm run push && npm version patch && npm publish",

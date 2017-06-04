@@ -19,8 +19,7 @@ whisper                   = CND.get_logger 'whisper',   badge
 echo                      = CND.echo.bind CND
 NEARLEY                   = require 'nearley'
 IDL_GRAMMAR               = require './idl'
-# IDLX_GRAMMAR              = require './idlx'
-# @IDL
+IDLX_GRAMMAR              = require './idlx'
 
 
 #===========================================================================================================
@@ -84,9 +83,6 @@ Idl_lexer::formatError = ( token, message ) ->
 @IDL = {}
 
 #-----------------------------------------------------------------------------------------------------------
-# @IDL._parser = new NEARLEY.Parser IDL_GRAMMAR.ParserRules, IDL_GRAMMAR.ParserStart, { lexer: new Idl_lexer(), }
-
-#-----------------------------------------------------------------------------------------------------------
 @IDL.parse = ( source ) ->
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
   throw new Error "expected a non-empty text, got an empty text" if source.length is 0
@@ -95,16 +91,29 @@ Idl_lexer::formatError = ( token, message ) ->
   # @_parser.reset()
   @_parser.feed source
   throw new Error "Syntax Error: #{rpr source}" unless @_parser.results.length is 1
-  return @_parser.results[ 0 ]
+  R = @_parser.results[ 0 ]
+  R = R[ 0 ] if R.length is 1
+  return R
 
 # #-----------------------------------------------------------------------------------------------------------
 # @IDLX = # Object.assign Object.create @IDL
 
-#   _parser: new NEARLEY.Parser IDLX_GRAMMAR.ParserRules, IDLX_GRAMMAR.ParserStart, { lexer: new Idlx_lexer(), }
+#-----------------------------------------------------------------------------------------------------------
+@IDLX = {}
 
-#   parse = ( source ) ->
-#     @_parser.reset()
-#     @_parser().feed source
-#     return parser.results
+#-----------------------------------------------------------------------------------------------------------
+@IDLX.parse = ( source ) ->
+  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
+  throw new Error "expected a non-empty text, got an empty text" if source.length is 0
+  ### TAINT should we rewind()? finish()? parser? ###
+  @_parser = new NEARLEY.Parser IDLX_GRAMMAR.ParserRules, IDLX_GRAMMAR.ParserStart, { lexer: new Idl_lexer(), }
+  # @_parser.reset()
+  @_parser.feed source
+  throw new Error "Syntax Error: #{rpr source}" unless @_parser.results.length is 1
+  R = @_parser.results[ 0 ]
+  # debug '33398', ( rpr R ), R.length
+  R = R[ 0 ] if R.length is 1
+  return R
+
 
 
