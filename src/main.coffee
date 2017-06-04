@@ -58,7 +58,7 @@ Idl_lexer::reset = ( data, state ) ->
 #-----------------------------------------------------------------------------------------------------------
 Idl_lexer::next = ->
   if @index < @buffer.length
-    chr     = @buffer[ @index ]
+    chr     = NCR.jzr_as_uchr @buffer[ @index ]
     @index += +1
     if chr is '\n'
       @line  += +1
@@ -116,4 +116,60 @@ Idl_lexer::formatError = ( token, message ) ->
   return R
 
 
+condense = ( grammar ) ->
+  registry  = _registry_from_grammar grammar
+  paths     = new Set()
+  _condense registry, ( new Set() ), paths, grammar.ParserStart
+  return Array.from paths
+
+_registry_from_grammar = ( grammar ) ->
+  R = {}
+  for rule in grammar.ParserRules
+    { name, symbols, } = rule
+    for symbol in symbols
+      if CND.isa_pod symbol
+        symbol = '"' + symbol.literal + '"'
+      entry   = R[ symbol ] ?= []
+      target  = R[ name   ] ?= []
+      target.push symbol
+  return R
+
+_condense = ( registry, seen, paths, name, route = [] ) ->
+  return if seen.has name
+  seen. add name
+  symbols         = registry[ name ]
+  is_public_name  = not /\$/.test name
+  route.push name if is_public_name
+  for symbol in symbols
+    entry = registry[ symbol ]
+    if ( entry.length is 0 )
+      route.push symbol
+      paths.add path unless /// (?: \/\/ ) | (?: \/ $ ) ///.test ( path = route.join '/' )
+      route.pop()
+    else
+      _condense registry, seen, paths, symbol, route
+  route.pop() if is_public_name
+  return null
+
+operators_from_paths = ( paths ) ->
+  R = {}
+  for path in paths
+    ### TAINT pattern should allow literal double quotes ###
+    unless ( match = path.match /// \+ ( [^ \/ + ]+ ) \+ .* " ( [^ "] ) "  $ /// )
+      throw new Error "illegal path #{rpr path}"
+    [ _
+      type
+      literal ]   = match
+    R[ literal ]  = type
+    # ( R[ type ] ?= [] ).push literal
+  return R
+
+
+############################################################################################################
+unless module.parent?
+    #.........................................................................................................
+    paths = condense IDLX_GRAMMAR
+    info paths
+    help operators_from_paths paths
+    process.exit 1
 

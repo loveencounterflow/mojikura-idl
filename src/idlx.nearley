@@ -74,18 +74,17 @@ $unnest = ( label, keys... ) ->
       info '$unnest', before_after data, R
     return R
 
-
 %}
 
-start     ->  ( solitaire | term )                            {% $unpack 'start',    0, 0 %}
-expr      ->  ( term | component                            ) {% $unpack 'expr',  0, 0, 0 %}
-expr3+    ->  ( expr expr expr:+                            ) {% $unnest 'expr3+',      0 %}
-term      ->  ( unary | binary | bracketed                  ) {% $unpack 'term',        0 %}
-unary     ->  ( unary_operator   expr                       ) {% $unpack 'unary',       0 %}
-binary    ->  ( binary_operator  expr expr                  ) {% $unpack 'binary',      0 %}
-bracketed ->  ( lbracket binary_operator  expr3+ rbracket   ) {% $unbracket 'bracketed', 0   %}
+start       ->  ( +solitaire+ | term                          ) {% $unpack    'start',      0, 0 %}
+expr        ->  ( term | component                            ) {% $unpack    'expr',    0, 0, 0 %}
+expr3+      ->  ( expr expr expr:+                            ) {% $unnest    'expr3+',        0 %}
+term        ->  ( unary | binary | +bracket+ed                ) {% $unpack    'term',          0 %}
+unary       ->  ( unary_+operator+   expr                     ) {% $unpack    'unary',         0 %}
+binary      ->  ( binary_+operator+  expr expr                ) {% $unpack    'binary',        0 %}
++bracket+ed ->  ( lbracket binary_+operator+  expr3+ rbracket ) {% $unbracket '+bracket+ed',   0 %}
 
-component       -> proxy | . {%
+component       -> +proxy+ | . {%
   ( data, loc, reject ) ->
     [ { value: R, }, ] = data
     return reject if /^\s+$/.test R
@@ -96,35 +95,35 @@ component       -> proxy | . {%
     return R
    %}
 
-unary_operator ->   ( similar
-                    | heavy
-                    | light
-                    | doubt
-                    | upsidedown
-                    | mirror
-                    | flip          ) {% $unpack 'unary_operator',  0, 0 %}
+unary_+operator+ ->   ( similar
+                      | heavy
+                      | light
+                      | doubt
+                      | upsidedown
+                      | mirror
+                      | flip          ) {% $unpack 'unary_+operator+',  0, 0 %}
 
-binary_operator ->  ( leftright
-                    | topdown
-                    | surround
-                    | cap
-                    | cup
-                    | leftembrace
-                    | topleft
-                    | topright
-                    | leftbottom
-                    | interlace
-                    | topleftcorner ) {% $unpack 'binary_operator',  0, 0 %}
+binary_+operator+ ->  ( leftright
+                      | topdown
+                      | surround
+                      | cap
+                      | cup
+                      | leftembrace
+                      | topleft
+                      | topright
+                      | leftbottom
+                      | interlace
+                      | topleftcorner ) {% $unpack 'binary_+operator+',  0, 0 %}
 
-bracket         ->  ( lbracket
-                    | rbracket      ) {% $unpack 'bracket' %}
+# +bracket         ->  ( lbracket
+#                     | rbracket      ) {% $unpack '+bracket' %}
 
-solitaire       ->  ( nosuchformula
-                    | terminator
-                    | inhibitor     ) {% $unpack 'solitaire', 0 %}
++solitaire+       ->  ( nosuchformula
+                      | terminator
+                      | inhibitor     ) {% $unpack '+solitaire+', 0 %}
 
-proxy           ->  ( getamark
-                    | curl          ) {% $unpack 'proxy' %}
++proxy+           ->  ( getamark
+                      | curl          ) {% $unpack '+proxy+', 0, 0 %}
 
 # unary operators:
 similar         -> "≈"    {% $unpack 'similar',        0, 'value', %}
@@ -155,57 +154,17 @@ lbracket        -> "("    {% $unpack 'lbracket',       0, 'value', %}
 rbracket        -> ")"    {% $unpack 'rbracket',       0, 'value', %}
 
 # solitaires:
-nosuchformula   -> "∅"   {% $unpack 'nosuchformula',  0, 'value', %}
-terminator      -> "●"   {% $unpack 'terminator',     0, 'value', %}
-inhibitor       -> "▽"   {% $unpack 'inhibitor',      0, 'value', %}
+nosuchformula   -> "∅"    {% $unpack 'nosuchformula',  0, 'value', %}
+terminator      -> "●"    {% $unpack 'terminator',     0, 'value', %}
+inhibitor       -> "▽"    {% $unpack 'inhibitor',      0, 'value', %}
 
 # proxies:
-# variable_x      -> "ⓧ"  {% $unpack 'variable_x',     0, 'value', %}
-# variable_y      -> "ⓨ"  {% $unpack 'variable_y',     0, 'value', %}
-# variable_z      -> "ⓩ"  {% $unpack 'variable_z',     0, 'value', %}
-getamark        -> "〓"   {% $unpack 'getamark',       0, 'value', %}
-curl            -> "§"   {% $unpack 'curl',           0, 'value', %}
+# variable_x      -> "ⓧ"    {% $unpack 'variable_x',     0, 'value', %}
+# variable_y      -> "ⓨ"    {% $unpack 'variable_y',     0, 'value', %}
+# variable_z      -> "ⓩ"    {% $unpack 'variable_z',     0, 'value', %}
+getamark        -> "〓"    {% $unpack 'getamark',       0, 'value', %}
+curl            -> "§"    {% $unpack 'curl',           0, 'value', %}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# module.exports = O =
-
-#   ###
-#   idlx:
-#     'operator-2':           /// [ ⿰ ⿱ ⿴ ⿵ ⿶ ⿷ ⿸ ⿹ ⿺ ⿻ ◰ ] ///
-#     'operator-1':           /// [ ≈ ↻ ↔ ↕ ] ///
-
-#   idl:
-#     # 'assignment-mark':      ':'
-#     # 'comment-mark':         '#'
-#     # 'comment-text':         /// ^ [^ \n ]* ///
-#     'finish-formula':       '●'
-#     'missing-formula':      '〓'
-#     'mapped-cp':            '▽'
-#     'ncr':                  /// & [a-z0-9]* \# (?: x [a-f0-9]+ | [0-9]+ ) ; ///
-#     # 'ncr':                  /// ^ #{$.ncr-kernel.source} ///
-#     'operator-2':           /// [⿰⿱⿴⿵⿶⿷⿸⿹⿺⿻] ///
-#     'operator-3':           /// [⿲⿳] ///
-#     'similarity-mark':      '≈'
-#     'curvy-line':           '§'
-#     'cjk-chr':              @cjk_chr_matcher
-#   ###
 
 #   sexpr:
 #     opener:     '('
@@ -216,27 +175,4 @@ curl            -> "§"   {% $unpack 'curl',           0, 'value', %}
 #     opener:     '('
 #     closer:     ')'
 #     spacer:     ''
-
-#   idl:
-#     operators:
-#       '⿰': { name: 'left-right',    arity: 2, }
-#       '⿱': { name: 'top/down',      arity: 2, }
-#       '⿴': { name: 'surround',      arity: 2, }
-#       '⿵': { name: 'cap',           arity: 2, }
-#       '⿶': { name: 'cup',           arity: 2, }
-#       '⿷': { name: 'left-embrace',  arity: 2, }
-#       '⿸': { name: 'topleft',       arity: 2, }
-#       '⿹': { name: 'topright',      arity: 2, }
-#       '⿺': { name: 'leftbottom',    arity: 2, }
-#       '⿻': { name: 'interlace',     arity: 2, }
-#       '⿲': { name: 'pillars',       arity: 3, }
-#       '⿳': { name: 'layers',        arity: 3, }
-
-
-
-
-
-
-
-
 

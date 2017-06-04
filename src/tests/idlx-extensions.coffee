@@ -20,27 +20,16 @@ TAP                       = require 'tap'
 { IDL, IDLX, }            = require '../..'
 
 
-#===========================================================================================================
-# TESTS (IDL)
 #-----------------------------------------------------------------------------------------------------------
-TAP.test "(IDL) parse simple formulas", ( T ) ->
+TAP.test "(IDLX) solitaires", ( T ) ->
   probes_and_matchers = [
-    ["⿲木木木",["⿲","木","木","木"]]
-    ["⿱刀口",["⿱","刀","口"]]
-    ["⿱癶⿰弓貝",["⿱","癶",["⿰","弓","貝"]]]
-    ["⿱⿰亻式貝",["⿱",["⿰","亻","式"],"貝"]]
-    ["⿱⿰亻式⿱目八",["⿱",["⿰","亻","式"],["⿱","目","八"]]]
-    ["⿺辶言",["⿺","辶","言"]]
-    ["⿰ab",["⿰","a","b"]]
-    ["⿰⿰abc",["⿰",["⿰","a","b"],"c"]]
-    ["⿱⿱刀口乙",["⿱",["⿱","刀","口"],"乙"]]
-    ["⿱⿱刀口乙",["⿱",["⿱","刀","口"],"乙"]]
-    ["⿱&jzr#xe24a;&jzr#xe11d;",["⿱","",""]]
-    ["⿰𠁣𠃛",["⿰","𠁣","𠃛"]]
+    ["●","●"]
+    ["▽","▽"]
+    ["∅","∅"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
-    # result = resume_next T, -> IDL.parse probe
-    result = IDL.parse probe
+    # result = resume_next T, -> IDLX.parse probe
+    result = IDLX.parse probe
     urge ( CND.truth CND.equals result, matcher ), JSON.stringify [ probe, result, ]
     # urge ( rpr probe ), result
     T.ok CND.equals result, matcher
@@ -49,8 +38,38 @@ TAP.test "(IDL) parse simple formulas", ( T ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-TAP.test "(IDL) reject bogus formulas", ( T ) ->
+TAP.test "(IDLX) extensions", ( T ) ->
   probes_and_matchers = [
+    [ '⿱〓〓', [ '⿱', '〓', '〓' ]]
+    [ '⿺走⿹◰口〓日', [ '⿺', '走', [ '⿹', [ '◰', '口', '〓' ], '日' ] ], ]
+    ["⿱丶⿵𠘨§",["⿱","丶",["⿵","𠘨","§"]]]
+    [ '↻正', [ '↻', '正', ], ]
+    [ '↔≈匕', [ '↔', [ '≈', '匕' ] ], ]
+    [ '≈正', [ '≈', '正', ], ]
+    [ '<正', [ '<', '正', ], ]
+    [ '>正', [ '>', '正', ], ]
+    [ '?正', [ '?', '正', ], ]
+    [ '↻正', [ '↻', '正', ], ]
+    [ '↔正', [ '↔', '正', ], ]
+    [ '↕正', [ '↕', '正', ], ]
+    [ '≈𪜀', [ '≈', '𪜀', ], ]
+    ["≈〇",["≈","〇"]]
+    ]
+  for [ probe, matcher, ] in probes_and_matchers
+    # result = resume_next T, -> IDLX.parse probe
+    result = IDLX.parse probe
+    urge ( CND.truth CND.equals result, matcher ), JSON.stringify [ probe, result, ]
+    # urge ( rpr probe ), result
+    T.ok CND.equals result, matcher
+  #.........................................................................................................
+  T.end()
+  return null
+
+###
+#-----------------------------------------------------------------------------------------------------------
+TAP.test "(IDLX) reject bogus formulas", ( T ) ->
+  probes_and_matchers = [
+    ["⿲木木木","invalid syntax at index 0 (⿲木木木)\nUnexpected \"⿲\"\n"]
     ["木","invalid syntax at index 0 (木)\nUnexpected \"木\"\n"]
     [42,"expected a text, got a number"]
     ["","expected a non-empty text, got an empty text"]
@@ -58,13 +77,10 @@ TAP.test "(IDL) reject bogus formulas", ( T ) ->
     ["⿺廴聿123","invalid syntax at index 3 (⿺廴聿123)\nUnexpected \"1\"\n"]
     ["⿺","Syntax Error: '⿺'"]
     ["⿺⿺⿺⿺","Syntax Error: '⿺⿺⿺⿺'"]
-    ["(⿰亻聿式)","invalid syntax at index 0 ((⿰亻聿式))\nUnexpected \"(\"\n"]
-    ["≈〇","invalid syntax at index 0 (≈〇)\nUnexpected \"≈\"\n"]
-    ["●","invalid syntax at index 0 (●)\nUnexpected \"●\"\n"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     try
-      result = IDL.parse probe
+      result = IDLX.parse probe
       debug ( rpr probe ), ( rpr result )
       warn "expected an exception, got result #{rpr result}"
       T.fail "expected an exception, got result #{rpr result}"
@@ -75,3 +91,7 @@ TAP.test "(IDL) reject bogus formulas", ( T ) ->
   #.........................................................................................................
   T.end()
   return null
+###
+
+
+
