@@ -30,7 +30,7 @@ TAP.test "(IDLX) solitaires", ( T ) ->
     [ '⿻', 'operator',  ]
     [ '◰', 'operator',  ]
     [ '(', 'bracket',   ]
-    [ 'x', 'other',     ]
+    [ 'x', 'component', ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     result = IDLX.type_from_literal probe

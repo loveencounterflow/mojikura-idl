@@ -120,6 +120,9 @@ Idl_lexer::formatError = ( token, message ) ->
 #===========================================================================================================
 #
 #-----------------------------------------------------------------------------------------------------------
+### TAINT methods in this section should be made available for IDL as well ###
+
+#-----------------------------------------------------------------------------------------------------------
 @IDLX.get_literals_and_types = ( grammar ) =>
   paths = @IDLX._paths_from_grammar IDLX_GRAMMAR
   return @IDLX._literals_and_types_from_paths paths
@@ -177,7 +180,40 @@ Idl_lexer::formatError = ( token, message ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@IDLX.type_from_literal = ( literal ) => IDLX_GRAMMAR[ σ_mojikura ].literals_and_types[ literal ] ? 'other'
+@IDLX.type_from_literal = ( literal ) =>
+  return IDLX_GRAMMAR[ σ_mojikura ].literals_and_types[ literal ] ? 'component'
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX.list_tokens = ( diagram_or_formula ) =>
+  switch type = CND.type_of diagram_or_formula
+    when 'text' then diagram = @IDLX.parse  diagram_or_formula
+    when 'list' then diagram =              diagram_or_formula
+    else throw new Error "expected a text or a list, got a #{type} in #{rpr diagram_or_formula}"
+  R = @IDLX._list_tokens diagram, []
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._list_tokens = ( diagram, R ) =>
+  for element, idx in diagram
+    switch type = CND.type_of element
+      when 'text'
+        token_type = @IDLX.type_from_literal element
+        R.push { t: token_type, s: element, }
+      when 'list'
+        if idx is 0
+          throw new Error "expected a text as first element of diagram, got a #{type} in #{rpr diagram}"
+        is_bracketed = element.length > 2
+        R.push { t: 'lbracket', s: '(' } if is_bracketed
+        R.splice R.length, 0, ( @IDLX.list_tokens element, R )...
+        R.push { t: 'rbracket', s: ')' } if is_bracketed
+      else
+        throw new Error "expected a text or a list, got a #{type} in #{rpr diagram}"
+  return R
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX.get_formula = ( diagram_or_formula ) =>
+  return ( literal for { s: literal, } in @IDLX.list_tokens diagram_or_formula ).join ''
+
 
 ############################################################################################################
 IDLX_GRAMMAR[ σ_mojikura ] = {}
@@ -197,5 +233,12 @@ unless module.parent?
     help '◰', @IDLX.type_from_literal '◰' # 'operator',
     help '(', @IDLX.type_from_literal '(' # 'bracket',
     help 'x', @IDLX.type_from_literal 'x' # 'other',
+    formula       = '⿹弓(⿰(⿱人人丨)(⿱人人丨)(⿱人人丨))'
+    whisper formula
+    help diagram  = @IDLX.parse formula
+    whisper formula
+    help tokens   = @IDLX.list_tokens diagram
+    urge @IDLX.get_formula formula
+    urge @IDLX.get_formula diagram
     process.exit 1
 
