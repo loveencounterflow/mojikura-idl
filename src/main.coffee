@@ -213,6 +213,14 @@ Idl_lexer::formatError = ( token, message ) ->
   ### TAINT possible inputs should be formula, diagram, or tokenlist ###
   return ( literal for { s: literal, } in @IDLX.list_tokens diagram_or_formula ).join ''
 
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._text_with_jzr_glyphs_as_uchrs = ( text ) =>
+  return ( NCR.jzr_as_uchr glyph for glyph in NCR.chrs_from_text text ).join ''
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._text_with_jzr_glyphs_as_xncrs = ( text ) =>
+  return ( NCR.jzr_as_xncr glyph for glyph in NCR.chrs_from_text text ).join ''
+
 
 #===========================================================================================================
 # TREE-SHAKING
