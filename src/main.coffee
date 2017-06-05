@@ -20,7 +20,6 @@ echo                      = CND.echo.bind CND
 NEARLEY                   = require 'nearley'
 IDL_GRAMMAR               = require './idl'
 IDLX_GRAMMAR              = require './idlx'
-σ_mojikura                = Symbol.for 'mojikura'
 
 
 #===========================================================================================================
@@ -123,7 +122,7 @@ Idl_lexer::formatError = ( token, message ) ->
 ### TAINT methods in this section should be made available for IDL as well ###
 
 #-----------------------------------------------------------------------------------------------------------
-@IDLX.get_literals_and_types = ( grammar ) =>
+@IDLX._get_literals_and_types = ( grammar ) =>
   paths = @IDLX._paths_from_grammar IDLX_GRAMMAR
   return @IDLX._literals_and_types_from_paths paths
 
@@ -180,8 +179,7 @@ Idl_lexer::formatError = ( token, message ) ->
   return null
 
 #-----------------------------------------------------------------------------------------------------------
-@IDLX.type_from_literal = ( literal ) =>
-  return IDLX_GRAMMAR[ σ_mojikura ].literals_and_types[ literal ] ? 'component'
+@IDLX.type_from_literal = ( literal ) => @IDLX.literals_and_types[ literal ] ? 'component'
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX.list_tokens = ( diagram_or_formula ) =>
@@ -212,18 +210,95 @@ Idl_lexer::formatError = ( token, message ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX.get_formula = ( diagram_or_formula ) =>
+  ### TAINT possible inputs should be formula, diagram, or tokenlist ###
   return ( literal for { s: literal, } in @IDLX.list_tokens diagram_or_formula ).join ''
 
 
+#===========================================================================================================
+# TREE-SHAKING
+#-----------------------------------------------------------------------------------------------------------
+@IDLX.formula_may_be_suboptimal = ( formula ) =>
+  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of formula ) is 'text'
+  return @IDLX._get_treeshaker_litmus().test formula
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX.normalize_diagram = ( diagram ) =>
+  unless ( type = CND.type_of diagram ) is 'list'
+    throw new Error "expected a list, got a #{type} in #{rpr diagram}"
+  return @IDLX._shake_tree JSON.parse JSON.stringify diagram
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX.normalize_formula = ( formula ) =>
+  unless ( type = CND.type_of formula ) is 'text'
+    throw new Error "expected a text, got a #{type} in #{rpr formula}"
+  return @IDLX.get_formula @IDLX._shake_tree @IDLX.parse formula
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._shake_tree = ( diagram ) =>
+  unless ( type = CND.type_of diagram ) is 'list'
+    throw new Error "expected a list, got a #{type}"
+  #.........................................................................................................
+  operator = diagram[ 0 ]
+  # #.........................................................................................................
+  # unless ( type = operator_token.t ) is 'operator'
+  #   throw new Error "expected an operator, got a #{type}"
+  #.........................................................................................................
+  argument_idx = 0
+  #.........................................................................................................
+  loop
+    argument_idx += +1
+    break if argument_idx > diagram.length - 1
+    sub_tree      = diagram[ argument_idx ]
+    continue unless ( CND.type_of sub_tree ) is 'list'
+    sub_operator  = sub_tree[ 0 ]
+    #.......................................................................................................
+    # unless ( type = CND.type_of sub_operator_token ) is 'MOJIKURA-IDL/token'
+    #   throw new Error "expected a MOJIKURA-IDL/token, got a #{type}"
+    # #.......................................................................................................
+    # unless ( type = sub_operator_token.t ) is 'operator'
+    #   throw new Error "expected an operator, got a #{type}"
+    #.......................................................................................................
+    if operator is sub_operator
+      diagram[ argument_idx .. argument_idx ] = sub_tree[ 1 .. ]
+      argument_idx += -1
+    else
+      @IDLX._shake_tree sub_tree
+  return diagram
+
+#-----------------------------------------------------------------------------------------------------------
+@IDLX._get_treeshaker_litmus = =>
+  ### When `@IDLX._get_treeshaker_litmus.pattern` matches a formula, it *may* be non-optimal; if the pattern
+  does *not* match a formula, there are certainly no opportunities for optimization. The pattern works by
+  trying to match sequences like `/...|(?:O[^MNPQ]*O)|(?:P[^MNOQ]*P)|.../`, where `MNOPQ` are the binary
+  operators. ###
+  return R if ( R = @IDLX._get_treeshaker_litmus.pattern )?
+  #.........................................................................................................
+  binary_operators = []
+  for symbol, token_type of @IDLX.literals_and_types
+    binary_operators.push symbol if token_type is 'binary_operator'
+  # binary_operators = binary_operators[ .. 3 ]
+  # debug '52998', binary_operators
+  pattern = []
+  for operator in binary_operators
+    sub_pattern = []
+    sub_pattern.push '[^'
+    for sub_operator in binary_operators
+      continue if sub_operator is operator
+      sub_pattern.push sub_operator
+    sub_pattern.push ']*'
+    pattern.push '(?:' + operator + ( sub_pattern.join '' ) + operator + ')'
+  #.........................................................................................................
+  return @IDLX._get_treeshaker_litmus.pattern = new RegExp pattern.join '|'
+
 ############################################################################################################
-IDLX_GRAMMAR[ σ_mojikura ] = {}
-IDLX_GRAMMAR[ σ_mojikura ].literals_and_types = @IDLX.get_literals_and_types IDLX_GRAMMAR
+@IDLX._get_treeshaker_litmus.pattern  = null
+@IDLX.literals_and_types              = @IDLX._get_literals_and_types IDLX_GRAMMAR
 
 
 ############################################################################################################
 unless module.parent?
     #.........................................................................................................
-    info @IDLX.get_literals_and_types IDLX_GRAMMAR
+    info @IDLX._get_literals_and_types IDLX_GRAMMAR
     info @IDLX.type_from_literal IDLX_GRAMMAR
     help '↻', @IDLX.type_from_literal '↻' # 'operator',
     help '〓', @IDLX.type_from_literal '〓' # 'proxy',
@@ -240,5 +315,14 @@ unless module.parent?
     help tokens   = @IDLX.list_tokens diagram
     urge @IDLX.get_formula formula
     urge @IDLX.get_formula diagram
+    urge @IDLX._get_treeshaker_litmus()
+    urge ( CND.yellow formula    ), ( CND.blue CND.truth @IDLX.formula_may_be_suboptimal formula    )
+    urge ( CND.yellow '⿱⿱𫝀口㐄'    ), ( CND.blue CND.truth @IDLX.formula_may_be_suboptimal '⿱⿱𫝀口㐄'    )
+    urge ( CND.yellow '⿱𫝀⿱口㐄'    ), ( CND.blue CND.truth @IDLX.formula_may_be_suboptimal '⿱𫝀⿱口㐄'    )
+    urge ( CND.yellow '⿰韋(⿱白大十)' ), ( CND.blue CND.truth @IDLX.formula_may_be_suboptimal '⿰韋(⿱白大十)' )
+    info ( CND.yellow formula    ), ( CND.blue @IDLX.normalize_formula formula                       )
+    info ( CND.yellow '⿱⿱𫝀口㐄'    ), ( CND.blue @IDLX.normalize_formula '⿱⿱𫝀口㐄'                       )
+    info ( CND.yellow '⿱𫝀⿱口㐄'    ), ( CND.blue @IDLX.normalize_formula '⿱𫝀⿱口㐄'                       )
+    info ( CND.yellow '⿰韋(⿱白大十)' ), ( CND.blue @IDLX.normalize_formula '⿰韋(⿱白大十)'                    )
     process.exit 1
 

@@ -1,7 +1,7 @@
 
 @preprocessor coffee
 
-# NOTE: in the below grammar, rules with two plusses in their names (like `binary_+operator+`, `+proxy+`,
+# NOTE: in the below grammar, rules with two plusses in their names (like `+binary_operator+`, `+proxy+`,
 # `+bracket+ed`) indicate type names. This convention allows us to reverse-engineer the grammar
 # to extract a mapping from type name to literals and from literals to type names.
 
@@ -85,9 +85,9 @@ start       ->  ( +solitaire+ | term                          ) {% $unpack    's
 expr        ->  ( term | component                            ) {% $unpack    'expr',    0, 0, 0 %}
 expr3+      ->  ( expr expr expr:+                            ) {% $unnest    'expr3+',        0 %}
 term        ->  ( unary | binary | +bracket+ed                ) {% $unpack    'term',          0 %}
-unary       ->  ( unary_+operator+   expr                     ) {% $unpack    'unary',         0 %}
-binary      ->  ( binary_+operator+  expr expr                ) {% $unpack    'binary',        0 %}
-+bracket+ed ->  ( lbracket binary_+operator+  expr3+ rbracket ) {% $unbracket '+bracket+ed',   0 %}
+unary       ->  ( +unary_operator+   expr                     ) {% $unpack    'unary',         0 %}
+binary      ->  ( +binary_operator+  expr expr                ) {% $unpack    'binary',        0 %}
++bracket+ed ->  ( lbracket +binary_operator+  expr3+ rbracket ) {% $unbracket '+bracket+ed',   0 %}
 
 component       -> +proxy+ | . {%
   ( data, loc, reject ) ->
@@ -100,15 +100,15 @@ component       -> +proxy+ | . {%
     return R
    %}
 
-unary_+operator+ ->   ( similar
++unary_operator+ ->   ( similar
                       | heavy
                       | light
                       | doubt
                       | upsidedown
                       | mirror
-                      | flip          ) {% $unpack 'unary_+operator+',  0, 0 %}
+                      | flip          ) {% $unpack '+unary_operator+',  0, 0 %}
 
-binary_+operator+ ->  ( leftright
++binary_operator+ ->  ( leftright
                       | topdown
                       | surround
                       | cap
@@ -118,7 +118,7 @@ binary_+operator+ ->  ( leftright
                       | topright
                       | leftbottom
                       | interlace
-                      | topleftcorner ) {% $unpack 'binary_+operator+',  0, 0 %}
+                      | topleftcorner ) {% $unpack '+binary_operator+',  0, 0 %}
 
 # +bracket         ->  ( lbracket
 #                     | rbracket      ) {% $unpack '+bracket' %}

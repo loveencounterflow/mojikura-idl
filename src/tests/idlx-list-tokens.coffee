@@ -23,14 +23,14 @@ TAP                       = require 'tap'
 #-----------------------------------------------------------------------------------------------------------
 TAP.test "(IDLX) solitaires", ( T ) ->
   probes_and_matchers = [
-    [ '↻', 'operator',  ]
-    [ '〓', 'proxy',     ]
-    [ '§', 'proxy',     ]
-    [ '⿰', 'operator',  ]
-    [ '⿻', 'operator',  ]
-    [ '◰', 'operator',  ]
-    [ '(', 'bracket',   ]
-    [ 'x', 'component', ]
+    [ '↻', 'unary_operator',   ]
+    [ '〓', 'proxy',            ]
+    [ '§', 'proxy',            ]
+    [ '⿰', 'binary_operator',  ]
+    [ '⿻', 'binary_operator',  ]
+    [ '◰', 'binary_operator',  ]
+    [ '(', 'bracket',          ]
+    [ 'x', 'component',        ]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     result = IDLX.type_from_literal probe
