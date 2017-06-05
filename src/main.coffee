@@ -192,6 +192,8 @@ Idl_lexer::formatError = ( token, message ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX._list_tokens = ( diagram, R ) =>
+  is_bracketed = diagram.length > 3
+  R.push { t: 'lbracket', s: '(' } if is_bracketed
   for element, idx in diagram
     switch type = CND.type_of element
       when 'text'
@@ -200,12 +202,10 @@ Idl_lexer::formatError = ( token, message ) ->
       when 'list'
         if idx is 0
           throw new Error "expected a text as first element of diagram, got a #{type} in #{rpr diagram}"
-        is_bracketed = element.length > 2
-        R.push { t: 'lbracket', s: '(' } if is_bracketed
         R.splice R.length, 0, ( @IDLX.list_tokens element, R )...
-        R.push { t: 'rbracket', s: ')' } if is_bracketed
       else
         throw new Error "expected a text or a list, got a #{type} in #{rpr diagram}"
+  R.push { t: 'rbracket', s: ')' } if is_bracketed
   return R
 
 #-----------------------------------------------------------------------------------------------------------
