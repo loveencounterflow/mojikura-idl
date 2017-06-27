@@ -161,7 +161,11 @@ do ->
           {"name": "terminator", "symbols": [{"literal":"●"}], "postprocess": $unpack 'terminator',     0, 'value',},
           {"name": "inhibitor", "symbols": [{"literal":"▽"}], "postprocess": $unpack 'inhibitor',      0, 'value',},
           {"name": "getamark", "symbols": [{"literal":"〓"}], "postprocess": $unpack 'getamark',       0, 'value',},
-          {"name": "curl", "symbols": [{"literal":"§"}], "postprocess": $unpack 'curl',           0, 'value',}
+          {"name": "curl", "symbols": [{"literal":"§"}], "postprocess": $unpack 'curl',           0, 'value',},
+          {"name": "anycomponent", "symbols": [{"literal":"_"}], "postprocess": $unpack 'anycomponent',   0, 'value',},
+          {"name": "anyoperator", "symbols": [{"literal":"%"}], "postprocess": $unpack 'anyoperator',    0, 'value',},
+          {"name": "anyclause$string$1", "symbols": [{"literal":"?"}, {"literal":"?"}, {"literal":"?"}, {"literal":"?"}, {"literal":"?"}, {"literal":"?"}, {"literal":"?"}, {"literal":"?"}, {"literal":"?"}, {"literal":"?"}, {"literal":"?"}], "postprocess": (d) -> d.join('')},
+          {"name": "anyclause", "symbols": ["anyclause$string$1"], "postprocess": $unpack 'anyclause',      0, 'value',}
       ],
     ParserStart: "start"
   }

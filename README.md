@@ -30,3 +30,20 @@
 ["⿰阜(⿱山介⿰(⿱山人几)(⿱山人几))",["⿰","阜",["⿱","山","介",["⿰",["⿱","山","人","几"],["⿱","山","人","几"]]]]]
 ["(⿱厶(⿰刃工刃)一(⿰丶丶丶)口)",["⿱","厶",["⿰","刃","工","刃"],"一",["⿰","丶","丶","丶"],"口"]]
 ```
+
+## Configuring PostGreSQL
+
+In `/etc/postgresql/9.5/main/pg_hba.conf`:
+
+```
+# "local" is for Unix domain socket connections only
+# IPv4 local connections:
+# IPv6 local connections:
+
+local   all             all                                     trust
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+```
+
+`/etc/init.d/postgresql restart`
+

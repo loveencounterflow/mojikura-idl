@@ -164,11 +164,17 @@ terminator      -> "●"    {% $unpack 'terminator',     0, 'value', %}
 inhibitor       -> "▽"    {% $unpack 'inhibitor',      0, 'value', %}
 
 # proxies:
+# newgetamark        -> "???????????"    {% $unpack 'newgetamark',       0, 'value', %}
+getamark        -> "〓"    {% $unpack 'getamark',       0, 'value', %}
+curl            -> "§"    {% $unpack 'curl',           0, 'value', %}
+
+# xxx:
 # variable_x      -> "ⓧ"    {% $unpack 'variable_x',     0, 'value', %}
 # variable_y      -> "ⓨ"    {% $unpack 'variable_y',     0, 'value', %}
 # variable_z      -> "ⓩ"    {% $unpack 'variable_z',     0, 'value', %}
-getamark        -> "〓"    {% $unpack 'getamark',       0, 'value', %}
-curl            -> "§"    {% $unpack 'curl',           0, 'value', %}
+anycomponent    -> "_"    {% $unpack 'anycomponent',   0, 'value', %}
+anyoperator     -> "%"    {% $unpack 'anyoperator',    0, 'value', %}
+anyclause       -> "???????????"    {% $unpack 'anyclause',      0, 'value', %}
 
 
 #   sexpr:

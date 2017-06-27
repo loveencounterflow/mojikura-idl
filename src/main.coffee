@@ -121,9 +121,12 @@ Idl_lexer::formatError = ( token, message ) ->
 #-----------------------------------------------------------------------------------------------------------
 ### TAINT methods in this section should be made available for IDL as well ###
 
+# #-----------------------------------------------------------------------------------------------------------
+# @IDLX.get_literals_and_types = => @_get_literals_and_types IDLX_GRAMMAR
+
 #-----------------------------------------------------------------------------------------------------------
 @IDLX._get_literals_and_types = ( grammar ) =>
-  paths = @IDLX._paths_from_grammar IDLX_GRAMMAR
+  paths = @IDLX._paths_from_grammar grammar
   return @IDLX._literals_and_types_from_paths paths
 
 #-----------------------------------------------------------------------------------------------------------
@@ -225,18 +228,18 @@ Idl_lexer::formatError = ( token, message ) ->
 #===========================================================================================================
 # TREE-SHAKING
 #-----------------------------------------------------------------------------------------------------------
-@IDLX.formula_may_be_suboptimal = ( formula ) =>
+@IDLX.formula_may_be_nonminimal = ( formula ) =>
   throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of formula ) is 'text'
   return @IDLX._get_treeshaker_litmus().test formula
 
 #-----------------------------------------------------------------------------------------------------------
-@IDLX.normalize_diagram = ( diagram ) =>
+@IDLX.minimize_diagram = ( diagram ) =>
   unless ( type = CND.type_of diagram ) is 'list'
     throw new Error "expected a list, got a #{type} in #{rpr diagram}"
   return @IDLX._shake_tree JSON.parse JSON.stringify diagram
 
 #-----------------------------------------------------------------------------------------------------------
-@IDLX.normalize_formula = ( formula ) =>
+@IDLX.minimize_formula = ( formula ) =>
   unless ( type = CND.type_of formula ) is 'text'
     throw new Error "expected a text, got a #{type} in #{rpr formula}"
   return @IDLX.get_formula @IDLX._shake_tree @IDLX.parse formula
@@ -275,7 +278,7 @@ Idl_lexer::formatError = ( token, message ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX._get_treeshaker_litmus = =>
-  ### When `@IDLX._get_treeshaker_litmus.pattern` matches a formula, it *may* be non-optimal; if the pattern
+  ### When `@IDLX._get_treeshaker_litmus.pattern` matches a formula, it *may* be non-minimal; if the pattern
   does *not* match a formula, there are certainly no opportunities for optimization. The pattern works by
   trying to match sequences like `/...|(?:O[^MNPQ]*O)|(?:P[^MNOQ]*P)|.../`, where `MNOPQ` are the binary
   operators. ###
@@ -324,13 +327,13 @@ unless module.parent?
     urge @IDLX.get_formula formula
     urge @IDLX.get_formula diagram
     urge @IDLX._get_treeshaker_litmus()
-    urge ( CND.yellow formula    ), ( CND.blue CND.truth @IDLX.formula_may_be_suboptimal formula    )
-    urge ( CND.yellow '⿱⿱𫝀口㐄'    ), ( CND.blue CND.truth @IDLX.formula_may_be_suboptimal '⿱⿱𫝀口㐄'    )
-    urge ( CND.yellow '⿱𫝀⿱口㐄'    ), ( CND.blue CND.truth @IDLX.formula_may_be_suboptimal '⿱𫝀⿱口㐄'    )
-    urge ( CND.yellow '⿰韋(⿱白大十)' ), ( CND.blue CND.truth @IDLX.formula_may_be_suboptimal '⿰韋(⿱白大十)' )
-    info ( CND.yellow formula    ), ( CND.blue @IDLX.normalize_formula formula                       )
-    info ( CND.yellow '⿱⿱𫝀口㐄'    ), ( CND.blue @IDLX.normalize_formula '⿱⿱𫝀口㐄'                       )
-    info ( CND.yellow '⿱𫝀⿱口㐄'    ), ( CND.blue @IDLX.normalize_formula '⿱𫝀⿱口㐄'                       )
-    info ( CND.yellow '⿰韋(⿱白大十)' ), ( CND.blue @IDLX.normalize_formula '⿰韋(⿱白大十)'                    )
+    urge ( CND.yellow formula    ), ( CND.blue CND.truth @IDLX.formula_may_be_nonminimal formula    )
+    urge ( CND.yellow '⿱⿱𫝀口㐄'    ), ( CND.blue CND.truth @IDLX.formula_may_be_nonminimal '⿱⿱𫝀口㐄'    )
+    urge ( CND.yellow '⿱𫝀⿱口㐄'    ), ( CND.blue CND.truth @IDLX.formula_may_be_nonminimal '⿱𫝀⿱口㐄'    )
+    urge ( CND.yellow '⿰韋(⿱白大十)' ), ( CND.blue CND.truth @IDLX.formula_may_be_nonminimal '⿰韋(⿱白大十)' )
+    info ( CND.yellow formula    ), ( CND.blue @IDLX.minimize_formula formula                       )
+    info ( CND.yellow '⿱⿱𫝀口㐄'    ), ( CND.blue @IDLX.minimize_formula '⿱⿱𫝀口㐄'                       )
+    info ( CND.yellow '⿱𫝀⿱口㐄'    ), ( CND.blue @IDLX.minimize_formula '⿱𫝀⿱口㐄'                       )
+    info ( CND.yellow '⿰韋(⿱白大十)' ), ( CND.blue @IDLX.minimize_formula '⿰韋(⿱白大十)'                    )
     process.exit 1
 
