@@ -21,28 +21,48 @@ pluck = ( x, key, fallback ) ->
   delete x[ key ]
   return R
 
-#-----------------------------------------------------------------------------------------------------------
-### TAINT should be derived from options or grammar ###
-@_unary_operator_pattern = /≈|<|>|\?|↻|↔|↕/g
-
-#-----------------------------------------------------------------------------------------------------------
-@_delete_unary_operators = ( formula ) -> formula.replace @_unary_operator_pattern, ''
+# #-----------------------------------------------------------------------------------------------------------
+# @get_relational_bigrams_as_tokens = ( formula ) ->
+#   tokens        = @list_tokens formula, { all_brackets: yes, }
+#   R             = []
+#   operators     = []
+#   prvs_token    = null
+#   #.........................................................................................................
+#   for this_token, i in tokens
+#     this_token = assign {}, this_token, { i, }
+#     switch this_token.t
+#       when 'lbracket'
+#         null
+#       when 'rbracket'
+#         operators.pop()
+#         prvs_token.o = last_of operators
+#       when 'binary_operator'
+#         operators.push this_token
+#       when 'unary_operator'
+#         operators.push this_token
+#       when 'component'
+#         this_token.o = last_of operators
+#         if prvs_token?
+#           operator = pluck prvs_token, 'o'
+#           R.push [ operator, prvs_token, this_token, ]
+#         prvs_token = this_token
+#       else
+#         throw new Error "unknown token type #{rpr this_token}"
+#   if R.length > 0
+#     delete ( last_of last_of R ).o
+#   return R
 
 #-----------------------------------------------------------------------------------------------------------
 @get_relational_bigrams_as_tokens = ( formula ) ->
-  formula = @_delete_unary_operators formula
-  try
-    tokens = @list_tokens formula, { all_brackets: yes, }
-  catch error
-    if error.message is "invalid syntax at index 0 (#{formula})\nUnexpected \"#{formula}\"\n"
-      return []
-    throw error
-  #.........................................................................................................
+  tokens        = @list_tokens formula, { all_brackets: yes, }
   R             = []
   operators     = []
   prvs_token    = null
-  for this_token, i in tokens
-    this_token = assign {}, this_token, { i, }
+  # countdowns    = []
+  #.........................................................................................................
+  for this_token in tokens
+    this_token = assign {}, this_token
+    # debug '87900', rpr this_token
     switch this_token.t
       when 'lbracket'
         null
@@ -50,6 +70,8 @@ pluck = ( x, key, fallback ) ->
         operators.pop()
         prvs_token.o = last_of operators
       when 'binary_operator'
+        operators.push this_token
+      when 'unary_operator'
         operators.push this_token
       when 'component'
         this_token.o = last_of operators
@@ -59,5 +81,6 @@ pluck = ( x, key, fallback ) ->
         prvs_token = this_token
       else
         throw new Error "unknown token type #{rpr this_token}"
-  delete ( last_of last_of R ).o
+  if R.length > 0
+    delete ( last_of last_of R ).o
   return R

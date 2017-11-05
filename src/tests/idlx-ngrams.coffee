@@ -54,12 +54,8 @@ TAP.test "(IDLX) ngrams", ( T ) ->
     ["浮:⿰氵⿱爫子","⿰氵爫,⿱爫子"]
     ["仔:⿰亻子","⿰亻子"]
     ["郭:⿰(⿱亠口子)阝","⿱亠口,⿱口子,⿰子阝"]
-    ["猛:⿰犭⿱子皿","⿰犭子,⿱子皿"]
     ["孙:⿰子小","⿰子小"]
     ["敦:⿰(⿱亠口子)夊","⿱亠口,⿱口子,⿰子夊"]
-    ["孟:⿱子皿","⿱子皿"]
-    ["孝:⿱耂子","⿱耂子"]
-    ["勃:⿰⿱子力","⿱子,⿰子力"]
     ["孕:⿱乃子","⿱乃子"]
     ["遜:⿺辶⿰子系","⿺辶子,⿰子系"]
     ["鷻:(⿰鳥(⿱亠口子)夊)","⿰鳥亠,⿱亠口,⿱口子,⿰子夊"]
@@ -73,22 +69,31 @@ TAP.test "(IDLX) ngrams", ( T ) ->
     ["竜:⿱立≈电","⿱立电"]
     ["覽:⿱⿰臣⿱罒見","⿰臣,⿱罒,⿱罒見"]
     ["龟:⿱𠂊≈电","⿱𠂊电"]
-    ["繭:⿱卄⿻≈巾⿰糹虫","⿱卄巾,⿻巾糹,⿰糹虫"]
-    ["𠕄:↻凹",""]
     ["𠗬:⿰冫⿸戶用","⿰冫戶,⿸戶用"]
     ["𠗭:(⿱⿰冫士寸)","⿰冫,⿱士,⿱士寸"]
     ["𠚖:⿶≈凵王","⿶凵王"]
     ["𠚜:⿶≈凵⿱爫臼","⿶凵爫,⿱爫臼"]
     ["𠚡:⿶?凵⿱爫臼","⿶凵爫,⿱爫臼"]
+    ["繭:⿱卄⿻≈巾⿰糹虫","⿱卄巾,⿻巾糹,⿰糹虫"]
+    ["𠕄:↻凹",""]
+    ["孝:⿱耂子","⿱耂子"]
+    ["猛:⿰犭⿱子皿","⿰犭子,⿱子皿"]
+    ["孟:⿱子皿","⿱子皿"]
+    ["勃:⿰⿱子力","⿱子,⿰子力"]
+    ["郭:⿰(⿱亠口子)阝","⿱亠口,⿱口子,⿰子阝"]
     ]
   for [ probe, matcher, ] in probes_and_matchers
     [ glyph, formula, ] = probe.split ':'
-    # debug '27821', IDLX.list_tokens formula, { all_brackets: yes, }; continue
-    bigrams = IDLX.get_relational_bigrams_as_tokens formula
-    # urge  '93209', formula
-    # urge  '93209', bigrams
-    result  = conflate bigrams
-    # debug JSON.stringify [ probe, result, ]
+    # debug '27821', IDLX.list_tokens formula, { all_brackets: yes, }
+    try
+      bigrams = IDLX.get_relational_bigrams_as_tokens formula
+      # urge  '93209', formula
+      # urge  '93209', bigrams
+      result  = conflate bigrams
+      # debug JSON.stringify [ probe, result, ]
+    catch error
+      T.fail "#{probe} failed with #{rpr error.message}"
+      continue
     if result == matcher then T.ok true
     else T.fail "expected #{matcher}, got #{result}"
   T.end()

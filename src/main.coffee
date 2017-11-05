@@ -20,6 +20,7 @@ echo                      = CND.echo.bind CND
 NEARLEY                   = require 'nearley'
 IDL_GRAMMAR               = require './idl'
 IDLX_GRAMMAR              = require './idlx'
+last_of                   = ( x ) -> x[ x.length - 1 ]
 
 
 #===========================================================================================================
@@ -190,26 +191,56 @@ Idl_lexer::formatError = ( token, message ) ->
     when 'text' then diagram = @IDLX.parse  diagram_or_formula
     when 'list' then diagram =              diagram_or_formula
     else throw new Error "expected a text or a list, got a #{type} in #{rpr diagram_or_formula}"
-  R = @IDLX._list_tokens diagram, [], settings ? {}
+  R         = []
+  R.i_base  = -1
+  R         = @IDLX._list_tokens diagram, R, settings ? {}
+  delete R.i_base
   return R
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX._list_tokens = ( diagram, R, settings ) =>
-  is_bracketed = ( diagram.length > 3 ) or ( settings.all_brackets ? no )
-  R.push { t: 'lbracket', s: '(' } if is_bracketed
-  for element, idx in diagram
+  ### `settings.all_brackets` is needed by `ngrams.get_relational_bigrams_as_tokens` to get brackets
+  around all operators. Brackets that are added for binary operators with two arguments and unary
+  operators are here called 'epenthetical'; they get no index (`token.i`) and the indices on the
+  other tokens are the same as the ones for a formula without epenthetical brackets. ###
+  if settings.all_brackets ? no
+    is_bracketed    = yes
+    is_epenthetical = ( diagram.length <= 3 )
+  #.........................................................................................................
+  else
+    is_bracketed    = ( diagram.length > 3 )
+    is_epenthetical = no
+  #.........................................................................................................
+  if is_bracketed
+    if is_epenthetical
+      R.push { t: 'lbracket', s: '(', i: null, }
+    else
+      R.i_base += +1
+      R.push { t: 'lbracket', s: '(', i: R.i_base, }
+  #.........................................................................................................
+  is_first = yes
+  for element in diagram
     switch type = CND.type_of element
       when 'text'
-        token_type = @IDLX.type_from_literal element
-        R.push { t: token_type, s: element, }
+        token_type  = @IDLX.type_from_literal element
+        # i           = if is_epenthetical
+        R.i_base += +1
+        R.push { t: token_type, s: element, i: R.i_base, }
       when 'list'
-        if idx is 0
+        if is_first
           throw new Error "expected a text as first element of diagram, got a #{type} in #{rpr diagram}"
-        # R.splice R.length, 0, ( @IDLX._list_tokens element, R, settings )...
         @IDLX._list_tokens element, R, settings
       else
         throw new Error "expected a text or a list, got a #{type} in #{rpr diagram}"
-  R.push { t: 'rbracket', s: ')' } if is_bracketed
+    is_first = no
+  #.........................................................................................................
+  if is_bracketed
+    if is_epenthetical
+      R.push { t: 'rbracket', s: ')', i: null, }
+    else
+      R.i_base += +1
+      R.push { t: 'rbracket', s: ')', i: R.i_base, }
+  #.........................................................................................................
   return R
 
 #-----------------------------------------------------------------------------------------------------------

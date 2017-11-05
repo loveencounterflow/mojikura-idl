@@ -12,33 +12,26 @@ info                      = CND.get_logger 'info',      badge
 whisper                   = CND.get_logger 'whisper',   badge
 # { IDLX, }            = require '../../../mojikura-idl'
 
-#-----------------------------------------------------------------------------------------------------------
-test_case = ->
-  debug @silhouette_from_formula '⿱⿰⿵𠘨䖝⿵𠘨䖝⿰⿵𠘨䖝⿵𠘨䖝'
-  debug @silhouette_from_formula '⿱⿰⿵&#123;䖝⿵𠘨䖝⿰⿵𠘨䖝⿵𠘨䖝'
-  debug @silhouette_from_formula '⿱⿰⿵&#x123;䖝⿵𠘨䖝⿰⿵𠘨䖝⿵𠘨䖝'
-  debug @silhouette_from_formula '⿱⿰⿵&jzr#123;䖝⿵𠘨䖝⿰⿵𠘨䖝⿵𠘨䖝'
-  debug @silhouette_from_formula '⿱⿰⿵&jzr#x123;䖝⿵𠘨䖝⿰⿵𠘨䖝⿵𠘨䖝'
-  debug @silhouette_from_formula '鐓:(⿰金(⿱亠口子)夊)'
-  debug @silhouette_from_formula '敦:⿰(⿱亠口子)夊'
 
 #-----------------------------------------------------------------------------------------------------------
-### TAINT pattern should be derived from options or grammar ###
-@_silhouette_codepoint_pattern = ///
-      (?: & [a-z0-9]* \# (?: x [a-f0-9]+ | [0-9]+ ) ; ) |
-      (?: [  \ud800-\udbff ] [ \udc00-\udfff ] ) |
-      [^ () ≈<>?↻↔↕∅●▽ o ]
-      ///g
-
-#-----------------------------------------------------------------------------------------------------------
-### TAINT pattern should be derived from options or grammar ###
-@_silhouette_operator_pattern = /// [ ⿰⿱⿴⿵⿶⿷⿸⿹⿺⿻◰ ] ///g
+### TAINT patterns should be derived from options or grammar ###
+@_silhouette_binary_operator_pattern  = /// [ ⿰⿱⿴⿵⿶⿷⿸⿹⿺⿻◰ ] ///g
+@_silhouette_unary_operator_pattern   = /// [ ≈<>?↻↔↕ ] ///g
+@_silhouette_singleton_pattern        = /// [ ∅●▽ ] ///g
+### TAINT will fail silently if we ever introduce singleton symbols from beyond U+ffff ###
+@_silhouette_element_pattern          = ///
+  (?: & [a-z0-9]* \# (?: x [a-f0-9]+ | [0-9]+ ) ; ) |
+  (?: [  \ud800-\udbff ] [ \udc00-\udfff ] ) |
+  [^ ( ) b u s ]
+  ///g
 
 #-----------------------------------------------------------------------------------------------------------
 @silhouette_from_formula = ( formula ) ->
   R = formula
-  R = R.replace @_silhouette_operator_pattern,  'o'
-  R = R.replace @_silhouette_codepoint_pattern, '.'
+  R = R.replace @_silhouette_binary_operator_pattern, 'b'
+  R = R.replace @_silhouette_unary_operator_pattern,  'u'
+  R = R.replace @_silhouette_singleton_pattern,       's'
+  R = R.replace @_silhouette_element_pattern,         '.'
   return R
 
 
