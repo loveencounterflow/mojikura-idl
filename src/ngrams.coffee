@@ -21,71 +21,23 @@ pluck = ( x, key, fallback ) ->
   delete x[ key ]
   return R
 
+#-----------------------------------------------------------------------------------------------------------
+### TAINT should be derived from options or grammar ###
+@_unary_operator_pattern = /≈|<|>|\?|↻|↔|↕/g
 
 #-----------------------------------------------------------------------------------------------------------
-@get_relational_bigrams = ( diagram_or_formula ) ->
-  switch type = CND.type_of diagram_or_formula
-    when 'text' then diagram = @parse       diagram_or_formula
-    when 'list' then diagram =              diagram_or_formula
-    else throw new Error "expected a text or a list, got a #{type} in #{rpr diagram_or_formula}"
-  #.........................................................................................................
-  R = @_bigrams_from_diagram diagram, []
-  delete R.operators
-  delete R.last_component
-  delete R.last_operators
-  return R
+@_delete_unary_operators = ( formula ) -> formula.replace @_unary_operator_pattern, ''
 
 #-----------------------------------------------------------------------------------------------------------
-@_bigrams_from_diagram = ( diagram, R ) ->
-  R.operators      ?= []
-  R.last_operators ?= []
-  # last_component  = null
+@get_relational_bigrams_as_tokens = ( formula ) ->
+  formula = @_delete_unary_operators formula
+  try
+    tokens = @list_tokens formula, { all_brackets: yes, }
+  catch error
+    if error.message is "invalid syntax at index 0 (#{formula})\nUnexpected \"#{formula}\"\n"
+      return []
+    throw error
   #.........................................................................................................
-  for part, idx in diagram
-    if idx is 0
-      R.operators.push part
-      continue
-    #.......................................................................................................
-    if CND.isa_list part
-      @_bigrams_from_diagram part, R
-    #.......................................................................................................
-    else
-      if ( last_component = R.last_component )?
-        # whisper R.operators, idx
-        if idx is 1
-          operator = last_of R.last_operators
-        else
-          operator = last_of R.operators
-        #...................................................................................................
-        list  = [ operator, last_component, part, ]
-        text  = list.join ''
-        #...................................................................................................
-        R.push { text, list, }
-        #...................................................................................................
-      if idx is 1
-        R.last_operators.push last_of R.operators
-      R.last_component = part
-  #.........................................................................................................
-  R.operators.pop()
-  R.last_operators.pop()
-  return R
-
-
-#-----------------------------------------------------------------------------------------------------------
-@get_relational_bigrams_II = ( formula ) ->
-  # switch type = CND.type_of tokens_or_formula
-  #   when 'text' then tokens = @list_tokens tokens_or_formula
-  #   when 'list' then tokens =              tokens_or_formula
-  #   else throw new Error "expected a text or a list, got a #{type} in #{rpr tokens_or_formula}"
-  #.........................................................................................................
-  R = @_bigrams_from_diagram_II @list_tokens formula, { all_brackets: yes, }
-  # delete R.operators
-  # delete R.last_component
-  # delete R.last_operators
-  return R
-
-#-----------------------------------------------------------------------------------------------------------
-@_bigrams_from_diagram_II = ( tokens ) ->
   R             = []
   operators     = []
   prvs_token    = null
@@ -107,4 +59,5 @@ pluck = ( x, key, fallback ) ->
         prvs_token = this_token
       else
         throw new Error "unknown token type #{rpr this_token}"
+  delete ( last_of last_of R ).o
   return R

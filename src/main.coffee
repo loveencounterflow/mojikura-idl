@@ -195,7 +195,7 @@ Idl_lexer::formatError = ( token, message ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX._list_tokens = ( diagram, R, settings ) =>
-  is_bracketed = ( diagram.length > 3 ) or ( settings.all_brackets )
+  is_bracketed = ( diagram.length > 3 ) or ( settings.all_brackets ? no )
   R.push { t: 'lbracket', s: '(' } if is_bracketed
   for element, idx in diagram
     switch type = CND.type_of element
