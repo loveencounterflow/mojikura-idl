@@ -185,17 +185,17 @@ Idl_lexer::formatError = ( token, message ) ->
 @IDLX.type_from_literal = ( literal ) => @IDLX.literals_and_types[ literal ] ? 'component'
 
 #-----------------------------------------------------------------------------------------------------------
-@IDLX.list_tokens = ( diagram_or_formula ) =>
+@IDLX.list_tokens = ( diagram_or_formula, settings ) =>
   switch type = CND.type_of diagram_or_formula
     when 'text' then diagram = @IDLX.parse  diagram_or_formula
     when 'list' then diagram =              diagram_or_formula
     else throw new Error "expected a text or a list, got a #{type} in #{rpr diagram_or_formula}"
-  R = @IDLX._list_tokens diagram, []
+  R = @IDLX._list_tokens diagram, [], settings ? {}
   return R
 
 #-----------------------------------------------------------------------------------------------------------
-@IDLX._list_tokens = ( diagram, R ) =>
-  is_bracketed = diagram.length > 3
+@IDLX._list_tokens = ( diagram, R, settings ) =>
+  is_bracketed = ( diagram.length > 3 ) or ( settings.all_brackets )
   R.push { t: 'lbracket', s: '(' } if is_bracketed
   for element, idx in diagram
     switch type = CND.type_of element
@@ -205,7 +205,8 @@ Idl_lexer::formatError = ( token, message ) ->
       when 'list'
         if idx is 0
           throw new Error "expected a text as first element of diagram, got a #{type} in #{rpr diagram}"
-        R.splice R.length, 0, ( @IDLX.list_tokens element, R )...
+        # R.splice R.length, 0, ( @IDLX._list_tokens element, R, settings )...
+        @IDLX._list_tokens element, R, settings
       else
         throw new Error "expected a text or a list, got a #{type} in #{rpr diagram}"
   R.push { t: 'rbracket', s: ')' } if is_bracketed
@@ -304,6 +305,16 @@ Idl_lexer::formatError = ( token, message ) ->
 ############################################################################################################
 @IDLX._get_treeshaker_litmus.pattern  = null
 @IDLX.literals_and_types              = @IDLX._get_literals_and_types IDLX_GRAMMAR
+
+
+#===========================================================================================================
+# SILHOUTTES, NGRAMS
+#-----------------------------------------------------------------------------------------------------------
+IDLX = @IDLX
+do ->
+  for module_name in [ './silhouettes', './ngrams', ]
+    for name, value of require module_name
+      IDLX[ name ] = value
 
 
 ############################################################################################################
