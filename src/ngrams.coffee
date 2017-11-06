@@ -21,36 +21,9 @@ pluck = ( x, key, fallback ) ->
   delete x[ key ]
   return R
 
-# #-----------------------------------------------------------------------------------------------------------
-# @get_relational_bigrams_as_tokens = ( formula ) ->
-#   tokens        = @list_tokens formula, { all_brackets: yes, }
-#   R             = []
-#   operators     = []
-#   prvs_token    = null
-#   #.........................................................................................................
-#   for this_token, i in tokens
-#     this_token = assign {}, this_token, { i, }
-#     switch this_token.t
-#       when 'lbracket'
-#         null
-#       when 'rbracket'
-#         operators.pop()
-#         prvs_token.o = last_of operators
-#       when 'binary_operator'
-#         operators.push this_token
-#       when 'unary_operator'
-#         operators.push this_token
-#       when 'component'
-#         this_token.o = last_of operators
-#         if prvs_token?
-#           operator = pluck prvs_token, 'o'
-#           R.push [ operator, prvs_token, this_token, ]
-#         prvs_token = this_token
-#       else
-#         throw new Error "unknown token type #{rpr this_token}"
-#   if R.length > 0
-#     delete ( last_of last_of R ).o
-#   return R
+#-----------------------------------------------------------------------------------------------------------
+@get_relational_bigrams = ( formula ) ->
+  return ( ( token.s for token in bigram ).join '' for bigram in @get_relational_bigrams_as_tokens formula )
 
 #-----------------------------------------------------------------------------------------------------------
 @get_relational_bigrams_as_tokens = ( formula ) ->
@@ -73,7 +46,7 @@ pluck = ( x, key, fallback ) ->
         operators.push this_token
       when 'unary_operator'
         operators.push this_token
-      when 'component'
+      when 'component', 'proxy'
         this_token.o = last_of operators
         if prvs_token?
           operator = pluck prvs_token, 'o'
@@ -84,3 +57,30 @@ pluck = ( x, key, fallback ) ->
   if R.length > 0
     delete ( last_of last_of R ).o
   return R
+
+#-----------------------------------------------------------------------------------------------------------
+@get_relational_bigrams_as_indices = ( formula ) ->
+  return @_indices_from_bigram_tokens @get_relational_bigrams_as_tokens formula
+
+#-----------------------------------------------------------------------------------------------------------
+@_indices_from_bigram_tokens = ( bigrams ) ->
+  return ( ( token.i for token in bigram ) for bigram in bigrams )
+
+#-----------------------------------------------------------------------------------------------------------
+@split_formula = ( formula ) ->
+  return ( token.s for token in @list_tokens formula )
+
+#-----------------------------------------------------------------------------------------------------------
+@bigrams_from_formula_and_indices = ( formula, bigrams_as_indices ) ->
+  return @bigrams_from_parts_and_indices ( @split_formula formula ), bigrams_as_indices
+
+#-----------------------------------------------------------------------------------------------------------
+@bigrams_from_parts_and_indices = ( parts, bigrams_as_indices ) ->
+  return ( ( parts[ idx ] for idx in bigram_indices ) for bigram_indices in bigrams_as_indices )
+
+
+
+
+
+
+
