@@ -42,7 +42,7 @@ TAP.test "(IDLX) silhouettes", ( T ) ->
     ]
   for [ probe, matcher, ] in probes_and_matchers
     result = IDLX.silhouette_from_formula probe
-    # debug JSON.stringify [ probe, result, ]
+    debug JSON.stringify [ probe, result, ]
     if result == matcher then T.ok true
     else T.fail "#{rpr probe}: expected #{rpr matcher}, got #{rpr result}"
   T.end()

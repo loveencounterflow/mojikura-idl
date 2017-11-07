@@ -11,6 +11,7 @@ urge                      = CND.get_logger 'urge',      badge
 info                      = CND.get_logger 'info',      badge
 whisper                   = CND.get_logger 'whisper',   badge
 # { IDL, IDLX, }            = require '../../../mojikura-idl'
+first_of                  = ( x ) -> x[ 0 ]
 last_of                   = ( x ) -> x[ x.length - 1 ]
 assign                    = Object.assign
 
@@ -54,8 +55,17 @@ pluck = ( x, key, fallback ) ->
         prvs_token = this_token
       else
         throw new Error "unknown token type #{rpr this_token}"
+  #.........................................................................................................
   if R.length > 0
     delete ( last_of last_of R ).o
+    ### ⊚⊙⎉⏵⏺⏹⏸ ###
+    [ first_operator, first_element,  _,            ] = first_of R
+    [ last_operator,  _,              last_element, ] = last_of  R
+    start_token = { t: 'start', s: '⊚', i: null, }
+    stop_token  = { t: 'stop',  s: '⊚', i: null, }
+    R.unshift [ first_operator, start_token,  first_element,  ]
+    R.push    [ last_operator,  last_element, stop_token,     ]
+  #.........................................................................................................
   return R
 
 #-----------------------------------------------------------------------------------------------------------
@@ -76,7 +86,7 @@ pluck = ( x, key, fallback ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @bigrams_from_parts_and_indices = ( parts, bigrams_as_indices ) ->
-  return ( ( parts[ idx ] for idx in bigram_indices ) for bigram_indices in bigrams_as_indices )
+  return ( ( ( parts[ idx ] ? '⊚' ) for idx in bigram_indices ) for bigram_indices in bigrams_as_indices )
 
 
 
