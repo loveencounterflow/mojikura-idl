@@ -3,7 +3,7 @@
 ############################################################################################################
 CND                       = require 'cnd'
 rpr                       = CND.rpr
-badge                     = 'KBM/MIXINS/IPC'
+badge                     = 'IDLX/NGRAMS'
 debug                     = CND.get_logger 'debug',     badge
 warn                      = CND.get_logger 'warn',      badge
 help                      = CND.get_logger 'help',      badge
