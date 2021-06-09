@@ -7,9 +7,7 @@
     "build": "nearleyc src/idl.nearley -o src/idl.coffee && nearleyc src/idlx.nearley -o src/idlx.coffee && coffee --map -o lib -c src",
     "railroad": "nearley-railroad src/idl.nearley -o idl.html",
     "doctoc": "doctoc README.md",
-    "pub": "npm run build && npm run doctoc && npm run push && npm version patch && npm publish",
-    "test-travis": "node lib/tests.js",
-    "test": "npm run build && tap lib/tests/*.js"
+    "test": "echo 'see https://github.com/loveencounterflow/hengist/tree/master/dev/mojikura-idl'"
   },
   "repository": {
     "type": "git",
@@ -29,8 +27,5 @@
     "intertype": "^7.6.7",
     "ncr": "^2.0.0",
     "nearley": "^2.9.3"
-  },
-  "devDependencies": {
-    "tap": "^10.3.3"
   }
 }

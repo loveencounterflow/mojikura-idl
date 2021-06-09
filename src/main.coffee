@@ -21,6 +21,10 @@ NEARLEY                   = require 'nearley'
 IDL_GRAMMAR               = require './idl'
 IDLX_GRAMMAR              = require './idlx'
 last_of                   = ( x ) -> x[ x.length - 1 ]
+{ isa
+  type_of
+  validate
+  equals   }              = require './types'
 
 
 #===========================================================================================================
@@ -85,7 +89,7 @@ Idl_lexer::formatError = ( token, message ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @IDL.parse = ( source ) ->
-  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
+  throw new Error "expected a text, got a #{type}" unless ( type = type_of source ) is 'text'
   throw new Error "expected a non-empty text, got an empty text" if source.length is 0
   ### TAINT should we rewind()? finish()? parser? ###
   @_parser = new NEARLEY.Parser IDL_GRAMMAR.ParserRules, IDL_GRAMMAR.ParserStart, { lexer: new Idl_lexer(), }
@@ -104,7 +108,7 @@ Idl_lexer::formatError = ( token, message ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX.parse = ( source ) ->
-  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of source ) is 'text'
+  throw new Error "expected a text, got a #{type}" unless ( type = type_of source ) is 'text'
   throw new Error "expected a non-empty text, got an empty text" if source.length is 0
   ### TAINT should we rewind()? finish()? parser? ###
   @_parser = new NEARLEY.Parser IDLX_GRAMMAR.ParserRules, IDLX_GRAMMAR.ParserStart, { lexer: new Idl_lexer(), }
@@ -157,7 +161,7 @@ Idl_lexer::formatError = ( token, message ) ->
   for rule in grammar.ParserRules
     { name, symbols, } = rule
     for symbol in symbols
-      if CND.isa_pod symbol
+      if isa.object symbol
         symbol = '"' + symbol.literal + '"'
       entry   = R[ symbol ] ?= []
       target  = R[ name   ] ?= []
@@ -187,7 +191,7 @@ Idl_lexer::formatError = ( token, message ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX.list_tokens = ( diagram_or_formula, settings ) =>
-  switch type = CND.type_of diagram_or_formula
+  switch type = type_of diagram_or_formula
     when 'text' then diagram = @IDLX.parse  diagram_or_formula
     when 'list' then diagram =              diagram_or_formula
     else throw new Error "expected a text or a list, got a #{type} in #{rpr diagram_or_formula}"
@@ -220,7 +224,7 @@ Idl_lexer::formatError = ( token, message ) ->
   #.........................................................................................................
   is_first = yes
   for element in diagram
-    switch type = CND.type_of element
+    switch type = type_of element
       when 'text'
         token_type  = @IDLX.type_from_literal element
         # i           = if is_epenthetical
@@ -261,24 +265,24 @@ Idl_lexer::formatError = ( token, message ) ->
 # TREE-SHAKING
 #-----------------------------------------------------------------------------------------------------------
 @IDLX.formula_may_be_nonminimal = ( formula ) =>
-  throw new Error "expected a text, got a #{type}" unless ( type = CND.type_of formula ) is 'text'
+  throw new Error "expected a text, got a #{type}" unless ( type = type_of formula ) is 'text'
   return @IDLX._get_treeshaker_litmus().test formula
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX.minimize_diagram = ( diagram ) =>
-  unless ( type = CND.type_of diagram ) is 'list'
+  unless ( type = type_of diagram ) is 'list'
     throw new Error "expected a list, got a #{type} in #{rpr diagram}"
   return @IDLX._shake_tree JSON.parse JSON.stringify diagram
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX.minimize_formula = ( formula ) =>
-  unless ( type = CND.type_of formula ) is 'text'
+  unless ( type = type_of formula ) is 'text'
     throw new Error "expected a text, got a #{type} in #{rpr formula}"
   return @IDLX.get_formula @IDLX._shake_tree @IDLX.parse formula
 
 #-----------------------------------------------------------------------------------------------------------
 @IDLX._shake_tree = ( diagram ) =>
-  unless ( type = CND.type_of diagram ) is 'list'
+  unless ( type = type_of diagram ) is 'list'
     throw new Error "expected a list, got a #{type}"
   #.........................................................................................................
   operator = diagram[ 0 ]
@@ -292,10 +296,10 @@ Idl_lexer::formatError = ( token, message ) ->
     argument_idx += +1
     break if argument_idx > diagram.length - 1
     sub_tree      = diagram[ argument_idx ]
-    continue unless ( CND.type_of sub_tree ) is 'list'
+    continue unless ( type_of sub_tree ) is 'list'
     sub_operator  = sub_tree[ 0 ]
     #.......................................................................................................
-    # unless ( type = CND.type_of sub_operator_token ) is 'MOJIKURA-IDL/token'
+    # unless ( type = type_of sub_operator_token ) is 'MOJIKURA-IDL/token'
     #   throw new Error "expected a MOJIKURA-IDL/token, got a #{type}"
     # #.......................................................................................................
     # unless ( type = sub_operator_token.t ) is 'operator'

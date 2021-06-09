@@ -12,13 +12,14 @@ do ->
   info                      = CND.get_logger 'info',      badge
   silent                    = no
   silent                    = yes
+  { isa }                   = require './types'
   
   #-----------------------------------------------------------------------------------------------------------
   $unpack = ( label, keys... ) ->
     return ( data, loc, reject ) ->
       R = data
       for key in keys
-        break if CND.isa_text R
+        break if isa.text R
         R = R[ key ]
       unless silent
         R.label = label

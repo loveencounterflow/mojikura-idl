@@ -15,6 +15,10 @@ log                       = CND.get_logger 'plain',     badge
 debug                     = CND.get_logger 'debug',     badge
 info                      = CND.get_logger 'info',      badge
 help                      = CND.get_logger 'help',      badge
+{ isa
+  type_of
+  validate
+  equals   }              = require './types'
 
 # #-----------------------------------------------------------------------------------------------------------
 # O =
@@ -36,7 +40,7 @@ before_after = ( before, after ) ->
 
 #-----------------------------------------------------------------------------------------------------------
 splice_into = ( target, idx ) ->
-  unless ( type = CND.type_of ( sub_data = target[ idx ] ) ) is 'list'
+  unless ( type = type_of ( sub_data = target[ idx ] ) ) is 'list'
     throw new Error "expected a list, got a #{type} as element 2 of #{rpr target}"
   target.splice idx, 1, sub_data...
   return target
@@ -47,7 +51,7 @@ $unpack = ( label, keys... ) ->
     if O.unpack
       R = data
       for key in keys
-        break if CND.isa_text R
+        break if isa.text R
         R = R[ key ]
     else
       R = Object.assign [], data
