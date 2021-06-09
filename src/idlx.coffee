@@ -1,7 +1,7 @@
-# Generated automatically by nearley
+# Generated automatically by nearley, version 2.20.1
 # http://github.com/Hardmath123/nearley
 do ->
-  id = (d)->d[0]
+  id = (d) -> d[0]
 
   
   CND                       = require 'cnd'
