@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [MojiKura Ideographic Description Language](#mojikura-ideographic-description-language)
+  - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -31,19 +32,15 @@
 ["(⿱厶(⿰刃工刃)一(⿰丶丶丶)口)",["⿱","厶",["⿰","刃","工","刃"],"一",["⿰","丶","丶","丶"],"口"]]
 ```
 
-## Configuring PostGreSQL
 
-In `/etc/postgresql/9.5/main/pg_hba.conf`:
+## To Do
 
-```
-# "local" is for Unix domain socket connections only
-# IPv4 local connections:
-# IPv6 local connections:
+* remove dependency on [`ncr`](https://github.com/loveencounterflow/ncr) which is only used in submodule `main`:
+  * `NCR.chrs_from_text()`
+  * `NCR.jzr_as_uchr()`
+  * `NCR.jzr_as_xncr()`
+* move tests to [`hengist`](https://github.com/loveencounterflow/hengist)
+* rewrite tests to use [`guy-test`](https://github.com/loveencounterflow/guy-test)
 
-local   all             all                                     trust
-host    all             all             127.0.0.1/32            trust
-host    all             all             ::1/128                 trust
-```
 
-`/etc/init.d/postgresql restart`
 
