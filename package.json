@@ -25,7 +25,7 @@
   "dependencies": {
     "cnd": "9.2.1",
     "intertype": "^7.6.7",
-    "ncr": "^2.0.0",
+    "ncr": "2.1.0",
     "nearley": "^2.9.3"
   }
 }
