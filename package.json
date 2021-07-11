@@ -1,6 +1,6 @@
 {
   "name": "mojikura-idl",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "文字倉字形描述語言 MojiKura Ideographic Description Language",
   "main": "lib/main.js",
   "scripts": {
