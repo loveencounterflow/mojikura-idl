@@ -30,7 +30,7 @@ last_of                   = ( x ) -> x[ x.length - 1 ]
 #===========================================================================================================
 # COMPATIBILITY WITH MKNCR
 #-----------------------------------------------------------------------------------------------------------
-NCR = Object.create require 'ncr'
+@_NCR = NCR = Object.create require 'ncr'
 NCR._input_default = 'xncr'
 NCR.jzr_as_uchr = ( glyph ) ->
   # return @as_uchr glyph, input: 'xncr' if ( @as_csg glyph, input: 'xncr' ) is 'jzr'
