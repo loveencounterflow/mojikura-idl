@@ -345,11 +345,16 @@ Idl_lexer::formatError = ( token, message ) ->
 #===========================================================================================================
 # SILHOUTTES, NGRAMS
 #-----------------------------------------------------------------------------------------------------------
-IDLX = @IDLX
+### NOTE: do not use parametric `require()` as this may throw off browserify (and rightly so) ###
+IDLX        = @IDLX
+SILHOUETTES = require './silhouettes'
+NGRAMS      = require './ngrams'
 do ->
-  for module_name in [ './silhouettes', './ngrams', ]
-    for name, value of require module_name
-      IDLX[ name ] = value
+  for name, value of SILHOUETTES
+    IDLX[ name ] = value
+  for name, value of NGRAMS
+    IDLX[ name ] = value
+  return null
 
 
 ############################################################################################################
